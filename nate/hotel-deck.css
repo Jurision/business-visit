@@ -1,0 +1,111 @@
+/* Mobile-only stacked hotel carousel. Desktop/tablet layouts stay untouched. */
+@media (max-width: 639px) {
+  #hotels {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    overflow-x: auto;
+    overflow-y: visible;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 9%;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    padding: 12px 9% 30px;
+    margin-left: -1.1rem;
+    margin-right: -1.1rem;
+    width: calc(100% + 2.2rem);
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    scrollbar-width: none;
+  }
+
+  #hotels::-webkit-scrollbar {
+    display: none;
+  }
+
+  #hotels .hcard {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 84%;
+    min-width: 0;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    overflow: hidden;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: 0 12px 28px -22px rgba(31, 43, 61, .5);
+    opacity: .7;
+    transform: translateY(16px) scale(.9);
+    transform-origin: center center;
+    transition:
+      transform .28s cubic-bezier(.2, .8, .3, 1),
+      opacity .28s ease,
+      box-shadow .28s ease;
+  }
+
+  #hotels .hcard + .hcard {
+    margin-left: -8%;
+  }
+
+  #hotels .hcard.focus {
+    z-index: 4;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    box-shadow:
+      0 24px 46px -26px rgba(31, 43, 61, .72),
+      0 4px 10px rgba(31, 43, 61, .08);
+  }
+
+  /* A side card is for navigation; tap it to bring it to the centre first. */
+  #hotels .hcard:not(.focus) .row {
+    pointer-events: none;
+  }
+
+  #hotels .hcard .hpic {
+    height: 205px;
+  }
+
+  #hotels .hcard .row {
+    min-height: 0;
+    padding: 1rem 1rem 1.05rem;
+    background: var(--card);
+  }
+
+  #hotels .hcard.focus .row.on {
+    background: var(--soft);
+  }
+
+  #hotels .hcard .n1 {
+    font-size: .98rem;
+  }
+
+  #hotels .hcard .n3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 380px) {
+  #hotels .hcard {
+    flex-basis: 86%;
+  }
+
+  #hotels .hcard + .hcard {
+    margin-left: -10%;
+  }
+
+  #hotels .hcard .hpic {
+    height: 190px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #hotels .hcard {
+    transition: none !important;
+  }
+}
