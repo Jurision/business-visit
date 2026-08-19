@@ -353,7 +353,7 @@ ul.ck input:checked + label .w{text-decoration:none}
   .hero .wx .t{font-size:2.6rem}
   .hero .wx .wk{flex:0 0 auto;text-align:right}
   .hero .facts{grid-column:1;grid-row:5;margin-top:2rem;max-width:none;gap:2rem}
-  #hotels{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;align-items:start;background:transparent;border:0;box-shadow:none;overflow:visible}
+  #hotels{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);grid-template-columns:none;gap:1rem;align-items:start;background:transparent;border:0;box-shadow:none;overflow:visible}
   #hotels .hcard{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);background:var(--card)}
   #hotels .hpic{height:150px}
   #hotels .row{flex:0 0 auto;flex-direction:column;align-items:flex-start;gap:.6rem;padding:1.15rem 1.2rem}
@@ -378,7 +378,7 @@ ul.ck input:checked + label .w{text-decoration:none}
   .wrap{max-width:720px}
   #plan{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem;align-items:start}
   .dcol{margin-bottom:0}
-  #hotels{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;background:transparent;border:0;box-shadow:none;overflow:visible}
+  #hotels{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);grid-template-columns:none;gap:.7rem;background:transparent;border:0;box-shadow:none;overflow:visible}
   #hotels .hcard{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);background:var(--card)}
 }
 
@@ -389,15 +389,77 @@ ul.ck input:checked + label .w{text-decoration:none}
 .qh:hover .qcv{color:var(--ink)}
 .q[data-open="0"] .qcv{transform:rotate(0deg)}
 .q[data-open="0"] .qh{margin-bottom:0}
-.qwrap{display:grid;grid-template-rows:1fr;transition:grid-template-rows .34s cubic-bezier(.4,0,.2,1),opacity .24s ease .06s}
+.qwrap{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:1fr;transition:grid-template-rows .34s cubic-bezier(.4,0,.2,1),opacity .24s ease .06s}
 .q[data-open="0"] .qwrap{grid-template-rows:0fr;opacity:0;transition:grid-template-rows .34s cubic-bezier(.4,0,.2,1),opacity .16s ease}
-.qbody{min-height:0;overflow:hidden}
+.qbody{min-height:0;min-width:0;overflow:hidden}
 .q.settled[data-open="1"] .qbody{overflow:visible}
 .qd{background:var(--card);border:1px solid var(--line);border-radius:var(--r);margin-top:.55rem;overflow:hidden}
 .qhd{padding:.72rem .85rem;font-size:.87rem;font-weight:800;align-items:center;gap:.5rem;margin-bottom:0;border-bottom:1px solid transparent;transition:border-color .3s}
 .qd[data-open="1"] .qhd{border-bottom-color:var(--line)}
 .qd .qcv{font-size:.8rem}
 @media (prefers-reduced-motion:reduce){.qh,.qcv,.qwrap{transition:none}}
+
+/* hotel cards: one row, level bottoms */
+@media (min-width:640px){
+ #hotels{align-items:stretch}
+ #hotels .hcard{display:flex;flex-direction:column}
+ #hotels .hcard .row{flex:1;align-items:flex-start}
+ #hotels .hcard .g{display:flex;flex-direction:column;flex:1}
+ #hotels .hcard .book{margin-top:auto}
+ #hotels .hcard .planning{margin-top:.6rem}
+}
+
+/* Amap hand-off */
+.amap{display:inline-flex;align-items:center;gap:.25rem;margin-top:.45rem;
+  align-self:flex-start;font-size:.72rem;font-weight:800;letter-spacing:.04em;
+  color:var(--gold);text-decoration:none;border:1px solid var(--line);
+  border-radius:999px;padding:.3rem .62rem;line-height:1;background:var(--card);
+  transition:border-color .18s,background .18s}
+.amap:hover{border-color:var(--gold);background:var(--soft)}
+.row.static > .g{display:flex;flex-direction:column;align-items:flex-start}
+
+/* tucked map tab: light body, gold edge, and it says what it is */
+.mapdock[data-state="peek"]{width:34px!important;height:120px!important;
+  background:var(--card);border-color:var(--line);
+  border-left:4px solid var(--gold)!important;border-radius:12px 0 0 12px;
+  box-shadow:-12px 0 26px -12px rgba(31,43,61,.45),0 2px 8px rgba(31,43,61,.12)}
+.mapdock[data-state="peek"].onleft{border-left:1px solid var(--line)!important;
+  border-right:4px solid var(--gold)!important;border-radius:0 12px 12px 0}
+.mapdock[data-state="peek"] .mapbar{background:transparent;flex-direction:column;
+  justify-content:center;align-items:center;gap:.3rem;padding:0;height:100%}
+.mapdock[data-state="peek"] .mapx{color:var(--gold);font-size:1rem;font-weight:800;
+  padding:0;min-width:0;line-height:1}
+.mapdock[data-state="peek"] .mapttl{display:block;writing-mode:vertical-rl;
+  transform:rotate(180deg);font-size:.56rem;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--gold);white-space:nowrap;margin:0}
+@media (max-width:640px){
+  .mapdock[data-state="peek"]{border-radius:12px 0 0 12px!important}
+}
+
+/* the tucked tab belongs to the screen edge, not to a stale coordinate */
+.mapdock[data-state="peek"]{right:0!important;left:auto!important}
+.mapdock[data-state="peek"].onleft{left:0!important;right:auto!important}
+
+/* tucked tab: reads as a page edge tab, not a floating chip.
+   no outline, square on the side that meets the screen edge,
+   the gold stripe is the only hard edge and it faces the content. */
+.mapdock[data-state="peek"]{
+  width:38px!important;height:132px!important;
+  background:var(--card)!important;
+  border-top:0!important;border-right:0!important;border-bottom:0!important;
+  border-left:4px solid var(--gold)!important;
+  border-radius:14px 0 0 14px!important;
+  box-shadow:-14px 0 30px -14px rgba(31,43,61,.42)!important}
+.mapdock[data-state="peek"].onleft{
+  border-left:0!important;border-right:4px solid var(--gold)!important;
+  border-radius:0 14px 14px 0!important;
+  box-shadow:14px 0 30px -14px rgba(31,43,61,.42)!important}
+.mapdock[data-state="peek"] .mapbar{gap:.42rem}
+.mapdock[data-state="peek"] .mapttl{font-size:.62rem;letter-spacing:.22em}
+.mapdock[data-state="peek"] .mapx{font-size:.8rem;opacity:.75}
+@media (max-width:640px){
+  .mapdock[data-state="peek"]{border-radius:14px 0 0 14px!important}
+}
 </style>
 </head>
 <body>
@@ -464,24 +526,26 @@ ul.ck input:checked + label .w{text-decoration:none}
 (function(){
 var P={
  hotel:{n:'Selected hotel',zh:'酒店',e:'🏨',xy:[186,190],km:[0,-9],hub:1},
- air:{n:'Airport',zh:'白云机场',e:'✈️',xy:[238,44],km:[2,-28]},
+ air:{n:'Airport',zh:'白云机场',e:'✈️',xy:[238,44],km:[2,-28],nav:{q:'广州白云国际机场',ct:'广州'}},
  us:{n:'Our factory',zh:'我们工厂 · 龙归',e:'🏢',xy:[146,112],km:[-4,-17]},
- hansen:{n:'Hansen',zh:'汉森机械',e:'⚙️',xy:[54,138],km:[-9,-24],est:1},
- zhigong:{n:'Zhigong',zh:'智工智能',e:'🛠️',xy:[186,132],km:[-6,-21],est:1},
- hongtai:{n:'Hongtai Glass',zh:'鸿泰玻璃',e:'🫙',xy:[280,138],km:[-5,-19],est:1},
- bright:{n:'Bright Glassware',zh:'明亮玻璃',e:'🫙',xy:[236,339],km:[95,55]},
- guyu:{rail:1,n:'Guyu Tubes',zh:'谷雨软管 · 汕头',e:'🧴',xy:[100,339],km:[345,-15],est:1}
+ hansen:{n:'Hansen',zh:'汉森机械',e:'⚙️',xy:[54,138],km:[-9,-24],est:1,nav:{q:'广州汉森机械',ct:'广州'}},
+ zhigong:{n:'Zhigong',zh:'智工智能',e:'🛠️',xy:[186,132],km:[-6,-21],est:1,nav:{q:'广州智工智能设备有限公司',ct:'广州'}},
+ hongtai:{n:'Hongtai Glass',zh:'鸿泰玻璃',e:'🫙',xy:[280,138],km:[-5,-19],est:1,nav:{q:'广州鸿泰玻璃工艺品',ct:'广州'}},
+ bright:{n:'Bright Glassware',zh:'明亮玻璃',e:'🫙',xy:[236,339],km:[95,55],nav:{q:'深圳明亮玻璃',ct:'深圳'}},
+  guyu:{rail:1,n:'Guyu Tubes',zh:'谷雨软管 · 汕头',e:'🧴',xy:[100,339],km:[345,-15],est:1,nav:{q:'汕头市谷雨软管包装',ct:'汕头'}},
+  city:{n:'Pearl River New Town',zh:'珠江新城',e:'🌃',xy:[150,272],km:[0,0],est:1}
 };
-var ORDER=['air','hansen','zhigong','us','hongtai','bright','guyu','hotel'];
+var ORDER=['air','hansen','zhigong','us','hongtai','bright','guyu','city','hotel'];
 var LAY={
- tall:{vb:'0 0 340 400',zones:[{r:[58,16,254,54],t:'HUADU & THE AIRPORT — north',tp:[70,34],o:.5},{r:[22,90,296,152],t:'BAIYUN DISTRICT — the factories',tp:[34,108],o:.34},{r:[58,258,224,34],t:'CITY CENTRE & TIANHE — south',tp:[70,279],o:.34},{r:[22,312,296,86],t:'FURTHER AFIELD',tp:[34,326],o:.42}],river:{d:'M6,314 C70,306 130,322 190,316 C246,310 296,326 334,320',t:[12,309]},north:[30,40],pos:{air:[238,42],us:[92,132],zhigong:[186,132],hongtai:[288,132],hansen:[92,212],hotel:[212,212],bright:[100,373],guyu:[240,373]},below:{bright:1,guyu:1}},
- wide:{vb:'0 0 700 480',zones:[{r:[206,18,330,74],t:'HUADU & THE AIRPORT — north',tp:[220,42],o:.5},{r:[26,116,506,216],t:'BAIYUN DISTRICT — the factories',tp:[40,140],o:.34},{r:[146,368,306,42],t:'CITY CENTRE & TIANHE — south',tp:[160,394],o:.34},{r:[534,196,156,214],t:'FURTHER AFIELD',tp:[546,220],o:.42}],river:{d:'M6,436 C120,428 240,444 360,438 C470,432 590,448 694,442',t:[12,431]},north:[54,52],pos:{air:[372,54],us:[142,180],zhigong:[286,180],hongtai:[430,180],hansen:[142,286],hotel:[300,286],bright:[600,276],guyu:[600,354]},below:{bright:1,guyu:1}}
+ tall:{vb:'0 0 340 400',zones:[{r:[58,16,254,54],t:'HUADU & THE AIRPORT — north',tp:[70,34],o:.5},{r:[22,90,296,152],t:'BAIYUN DISTRICT — the factories',tp:[34,108],o:.34},{r:[58,258,224,34],t:'CITY CENTRE & TIANHE — south',tp:[70,279],o:.34},{r:[22,312,296,86],t:'FURTHER AFIELD',tp:[34,326],o:.42}],river:{d:'M6,314 C70,306 130,322 190,316 C246,310 296,326 334,320',t:[12,309]},north:[30,40],pos:{air:[238,42],us:[92,132],zhigong:[186,132],hongtai:[288,132],hansen:[92,212],hotel:[212,212],bright:[100,373],guyu:[240,373],city:[150,272]},below:{bright:1,guyu:1}},
+ wide:{vb:'0 0 700 480',zones:[{r:[206,18,330,74],t:'HUADU & THE AIRPORT — north',tp:[220,42],o:.5},{r:[26,116,506,216],t:'BAIYUN DISTRICT — the factories',tp:[40,140],o:.34},{r:[146,368,306,42],t:'CITY CENTRE & TIANHE — south',tp:[160,394],o:.34},{r:[534,196,156,214],t:'FURTHER AFIELD',tp:[546,220],o:.42}],river:{d:'M6,436 C120,428 240,444 360,438 C470,432 590,448 694,442',t:[12,431]},north:[54,52],pos:{air:[372,54],us:[142,180],zhigong:[286,180],hongtai:[430,180],hansen:[142,286],hotel:[300,286],bright:[600,276],guyu:[600,354],city:[300,385]},below:{bright:1,guyu:1}}
 };
 function lay(){return document.getElementById('mapdock').dataset.state==='max'?LAY.wide:LAY.tall;}
-var SPOKES=['air','hansen','zhigong','us','hongtai','bright','guyu'];
+var SPOKES=['air','hansen','zhigong','us','hongtai','bright','guyu','city'];
 function dist(a,b){var A=P[a].km,B=P[b].km;return Math.round(Math.sqrt(Math.pow(A[0]-B[0],2)+Math.pow(A[1]-B[1],2))*1.2);}
 function drive(km){var sp=km<=15?28:(km<=40?45:70);return Math.max(5,Math.round(km/sp*60)+5);}
 function fmt(m){return m<60?m+' min':(Math.floor(m/60)+'h '+(m%60?(m%60)+'m':'')).trim();}
+function cityLine(p){var A=P.city.km,B=p.km,d=Math.round(Math.sqrt(Math.pow(A[0]-B[0],2)+Math.pow(A[1]-B[1],2))*1.2);return '≈ '+d+' km · '+fmt(drive(d))+' to Pearl River New Town';}
 var CATS=[{k:'pack',t:'Packaging',s:'boxes, card stock and tubes'},{k:'glass',t:'Glassware',s:'candle jars and diffuser bottles'},{k:'mach',t:'Candle pouring &amp; liquid filling machinery',s:''}];
 var VISITS=[
  {k:'us',cat:'pack',n:'Our factory — showroom &amp; press',at:'us',d:.5,tag:'host visit',s:'Review card stocks and finishes'},
@@ -494,7 +558,8 @@ var VISITS=[
 var PROPS=[
  {k:'marriott',n:'Guangzhou Marriott Hotel Baiyun',zh:'广州白云万豪酒店',p:'A$145–190',slug:'guangzhou-marriott-baiyun',pin:'Marriott Baiyun',pinzh:'白云万豪',km:[-1,-8],xy:[186,190],w:'Direct access to Baiyun Culture Square Metro Station, with convenient connections to the airport.',tag:'Recommended'},
  {k:'hilton',n:'Hilton Guangzhou Baiyun',zh:'希尔顿广州白云酒店',p:'A$145–190',slug:'hilton-guangzhou-baiyun',pin:'Hilton Baiyun',pinzh:'白云希尔顿',km:[-2,-9],xy:[176,196],w:'Located in Baiyun New Town, with an indoor pool and multiple on-site dining options.'},
- {k:'holidayinn',n:'Holiday Inn Guangzhou South Lake',zh:'广州南湖假日酒店',p:'A$105–145',slug:'holiday-inn-guangzhou-south-lake',pin:'Holiday Inn',pinzh:'南湖假日',km:[4,-11],xy:[216,184],w:'A quieter option and typically the most economical of the three.'}
+ {k:'holidayinn',n:'Holiday Inn Guangzhou South Lake',zh:'广州南湖假日酒店',p:'A$105–145',slug:'holiday-inn-guangzhou-south-lake',pin:'Holiday Inn',pinzh:'南湖假日',km:[4,-11],xy:[216,184],w:'A quieter option and typically the most economical of the three.'},
+ {k:'savhe',n:'SAVHE Hotel Guangzhou Financial City',zh:'广州金融城萨和酒店',p:'',slug:'canton-fair-international-financial-center-savhe',pin:'SAVHE Financial City',pinzh:'金融城萨和',km:[6,1],xy:[215,275],pt:[215,275],pw:[370,388],w:'In Tianhe Financial City, east of the CBD — further from the Baiyun suppliers, so daily travel is longer.'}
 ];
 var CI='2026-08-31',CO='2026-09-05';
 function bk(slug){return 'https://www.booking.com/hotel/cn/'+slug+'.en-gb.html?checkin='+CI+'&checkout='+CO+'&group_adults=2&no_rooms=2&group_children=0';}
@@ -503,7 +568,7 @@ function save(){try{localStorage.setItem(K,JSON.stringify(S));}catch(e){}}
 var toast=document.getElementById('toast'),tmo;
 function say(m){toast.textContent=m;toast.classList.add('show');clearTimeout(tmo);tmo=setTimeout(function(){toast.classList.remove('show')},1700);}
 function picked(){return VISITS.filter(function(v){return S[v.k];});}
-function syncHotel(){var h=PROPS.filter(function(x){return x.k===S.hotel;})[0];if(h){P.hotel.n=h.pin;P.hotel.zh=h.pinzh;P.hotel.km=h.km;P.hotel.xy=h.xy;}else{P.hotel.n='Selected hotel';P.hotel.zh='酒店 · 白云';P.hotel.km=[0,-9];P.hotel.xy=[186,190];}}
+function syncHotel(){var h=PROPS.filter(function(x){return x.k===S.hotel;})[0];if(h){P.hotel.n=h.pin;P.hotel.zh=h.pinzh;P.hotel.km=h.km;P.hotel.xy=h.xy;LAY.tall.pos.hotel=h.pt||[212,212];LAY.wide.pos.hotel=h.pw||[300,286];}else{P.hotel.n='Selected hotel';P.hotel.zh='酒店 · 白云';P.hotel.km=[0,-9];P.hotel.xy=[186,190];LAY.tall.pos.hotel=[212,212];LAY.wide.pos.hotel=[300,286];}}
 var A=null,B=null;
 function halo(x,y,s,t,w,c,anch,cls){return '<text class="'+(cls||'')+'" x="'+x+'" y="'+y+'" text-anchor="'+(anch||'middle')+'" font-size="'+s+'" font-family="sans-serif" font-weight="'+w+'" fill="'+c+'" stroke="var(--land)" stroke-width="3" paint-order="stroke">'+t+'</text>';}
 function drawBg(){var L=lay(),m=document.getElementById('map'),g='';m.setAttribute('viewBox',L.vb);L.zones.forEach(function(z){g+='<rect x="'+z.r[0]+'" y="'+z.r[1]+'" width="'+z.r[2]+'" height="'+z.r[3]+'" rx="12" fill="var(--oat)" opacity="'+z.o+'"/><text class="bandlbl" x="'+z.tp[0]+'" y="'+z.tp[1]+'" font-size="7.6" font-family="sans-serif" letter-spacing="1.5" font-weight="800" fill="var(--faint)">'+z.t+'</text>';});g+='<path d="'+L.river.d+'" fill="none" stroke="var(--water)" stroke-width="7" stroke-linecap="round"/><text class="bandlbl" x="'+L.river.t[0]+'" y="'+L.river.t[1]+'" font-size="7" font-family="sans-serif" letter-spacing="1" font-weight="700" fill="var(--faint)">PEARL RIVER</text>';var n=L.north;g+='<g class="bandlbl"><circle cx="'+n[0]+'" cy="'+n[1]+'" r="12.5" fill="var(--card)" stroke="var(--line)" stroke-width="1"/><path d="M'+n[0]+','+(n[1]-8.5)+' l3.8,9.5 l-3.8,-2.5 l-3.8,2.5 Z" fill="var(--ink)"/><text x="'+n[0]+'" y="'+(n[1]+11.5)+'" text-anchor="middle" font-size="6.4" font-weight="800" font-family="sans-serif" fill="var(--faint)">N</text></g>';document.getElementById('mbg').innerHTML=g;}
@@ -516,20 +581,22 @@ var dock=document.getElementById('mapdock'),mapBtn=document.getElementById('mapT
 function dockSave(){try{localStorage.setItem(DK,JSON.stringify({st:dock.dataset.state,side:dock.classList.contains('onleft')?'L':'R',moved:dock.classList.contains('moved'),l:dock.style.left,t:dock.style.top}));}catch(e){}}
 var maxBtn=document.getElementById('mapMax'),tuckBtn=document.getElementById('mapTuck');
 function setDock(st){dock.dataset.state=st;if(st==='peek')mapBtn.textContent=dock.classList.contains('onleft')?'›':'‹';else if(st==='mini')mapBtn.textContent='⤢';else mapBtn.textContent='−';maxBtn.textContent=st==='max'?'⤡':'⤢';tuckBtn.textContent=dock.classList.contains('onleft')?'«':'»';maxBtn.setAttribute('aria-label',st==='max'?'restore map':'maximise map');mapBtn.setAttribute('aria-label',st==='mini'?'expand map':'shrink map');mapAll();dockSave();}
-function clampDock(){if(!dock.classList.contains('moved')||dock.dataset.state==='peek')return;var r=dock.getBoundingClientRect(),m=8,t=Math.min(Math.max(m,r.top),innerHeight-r.height-m);if(!phone()){dock.style.left=Math.min(Math.max(m,r.left),innerWidth-r.width-m)+'px';}dock.style.top=t+'px';dockSave();}
+function clampDock(){if(!dock.classList.contains('moved'))return;if(dock.dataset.state==='peek'){var pr=dock.getBoundingClientRect();dock.style.left='';dock.style.top=Math.min(Math.max(8,pr.top),Math.max(8,innerHeight-pr.height-8))+'px';return;}var r=dock.getBoundingClientRect(),m=8,t=Math.min(Math.max(m,r.top),innerHeight-r.height-m);if(!phone()){dock.style.left=Math.min(Math.max(m,r.left),innerWidth-r.width-m)+'px';}dock.style.top=t+'px';dockSave();}
 window.addEventListener('resize',clampDock);
-(function(){var v=null;try{v=JSON.parse(localStorage.getItem(DK)||'null');}catch(e){}if(v&&typeof v==='object'){if(v.moved&&v.l){dock.classList.add('moved');if(!phone())dock.style.left=v.l;dock.style.top=v.t;}if(v.side==='L'&&!phone())dock.classList.add('onleft');setDock(v.st||'mini');}else setDock('mini');setTimeout(clampDock,50);})();
+(function(){var v=null;try{v=JSON.parse(localStorage.getItem(DK)||'null');}catch(e){}if(v&&typeof v==='object'){if(v.moved&&v.l){dock.classList.add('moved');if(!phone())dock.style.left=v.l;dock.style.top=v.t;}if(v.side==='L'&&!phone())dock.classList.add('onleft');setDock(v.st||'mini');}else setDock(innerWidth>640?'open':'mini');setTimeout(clampDock,50);})();
 function unpeek(){if(phone()){dock.style.left='';dock.classList.remove('onleft');}else{var w=Math.min(400,innerWidth-22);dock.style.left=dock.classList.contains('onleft')?'8px':Math.max(8,innerWidth-w-8)+'px';}setDock('open');setTimeout(clampDock,340);}
 var lastY=window.scrollY;window.addEventListener('scroll',function(){if(Math.abs(window.scrollY-lastY)<6)return;lastY=window.scrollY;if(dock.dataset.state==='mini'&&!DD)tuckAway();},{passive:true});
-function tuckAway(){var r=dock.getBoundingClientRect(),left=(!phone())&&((r.left+r.width/2)<innerWidth/2);dock.classList.add('moved');dock.classList.toggle('onleft',left);if(phone())dock.style.left='';else dock.style.left=left?'0px':(innerWidth-30)+'px';dock.style.top=Math.min(Math.max(8,r.top),innerHeight-104)+'px';setDock('peek');}
+function tuckAway(){var r=dock.getBoundingClientRect(),left=(!phone())&&((r.left+r.width/2)<innerWidth/2);dock.classList.add('moved');dock.classList.toggle('onleft',left);dock.style.left='';dock.style.top=Math.min(Math.max(8,r.top),innerHeight-104)+'px';setDock('peek');}
 function phone(){return innerWidth<=640;}
 var DD=null,dragJustEnded=false,dockArm=null;
 dock.addEventListener('pointerdown',function(e){dragJustEnded=false;var bar=e.target.closest('.mapbar');if(!bar||e.target.closest('.mapx')||dock.dataset.state==='peek'||dock.dataset.state==='max')return;var r=dock.getBoundingClientRect(),touch=(e.pointerType==='touch'),cand={dx:e.clientX-r.left,dy:e.clientY-r.top,sx:e.clientX,sy:e.clientY,w:r.width,h:r.height,moved:false,armed:!touch};function arm(){cand.armed=true;dock.classList.add('armed');try{dock.setPointerCapture(e.pointerId);}catch(err){}if(navigator.vibrate)try{navigator.vibrate(8);}catch(err){}}if(touch)dockArm=setTimeout(arm,260);function start(){DD=cand;dock.classList.add('moved','dragging');if(!phone())dock.style.left=r.left+'px';dock.style.top=r.top+'px';}function move(ev){var dx=ev.clientX-cand.sx,dy=ev.clientY-cand.sy;if(!cand.armed){if(Math.abs(dx)+Math.abs(dy)>10)done();return;}if(!DD){if(Math.abs(dx)+Math.abs(dy)<4)return;start();}ev.preventDefault();dmove(ev);}function done(){clearTimeout(dockArm);dock.classList.remove('armed');document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',end);document.removeEventListener('pointercancel',end);}function end(){if(DD)dup();done();}document.addEventListener('pointermove',move,{passive:false});document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);});
 function dmove(e){if(!DD)return;e.preventDefault();DD.moved=true;if(!phone())dock.style.left=(e.clientX-DD.dx)+'px';dock.style.top=(e.clientY-DD.dy)+'px';}
-function dup(){if(!DD)return;if(DD.moved){dragJustEnded=true;setTimeout(function(){dragJustEnded=false;},300);}dock.classList.remove('dragging','armed');var r=dock.getBoundingClientRect();if(r.left+r.width*.5<0){dock.classList.add('onleft');dock.style.left='0px';dock.style.top=Math.min(Math.max(8,r.top),innerHeight-96)+'px';setDock('peek');}else if(r.right-r.width*.5>innerWidth){dock.classList.remove('onleft');dock.style.left=(innerWidth-26)+'px';dock.style.top=Math.min(Math.max(8,r.top),innerHeight-96)+'px';setDock('peek');}else clampDock();DD=null;}
+function dup(){if(!DD)return;if(DD.moved){dragJustEnded=true;setTimeout(function(){dragJustEnded=false;},300);}dock.classList.remove('dragging','armed');var r=dock.getBoundingClientRect();if(r.left+r.width*.5<0){dock.classList.add('onleft');dock.style.left='';dock.style.top=Math.min(Math.max(8,r.top),innerHeight-96)+'px';setDock('peek');}else if(r.right-r.width*.5>innerWidth){dock.classList.remove('onleft');dock.style.left='';dock.style.top=Math.min(Math.max(8,r.top),innerHeight-96)+'px';setDock('peek');}else clampDock();DD=null;}
 dock.addEventListener('click',function(e){if(DD||dragJustEnded)return;if(dock.dataset.state==='peek'){unpeek();return;}if(e.target.closest('#mapTuck')){tuckAway();return;}if(e.target.closest('#mapMax')){setDock(dock.dataset.state==='max'?'open':'max');setTimeout(clampDock,340);return;}if(e.target.closest('#mapToggle')){setDock(dock.dataset.state==='mini'?'open':'mini');setTimeout(clampDock,340);return;}if(dock.dataset.state==='mini'){setDock('open');setTimeout(clampDock,340);}});
 document.getElementById('map').addEventListener('click',function(e){var g=e.target.closest('.pinhit');if(!g)return;var k=g.dataset.p;if(A&&B){A=k;B=null;}else if(!A){A=k;}else if(k===A){A=null;}else{B=k;}mapAll();});
-function drawVisits(){var total=VISITS.reduce(function(s,v){return s+v.d;},0),html='';CATS.forEach(function(c){var items=VISITS.filter(function(v){return v.cat===c.k;});if(!items.length)return;html+='<div class="cathead"><span class="catt">'+c.t+'</span>'+(c.s?'<span class="cats">'+c.s+'</span>':'')+'</div>';html+=items.map(function(v){var far=(!v.at)?'':(P[v.at].rail?'day trip by rail':fmt(drive(dist('hotel',v.at)))+' from hotel');return '<div class="row static"><span class="dot">'+(v.at?P[v.at].e:'🚄')+'</span><span class="g"><span class="n1">'+v.n+(v.tag?'<span class="pill g">'+v.tag+'</span>':'')+'</span><span class="n2">'+v.s+'</span><span class="n2 leg">'+far+'</span></span><span class="rt">'+(v.d===1?'1 day':'½ day')+'</span></div>';}).join('');});document.getElementById('visits').innerHTML=html+'<div class="tally"><span>'+VISITS.length+' places · 3 categories</span><b>'+total+' of 4½ working days</b></div>';}
+function amapURL(k){var p=P[k];if(!p||!p.nav)return '';var n=p.nav;if(n.ll)return 'https://uri.amap.com/marker?position='+n.ll+'&name='+encodeURIComponent(n.a||n.q)+'&coordinate=gaode&callnative=1';return 'https://uri.amap.com/search?keyword='+encodeURIComponent(n.a||n.q)+'&city='+encodeURIComponent(n.ct||'')+'&callnative=1';}
+function amapLink(k){var u=amapURL(k);if(!u)return '';var p=P[k],pin=!!p.nav.ll;return '<a class="amap" href="'+u+'" target="_blank" rel="noopener">'+(pin?'Navigate in Amap':'Find in Amap')+' ↗</a>';}
+function drawVisits(){var total=VISITS.reduce(function(s,v){return s+v.d;},0),html='';CATS.forEach(function(c){var items=VISITS.filter(function(v){return v.cat===c.k;});if(!items.length)return;html+='<div class="cathead"><span class="catt">'+c.t+'</span>'+(c.s?'<span class="cats">'+c.s+'</span>':'')+'</div>';html+=items.map(function(v){var far=(!v.at)?'':(P[v.at].rail?'day trip by rail':fmt(drive(dist('hotel',v.at)))+' from hotel');return '<div class="row static"><span class="dot">'+(v.at?P[v.at].e:'🚄')+'</span><span class="g"><span class="n1">'+v.n+(v.tag?'<span class="pill g">'+v.tag+'</span>':'')+'</span><span class="n2">'+v.s+'</span><span class="n2 leg">'+far+'</span>'+(v.at?amapLink(v.at):'')+'</span><span class="rt">'+(v.d===1?'1 day':'½ day')+'</span></div>';}).join('');});document.getElementById('visits').innerHTML=html+'<div class="tally"><span>'+VISITS.length+' places · 3 categories</span><b>'+total+' of 4½ working days</b></div>';}
 function hotelDeckMobile(){return window.matchMedia&&window.matchMedia('(max-width:639px)').matches;}
 var deckTrack=null,deckIdx=1,deckX=0,deckDragJust=false,deckSupTimer=null,deckLoopTimer=null,deckCount=0,deckAnimating=false;
 function deckMotion(){return !(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);}
@@ -544,7 +611,7 @@ function deckDrag(e){if(!hotelDeckMobile()||!deckTrack||deckAnimating)return;if(
 document.addEventListener('click',function(e){if(deckDragJust){e.preventDefault();e.stopPropagation();}},true);
 function setupHotelDeck(){var deck=document.getElementById('hotels');if(!deck)return;if(!hotelDeckMobile()){deck.querySelectorAll('.hcard').forEach(function(c){c.classList.remove('focus');});deckTrack=null;deckCount=0;deckAnimating=false;return;}deckTrack=deck.querySelector('.hdeck');if(!deckTrack)return;deckCount=PROPS.length;if(!deck._hdBound){deck._hdBound=true;deck.addEventListener('pointerdown',deckDrag);deck.addEventListener('click',function(e){if(deckDragJust){e.preventDefault();e.stopPropagation();return;}if(!hotelDeckMobile()||deckAnimating)return;var card=e.target.closest('.hcard');if(!card||card.classList.contains('focus'))return;e.preventDefault();e.stopPropagation();var cs=deckTrack.children,i=0;for(;i<cs.length;i++)if(cs[i]===card)break;if(i===deckIdx-1)deckPrev();else if(i===deckIdx+1)deckNext();else if(i<deckIdx)deckPrev();else if(i>deckIdx)deckNext();});window.addEventListener('resize',function(){if(hotelDeckMobile()&&deckTrack)deckPos(deckIdx,false);});}if(!deckTrack._loopBound){deckTrack._loopBound=true;deckTrack.addEventListener('transitionend',function(e){if(e.propertyName==='transform')deckNormalize();});}var sel=S.hotel||'',real=0;PROPS.forEach(function(p,i){if(sel&&p.k===sel)real=i;});deckIdx=real+1;deckPos(deckIdx,false);deckFocus();deckAnimating=false;}
 var hq=window.matchMedia('(max-width:639px)'),hqcb=function(){drawHotels();setupHotelDeck();};if(hq.addEventListener)hq.addEventListener('change',hqcb);else if(hq.addListener)hq.addListener(hqcb);
-function hotelCard(p,i,clone){var rowAttrs=clone?' data-clone="true"':' data-t="hotel" data-k="'+p.k+'"',tab=clone?' tabindex="-1"':'';return '<div class="hcard'+(clone?' clone':'')+'" data-real="'+i+'"'+(clone?' aria-hidden="true"':'')+'><img class="hpic" alt="'+p.n+'" src="img/'+p.k+'.jpg"><div class="row rad'+(S.hotel===p.k?' on':'')+'"'+rowAttrs+'><span class="box"></span><span class="g"><span class="n1">'+p.n+(p.tag?'<span class="pill">'+p.tag+'</span>':'')+'</span><span class="price">'+p.p+'<s>per night</s></span><span class="n2">'+p.zh+'</span><span class="n3">'+p.w+'</span><a class="book"'+tab+' target="_blank" rel="noopener" href="'+bk(p.slug)+'">View on Booking.com ↗</a>'+(S.hotel===p.k?'<span class="planning">Selected as itinerary base</span>':'')+'</span></div></div>';}
+function hotelCard(p,i,clone){var rowAttrs=clone?' data-clone="true"':' data-t="hotel" data-k="'+p.k+'"',tab=clone?' tabindex="-1"':'';return '<div class="hcard'+(clone?' clone':'')+'" data-real="'+i+'"'+(clone?' aria-hidden="true"':'')+'><img class="hpic" alt="'+p.n+'" src="img/'+p.k+'.jpg"><div class="row rad'+(S.hotel===p.k?' on':'')+'"'+rowAttrs+'><span class="box"></span><span class="g"><span class="n1">'+p.n+(p.tag?'<span class="pill">'+p.tag+'</span>':'')+'</span><span class="price">'+(p.p?p.p+'<s>per night</s>':'<s>rate shown on Booking.com</s>')+'</span><span class="n2">'+p.zh+'</span><span class="n3">'+p.w+'</span><span class="n2 leg">'+cityLine(p)+'</span><a class="book"'+tab+' target="_blank" rel="noopener" href="'+bk(p.slug)+'">View on Booking.com ↗</a>'+(S.hotel===p.k?'<span class="planning">Selected as itinerary base</span>':'')+'</span></div></div>';}
 function drawHotels(){var cards=PROPS.map(function(p,i){return hotelCard(p,i,false);}),html=cards.join('');if(hotelDeckMobile()&&cards.length>1){html='<div class="hdeck">'+hotelCard(PROPS[PROPS.length-1],PROPS.length-1,true)+html+hotelCard(PROPS[0],0,true)+'</div>';}document.getElementById('hotels').innerHTML=html;document.querySelectorAll('#hotels img.hpic').forEach(function(img){img.addEventListener('error',function(){var ph=document.createElement('div');ph.className='hpic ph';ph.innerHTML='<span>Photo unavailable</span>';img.replaceWith(ph);});if(img.complete&&img.naturalWidth===0)img.dispatchEvent(new Event('error'));});}
 var DAYS=[{lbl:'Tue 1',sub:'1 September',cap:1},{lbl:'Wed 2',sub:'2 September',cap:1},{lbl:'Thu 3',sub:'3 September',cap:1},{lbl:'Fri 4',sub:'4 September',cap:1},{lbl:'Sat 5',sub:'5 September · departure 21:20',cap:.5}];
 function pad(n){return(n<10?'0':'')+n;}function hhmm(m){return pad(Math.floor(m/60))+':'+pad(m%60);}function legMin(v){return v.at?drive(dist('hotel',v.at)):240;}function byKey(k){return VISITS.filter(function(v){return v.k===k;})[0];}var MAXPD=3;function durOf(v){return v.d===1?330:150;}
