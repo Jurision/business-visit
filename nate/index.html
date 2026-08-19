@@ -136,18 +136,11 @@ body{margin:0;background:var(--bg);color:var(--ink);overflow-x:hidden;
 .hpic.ph span{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;
   font-weight:800;color:var(--faint)}
 
-/* ---------- mobile hotel deck ---------- */
+/* ---------- mobile hotel deck (infinite transform carousel) ---------- */
 @media (max-width:639px){
   #hotels{
-    display:flex;
-    align-items:flex-start;
-    overflow-x:auto;
-    overflow-y:visible;
-    scroll-snap-type:x mandatory;
-    scroll-padding-inline:9%;
-    -webkit-overflow-scrolling:touch;
-    overscroll-behavior-x:contain;
-    gap:0;
+    display:block;
+    overflow:hidden;
     padding:12px 9% 30px;
     margin-left:-1.1rem;
     margin-right:-1.1rem;
@@ -156,16 +149,18 @@ body{margin:0;background:var(--bg);color:var(--ink);overflow-x:hidden;
     border:0;
     border-radius:0;
     box-shadow:none;
-    scrollbar-width:none;
   }
-  #hotels::-webkit-scrollbar{display:none}
+  #hotels .hdeck{
+    display:flex;
+    align-items:flex-start;
+    touch-action:pan-y;
+    will-change:transform;
+  }
   #hotels .hcard{
     position:relative;
     z-index:1;
     flex:0 0 84%;
     min-width:0;
-    scroll-snap-align:center;
-    scroll-snap-stop:always;
     overflow:hidden;
     background:var(--card);
     border:1px solid var(--line);
@@ -513,12 +508,17 @@ document.getElementById('map').addEventListener('click',function(e){var g=e.targ
 function drawVisits(){var total=VISITS.reduce(function(s,v){return s+v.d;},0),html='';CATS.forEach(function(c){var items=VISITS.filter(function(v){return v.cat===c.k;});if(!items.length)return;html+='<div class="cathead"><span class="catt">'+c.t+'</span><span class="cats">'+c.s+'</span></div>';html+=items.map(function(v){var far=v.at?fmt(drive(dist('hotel',v.at)))+' from hotel':'high-speed rail day trip';return '<div class="row static"><span class="dot">'+(v.at?P[v.at].e:'🚄')+'</span><span class="g"><span class="n1">'+v.n+(v.tag?'<span class="pill g">'+v.tag+'</span>':'')+'</span><span class="n2">'+v.s+'</span><span class="n2 leg">'+far+'</span></span><span class="rt">'+(v.d===1?'1 day':'½ day')+'</span></div>';}).join('');});document.getElementById('visits').innerHTML=html+'<div class="tally"><span>'+VISITS.length+' places · 3 categories</span><b>'+total+' of 4½ working days</b></div>';}
 var hotelDeckRAF=0;
 function hotelDeckMobile(){return window.matchMedia&&window.matchMedia('(max-width:639px)').matches;}
-function updateHotelDeckFocus(deck){if(!deck)return;var cards=[].slice.call(deck.querySelectorAll('.hcard'));if(!cards.length)return;if(!hotelDeckMobile()){cards.forEach(function(c){c.classList.remove('focus');});return;}var r=deck.getBoundingClientRect(),cx=r.left+r.width/2,best=cards[0],bd=Infinity;cards.forEach(function(c){var cr=c.getBoundingClientRect(),d=Math.abs((cr.left+cr.width/2)-cx);if(d<bd){bd=d;best=c;}});cards.forEach(function(c){c.classList.toggle('focus',c===best);});}
-function centerHotelCard(deck,card,behavior){if(!deck||!card||!hotelDeckMobile())return;var left=card.offsetLeft-(deck.clientWidth-card.offsetWidth)/2;deck.scrollTo({left:Math.max(0,left),behavior:behavior||'auto'});}
-function setupHotelDeck(){var deck=document.getElementById('hotels');if(!deck)return;if(!deck._hotelDeckBound){deck._hotelDeckBound=true;deck.addEventListener('scroll',function(){cancelAnimationFrame(hotelDeckRAF);hotelDeckRAF=requestAnimationFrame(function(){updateHotelDeckFocus(deck);});clearTimeout(deck._hotelWrap);deck._hotelWrap=setTimeout(function(){wrapHotelDeck(deck);},220);},{passive:true});deck.addEventListener('click',function(e){if(!hotelDeckMobile())return;var card=e.target.closest('.hcard');if(!card||card.classList.contains('focus'))return;e.preventDefault();e.stopPropagation();centerHotelCard(deck,card,'smooth');});window.addEventListener('resize',function(){cancelAnimationFrame(hotelDeckRAF);hotelDeckRAF=requestAnimationFrame(function(){updateHotelDeckFocus(deck);});});}if(!hotelDeckMobile()){deck.querySelectorAll('.hcard').forEach(function(c){c.classList.remove('focus');});return;}var all=deck.querySelectorAll('.hcard'),n=(all.length/3)|0,sel=S.hotel||'',target=null;[].forEach.call(all,function(c,i){if(!target&&i>=n&&i<2*n&&c.querySelector('.row[data-k="'+sel+'"]'))target=c;});if(!target)target=all[n]||all[0];var shouldCenter=deck._hotelDeckSelected!==sel||!deck.querySelector('.hcard.focus');deck._hotelDeckSelected=sel;requestAnimationFrame(function(){if(shouldCenter)centerHotelCard(deck,target,'auto');updateHotelDeckFocus(deck);});}
-function wrapHotelDeck(deck){if(!deck||!hotelDeckMobile())return;var cards=deck.querySelectorAll('.hcard');if(cards.length<6)return;var n=(cards.length/3)|0,P=cards[1].offsetLeft-cards[0].offsetLeft,base=cards[n],minS=base.offsetLeft-(deck.clientWidth-base.offsetWidth)/2,maxS=minS+2*P,blockW=cards[n].offsetLeft-cards[0].offsetLeft,s=deck.scrollLeft,to=null;if(s<minS-blockW/2)to=s+blockW;else if(s>maxS+blockW/2)to=s-blockW;if(to===null)return;deck.classList.add('noanim');deck.scrollLeft=to;updateHotelDeckFocus(deck);requestAnimationFrame(function(){requestAnimationFrame(function(){deck.classList.remove('noanim');});});}
+var deckTrack=null,deckIdx=0,deckX=0,deckDragJust=false,deckSupTimer=null;
+function deckMeasure(){var tr=deckTrack.style.transform;deckTrack.style.transition='none';deckTrack.style.transform='none';var cs=[].map.call(deckTrack.children,function(c){var r=c.getBoundingClientRect();return r.left+r.width/2;});deckTrack.style.transform=tr||'none';return cs;}
+function deckPos(i,anim){var cs=deckMeasure(),deck=document.getElementById('hotels'),d=deck.getBoundingClientRect();deckX=(d.left+d.width/2)-cs[i];deckTrack.style.transition=anim?'transform .3s cubic-bezier(.2,.8,.3,1)':'none';deckTrack.style.transform='translateX('+deckX+'px)';}
+function deckFocus(){[].forEach.call(deckTrack.children,function(c,i){c.classList.toggle('focus',i===deckIdx);});}
+function deckNext(){var t=deckTrack,cs=t.children;if(deckIdx===cs.length-1){t.appendChild(cs[0]);deckIdx--;deckPos(deckIdx,false);}deckIdx++;deckPos(deckIdx,true);deckFocus();}
+function deckPrev(){var t=deckTrack,cs=t.children;if(deckIdx===0){t.insertBefore(cs[cs.length-1],cs[0]);deckIdx++;deckPos(deckIdx,false);}deckIdx--;deckPos(deckIdx,true);deckFocus();}
+function deckDrag(e){if(!hotelDeckMobile()||!deckTrack)return;if(e.target.closest('a'))return;var sx=e.clientX,bx=deckX,moved=false;function mv(ev){var dx=ev.clientX-sx;if(!moved){if(Math.abs(dx)<8)return;moved=true;}ev.preventDefault();deckTrack.style.transition='none';deckTrack.style.transform='translateX('+(bx+dx)+'px)';}function up(ev){document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);document.removeEventListener('pointercancel',up);if(!moved)return;deckDragJust=true;clearTimeout(deckSupTimer);deckSupTimer=setTimeout(function(){deckDragJust=false;},300);var cs=deckMeasure(),p=(cs[1]-cs[0])||1,th=Math.min(60,p*0.28),dx=ev.clientX-sx;if(dx<=-th)deckNext();else if(dx>=th)deckPrev();else deckPos(deckIdx,true);}document.addEventListener('pointermove',mv,{passive:false});document.addEventListener('pointerup',up);document.addEventListener('pointercancel',up);}
+document.addEventListener('click',function(e){if(deckDragJust){e.preventDefault();e.stopPropagation();}},true);
+function setupHotelDeck(){var deck=document.getElementById('hotels');if(!deck)return;if(!hotelDeckMobile()){deck.querySelectorAll('.hcard').forEach(function(c){c.classList.remove('focus');});return;}deckTrack=deck.querySelector('.hdeck');if(!deckTrack)return;if(!deck._hdBound){deck._hdBound=true;deck.addEventListener('pointerdown',deckDrag);deck.addEventListener('click',function(e){if(deckDragJust){e.preventDefault();e.stopPropagation();return;}if(!hotelDeckMobile())return;var card=e.target.closest('.hcard');if(!card||card.classList.contains('focus'))return;e.preventDefault();e.stopPropagation();var cs=deckTrack.children,i=0;for(;i<cs.length;i++)if(cs[i]===card)break;if(i>deckIdx)deckNext();else if(i<deckIdx)deckPrev();});window.addEventListener('resize',function(){if(hotelDeckMobile()&&deckTrack)deckPos(deckIdx,false);});}var sel=S.hotel||'',idx=0;[].forEach.call(deckTrack.children,function(c,i){if(sel&&c.querySelector('.row[data-k="'+sel+'"]'))idx=i;});deckIdx=idx;deckPos(idx,false);deckFocus();}
 var hq=window.matchMedia('(max-width:639px)'),hqcb=function(){drawHotels();setupHotelDeck();};if(hq.addEventListener)hq.addEventListener('change',hqcb);else if(hq.addListener)hq.addListener(hqcb);
-function drawHotels(){var cards=PROPS.map(function(p){return '<div class="hcard"><img class="hpic" alt="'+p.n+'" src="img/'+p.k+'.jpg"><div class="row rad'+(S.hotel===p.k?' on':'')+'" data-t="hotel" data-k="'+p.k+'"><span class="box"></span><span class="g"><span class="n1">'+p.n+(p.tag?'<span class="pill">'+p.tag+'</span>':'')+'</span><span class="price">'+p.p+'<s>per night</s></span><span class="n2">'+p.zh+'</span><span class="n3">'+p.w+'</span><a class="book" target="_blank" rel="noopener" href="'+bk(p.slug)+'">View on Booking.com ↗</a>'+(S.hotel===p.k?'<span class="planning">Selected as itinerary base</span>':'')+'</span></div></div>';}).join('');document.getElementById('hotels').innerHTML=hotelDeckMobile()?cards+cards+cards:cards;document.querySelectorAll('#hotels img.hpic').forEach(function(img){img.addEventListener('error',function(){var ph=document.createElement('div');ph.className='hpic ph';ph.innerHTML='<span>Photo unavailable</span>';img.replaceWith(ph);});if(img.complete&&img.naturalWidth===0)img.dispatchEvent(new Event('error'));});}
+function drawHotels(){var cards=PROPS.map(function(p){return '<div class="hcard"><img class="hpic" alt="'+p.n+'" src="img/'+p.k+'.jpg"><div class="row rad'+(S.hotel===p.k?' on':'')+'" data-t="hotel" data-k="'+p.k+'"><span class="box"></span><span class="g"><span class="n1">'+p.n+(p.tag?'<span class="pill">'+p.tag+'</span>':'')+'</span><span class="price">'+p.p+'<s>per night</s></span><span class="n2">'+p.zh+'</span><span class="n3">'+p.w+'</span><a class="book" target="_blank" rel="noopener" href="'+bk(p.slug)+'">View on Booking.com ↗</a>'+(S.hotel===p.k?'<span class="planning">Selected as itinerary base</span>':'')+'</span></div></div>';}).join('');document.getElementById('hotels').innerHTML=hotelDeckMobile()?'<div class="hdeck">'+cards+'</div>':cards;document.querySelectorAll('#hotels img.hpic').forEach(function(img){img.addEventListener('error',function(){var ph=document.createElement('div');ph.className='hpic ph';ph.innerHTML='<span>Photo unavailable</span>';img.replaceWith(ph);});if(img.complete&&img.naturalWidth===0)img.dispatchEvent(new Event('error'));});}
 var DAYS=[{lbl:'Tue 1',sub:'1 September',cap:1},{lbl:'Wed 2',sub:'2 September',cap:1},{lbl:'Thu 3',sub:'3 September',cap:1},{lbl:'Fri 4',sub:'4 September',cap:1},{lbl:'Sat 5',sub:'5 September · departure 21:20',cap:.5}];
 function pad(n){return(n<10?'0':'')+n;}function hhmm(m){return pad(Math.floor(m/60))+':'+pad(m%60);}function legMin(v){return v.at?drive(dist('hotel',v.at)):240;}function byKey(k){return VISITS.filter(function(v){return v.k===k;})[0];}var MAXPD=3;function durOf(v){return v.d===1?330:150;}
 function defaultPlan(){var sel=VISITS.slice().sort(function(a,b){return legMin(b)-legMin(a);}),plan=DAYS.map(function(){return[];});sel.forEach(function(v){for(var i=0;i<DAYS.length;i++){var used=plan[i].reduce(function(s,k){return s+byKey(k).d;},0),near=plan[i].length===0||Math.abs(legMin(byKey(plan[i][0]))-legMin(v))<=20;if(used+v.d<=DAYS[i].cap&&near&&plan[i].length<MAXPD){plan[i].push(v.k);return;}}});return plan;}
