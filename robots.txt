@@ -1,0 +1,14 @@
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: *
+Allow: /
+Disallow: /nate/
+
+Sitemap: https://trip.arielzhu.space/sitemap.xml
