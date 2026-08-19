@@ -32,9 +32,14 @@ server/
 
 `server/trip-plan-sync.py` serves exactly one tiny JSON document:
 
-- `GET /nate/api/plan` → `{"plan": [[...] × 5 days], "rev": N}`
-- `PUT /nate/api/plan` → validates keys, capacity and duplicates, bumps `rev`
-  and atomically writes `plan.json`.
+- `GET /nate/api/plan` → `{"plan": [[...] × 5 days], "check": {"c1": true, ...}, "rev": N}`
+- `PUT /nate/api/plan` → accepts `plan` and/or `check` (each optional, validated
+  separately); fields merge independently so editing the schedule on one device
+  never clobbers checklist state from another. Bumps `rev` and atomically writes
+  `plan.json`.
+
+Both the schedule and the pre-departure checklist sync across devices this way.
+The page polls every 8s and also pushes each change (debounced) after edits.
 
 Run it on the host (here `python3 /usr/local/bin/trip-plan-sync.py`), bind to
 an interface Caddy can reach, and reverse-proxy `/nate/api/*` to it.

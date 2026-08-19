@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Tiny sync service for the Guangzhou trip plan.
-Serves and accepts exactly one small JSON document. Nothing else is writable."""
+"""Tiny sync service for the Guangzhou trip plan and pre-departure checklist.
+Serves and accepts one small JSON document. Nothing else is writable."""
 import json, os, threading, http.server, socketserver
 
 STORE = "/opt/caddy-gateway/caddy_data/trip/nate/plan.json"
 KEYS  = {"us", "machines", "zhigong", "hongtai", "bright", "tube"}
+CHECKS = {"c%d" % i for i in range(1, 8)}
 DAYS  = 5
 MAXPD = 3
 LOCK  = threading.Lock()
@@ -13,12 +14,14 @@ def load():
     try:
         with open(STORE) as f:
             d = json.load(f)
-        d.setdefault("rev", 1)
-        return d
     except Exception:
-        return {"plan": [["tube"], ["bright"], ["machines"], ["hongtai", "us"], []], "rev": 1}
+        d = {}
+    d.setdefault("plan", [["tube"], ["bright"], ["machines"], ["hongtai", "us"], []])
+    d.setdefault("check", {})
+    d.setdefault("rev", 1)
+    return d
 
-def valid(plan):
+def valid_plan(plan):
     if not isinstance(plan, list) or len(plan) != DAYS:
         return False
     seen = set()
@@ -30,6 +33,21 @@ def valid(plan):
                 return False
             seen.add(k)
     return True
+
+def valid_check(check):
+    if not isinstance(check, dict):
+        return False
+    for k, v in check.items():
+        if k not in CHECKS or not isinstance(v, bool):
+            return False
+    return True
+
+def write(d):
+    tmp = STORE + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(d, f, separators=(",", ":"))
+    os.replace(tmp, STORE)
+    os.chmod(STORE, 0o644)
 
 class H(http.server.BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
@@ -46,7 +64,7 @@ class H(http.server.BaseHTTPRequestHandler):
         if self.path.rstrip("/").endswith("/plan"):
             with LOCK:
                 d = load()
-            self._send(200, {"plan": d["plan"], "rev": d["rev"]})
+            self._send(200, {"plan": d["plan"], "check": d["check"], "rev": d["rev"]})
         else:
             self._send(404, {"error": "not found"})
 
@@ -54,24 +72,32 @@ class H(http.server.BaseHTTPRequestHandler):
         if not self.path.rstrip("/").endswith("/plan"):
             return self._send(404, {"error": "not found"})
         n = int(self.headers.get("Content-Length") or 0)
-        if n <= 0 or n > 4096:
+        if n <= 0 or n > 8192:
             return self._send(413, {"error": "too big"})
         try:
             body = json.loads(self.rfile.read(n))
         except Exception:
             return self._send(400, {"error": "bad json"})
-        plan = body.get("plan")
-        if not valid(plan):
+        has_plan = "plan" in body
+        has_check = "check" in body
+        if not has_plan and not has_check:
+            return self._send(400, {"error": "nothing to update"})
+        if has_plan and not valid_plan(body["plan"]):
             return self._send(400, {"error": "bad plan"})
+        if has_check and not valid_check(body["check"]):
+            return self._send(400, {"error": "bad check"})
         with LOCK:
             d = load()
-            d["plan"] = plan
-            d["rev"] = int(d.get("rev", 1)) + 1
-            tmp = STORE + ".tmp"
-            with open(tmp, "w") as f:
-                json.dump(d, f, separators=(",", ":"))
-            os.replace(tmp, STORE)
-            os.chmod(STORE, 0o644)
+            changed = False
+            if has_plan and body["plan"] != d["plan"]:
+                d["plan"] = body["plan"]
+                changed = True
+            if has_check and body["check"] != d["check"]:
+                d["check"] = body["check"]
+                changed = True
+            if changed:
+                d["rev"] = int(d.get("rev", 1)) + 1
+                write(d)
         self._send(200, {"ok": True, "rev": d["rev"]})
 
     def log_message(self, *a):
