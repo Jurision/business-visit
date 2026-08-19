@@ -180,3 +180,5 @@ function setupHotelDeck(){
           git add nate/index.html
           git commit -m 'feat: add stacked mobile hotel carousel'
           git push origin master
+
+# trigger: 2026-08-20
