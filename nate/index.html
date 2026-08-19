@@ -114,6 +114,10 @@ body{margin:0;background:var(--bg);color:var(--ink);overflow-x:hidden;
   line-height:1.35;padding-top:.1rem}
 .rt s{display:block;text-decoration:none;font-weight:800;font-size:.6rem;
   letter-spacing:.09em;text-transform:uppercase;margin-top:.2rem;color:var(--faint)}
+.price{display:block;font-size:.92rem;font-weight:800;color:var(--gold);
+  margin-top:.32rem;letter-spacing:-.01em;line-height:1.3}
+.price s{text-decoration:none;font-weight:800;font-size:.6rem;
+  letter-spacing:.09em;text-transform:uppercase;margin-left:.35rem;color:var(--faint)}
 .pill{display:inline-block;font-size:.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
   color:#fff;background:var(--gold);border-radius:var(--pill);padding:.14rem .52rem;
   vertical-align:.14em;margin-left:.35rem}
@@ -181,11 +185,15 @@ body{margin:0;background:var(--bg);color:var(--ink);overflow-x:hidden;
     box-shadow:0 24px 46px -26px rgba(31,43,61,.72),0 4px 10px rgba(31,43,61,.08);
   }
   #hotels .hcard:not(.focus) .row{pointer-events:none}
-  #hotels .hcard .hpic{height:205px}
-  #hotels .hcard .row{min-height:0;padding:1rem 1rem 1.05rem;background:var(--card)}
+  #hotels .hcard .hpic{height:200px}
+  #hotels .hcard .row{min-height:0;padding:1.15rem 1.2rem 1.3rem;gap:.55rem;background:var(--card)}
   #hotels .hcard.focus .row.on{background:var(--soft)}
-  #hotels .hcard .n1{font-size:.98rem}
-  #hotels .hcard .n3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  #hotels .hcard .n1{font-size:1.04rem;line-height:1.3}
+  #hotels .hcard .n2{margin-top:.28rem;font-size:.8rem}
+  #hotels .hcard .price{font-size:1.12rem;margin-top:.45rem}
+  #hotels .hcard .n3{margin-top:.45rem;font-size:.82rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  #hotels .hcard .book{display:flex;align-items:center;justify-content:center;margin-top:.8rem;min-height:2.6rem;border-radius:14px}
+  #hotels .hcard .planning{text-align:center;margin-top:.7rem}
 }
 @media (max-width:380px){
   #hotels .hcard{flex-basis:86%}
@@ -348,10 +356,11 @@ ul.ck input:checked + label .w{text-decoration:none}
   #hotels{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;align-items:start;background:transparent;border:0;box-shadow:none;overflow:visible}
   #hotels .hcard{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);background:var(--card)}
   #hotels .hpic{height:150px}
-  #hotels .row{flex:0 0 auto;flex-direction:column;align-items:flex-start;gap:.5rem;padding:1rem}
+  #hotels .row{flex:0 0 auto;flex-direction:column;align-items:flex-start;gap:.6rem;padding:1.15rem 1.2rem}
   #hotels .box{margin-top:0}
-  #hotels .rt{order:-1;text-align:left;padding-top:0;display:flex;align-items:baseline;gap:.45rem;font-size:.95rem}
-  #hotels .rt s{display:inline;margin-top:0;font-size:.58rem}
+  #hotels .n1{font-size:1.05rem}
+  #hotels .price{font-size:1.02rem;margin-top:.1rem}
+  #hotels .book{align-self:flex-start;display:inline-flex;align-items:center;min-height:2.4rem}
   #plan{display:grid;grid-template-columns:repeat(5,1fr);gap:.7rem;align-items:start}
   .dcol{margin-bottom:0}
   .dhead{flex-wrap:wrap;gap:.15rem .4rem;padding:.7rem .7rem .6rem}
@@ -512,7 +521,7 @@ function hotelDeckMobile(){return window.matchMedia&&window.matchMedia('(max-wid
 function updateHotelDeckFocus(deck){if(!deck)return;var cards=[].slice.call(deck.querySelectorAll('.hcard'));if(!cards.length)return;if(!hotelDeckMobile()){cards.forEach(function(c){c.classList.remove('focus');});return;}var r=deck.getBoundingClientRect(),cx=r.left+r.width/2,best=cards[0],bd=Infinity;cards.forEach(function(c){var cr=c.getBoundingClientRect(),d=Math.abs((cr.left+cr.width/2)-cx);if(d<bd){bd=d;best=c;}});cards.forEach(function(c){c.classList.toggle('focus',c===best);});}
 function centerHotelCard(deck,card,behavior){if(!deck||!card||!hotelDeckMobile())return;var left=card.offsetLeft-(deck.clientWidth-card.offsetWidth)/2;deck.scrollTo({left:Math.max(0,left),behavior:behavior||'auto'});}
 function setupHotelDeck(){var deck=document.getElementById('hotels');if(!deck)return;if(!deck._hotelDeckBound){deck._hotelDeckBound=true;deck.addEventListener('scroll',function(){cancelAnimationFrame(hotelDeckRAF);hotelDeckRAF=requestAnimationFrame(function(){updateHotelDeckFocus(deck);});},{passive:true});deck.addEventListener('click',function(e){if(!hotelDeckMobile())return;var card=e.target.closest('.hcard');if(!card||card.classList.contains('focus'))return;e.preventDefault();e.stopPropagation();centerHotelCard(deck,card,'smooth');});window.addEventListener('resize',function(){cancelAnimationFrame(hotelDeckRAF);hotelDeckRAF=requestAnimationFrame(function(){updateHotelDeckFocus(deck);});});}var selected=S.hotel||'',selRow=selected?deck.querySelector('.row[data-k="'+selected+'"]'):null,target=selRow?selRow.closest('.hcard'):deck.querySelector('.hcard'),shouldCenter=deck._hotelDeckSelected!==selected||!deck.querySelector('.hcard.focus');deck._hotelDeckSelected=selected;requestAnimationFrame(function(){if(shouldCenter)centerHotelCard(deck,target,'auto');updateHotelDeckFocus(deck);});}
-function drawHotels(){document.getElementById('hotels').innerHTML=PROPS.map(function(p){return '<div class="hcard"><img class="hpic" alt="'+p.n+'" src="img/'+p.k+'.jpg"><div class="row rad'+(S.hotel===p.k?' on':'')+'" data-t="hotel" data-k="'+p.k+'"><span class="box"></span><span class="g"><span class="n1">'+p.n+(p.tag?'<span class="pill">'+p.tag+'</span>':'')+'</span><span class="n2">'+p.zh+'</span><span class="n3">'+p.w+'</span><a class="book" target="_blank" rel="noopener" href="'+bk(p.slug)+'">Book it on Booking.com ↗</a>'+(S.hotel===p.k?'<span class="planning">↑ your week is planned from here</span>':'')+'</span><span class="rt">'+p.p+'<s>a night</s></span></div></div>';}).join('');document.querySelectorAll('#hotels img.hpic').forEach(function(img){img.addEventListener('error',function(){var ph=document.createElement('div');ph.className='hpic ph';ph.innerHTML='<span>photo to come</span>';img.replaceWith(ph);});if(img.complete&&img.naturalWidth===0)img.dispatchEvent(new Event('error'));});}
+function drawHotels(){document.getElementById('hotels').innerHTML=PROPS.map(function(p){return '<div class="hcard"><img class="hpic" alt="'+p.n+'" src="img/'+p.k+'.jpg"><div class="row rad'+(S.hotel===p.k?' on':'')+'" data-t="hotel" data-k="'+p.k+'"><span class="box"></span><span class="g"><span class="n1">'+p.n+(p.tag?'<span class="pill">'+p.tag+'</span>':'')+'</span><span class="price">'+p.p+'<s>a night</s></span><span class="n2">'+p.zh+'</span><span class="n3">'+p.w+'</span><a class="book" target="_blank" rel="noopener" href="'+bk(p.slug)+'">Book it on Booking.com ↗</a>'+(S.hotel===p.k?'<span class="planning">↑ your week is planned from here</span>':'')+'</span></div></div>';}).join('');document.querySelectorAll('#hotels img.hpic').forEach(function(img){img.addEventListener('error',function(){var ph=document.createElement('div');ph.className='hpic ph';ph.innerHTML='<span>photo to come</span>';img.replaceWith(ph);});if(img.complete&&img.naturalWidth===0)img.dispatchEvent(new Event('error'));});}
 var DAYS=[{lbl:'Tue 1',sub:'1 September',cap:1},{lbl:'Wed 2',sub:'2 September',cap:1},{lbl:'Thu 3',sub:'3 September',cap:1},{lbl:'Fri 4',sub:'4 September',cap:1},{lbl:'Sat 5',sub:'5 September · fly 21:20',cap:.5}];
 function pad(n){return(n<10?'0':'')+n;}function hhmm(m){return pad(Math.floor(m/60))+':'+pad(m%60);}function legMin(v){return v.at?drive(dist('hotel',v.at)):240;}function byKey(k){return VISITS.filter(function(v){return v.k===k;})[0];}var MAXPD=3;function durOf(v){return v.d===1?330:150;}
 function defaultPlan(){var sel=VISITS.slice().sort(function(a,b){return legMin(b)-legMin(a);}),plan=DAYS.map(function(){return[];});sel.forEach(function(v){for(var i=0;i<DAYS.length;i++){var used=plan[i].reduce(function(s,k){return s+byKey(k).d;},0),near=plan[i].length===0||Math.abs(legMin(byKey(plan[i][0]))-legMin(v))<=20;if(used+v.d<=DAYS[i].cap&&near&&plan[i].length<MAXPD){plan[i].push(v.k);return;}}});return plan;}
