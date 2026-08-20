@@ -1,2 +1,4 @@
 nate/plan.json
 nate/weather.json
+__pycache__/
+*.pyc

@@ -18,6 +18,9 @@ nate/                 the itinerary site
   img/                hotel photos
 server/
   trip-plan-sync.py   tiny Python service that persists the plan to plan.json
+scripts/
+  verify-live.sh      confirms the deployed HTML exactly matches the checkout
+tests/                dependency-free validation and API unit tests
 ```
 
 ## Runtime files (not in the repo)
@@ -41,6 +44,25 @@ server/
 Both the schedule and the pre-departure checklist sync across devices this way.
 The page polls every 8s and also pushes each change (debounced) after edits.
 
+The service validates a complete plan: every known visit must occur exactly
+once, no day may contain more than three visits, and checklist keys are
+allow-listed. The store path, bind host and port can be overridden with
+`TRIP_PLAN_STORE`, `TRIP_PLAN_HOST` and `TRIP_PLAN_PORT` for testing.
+
+## Privacy and access control
+
+This is a customer-specific itinerary containing travel and supplier details.
+`robots.txt` and the page's `noindex` metadata reduce accidental discovery but
+are not access control. Protect the complete `/nate` route, including static
+assets and the sync API, at the reverse proxy.
+
+Generate a password hash on the host (do not commit the plaintext password or
+the generated hash):
+
+```sh
+caddy hash-password
+```
+
 Run it on the host (here `python3 /usr/local/bin/trip-plan-sync.py`), bind to
 an interface Caddy can reach, and reverse-proxy `/nate/api/*` to it.
 
@@ -49,6 +71,11 @@ an interface Caddy can reach, and reverse-proxy `/nate/api/*` to it.
 ```
 trip.arielzhu.space {
     encode zstd gzip
+
+    @private path /nate /nate/*
+    basic_auth @private {
+        nate {$NATE_PASSWORD_HASH}
+    }
 
     handle /nate/api/* {
         uri strip_prefix /nate/api
@@ -62,10 +89,36 @@ trip.arielzhu.space {
             Cache-Control "no-cache"
             X-Content-Type-Options "nosniff"
             Referrer-Policy "no-referrer"
+            Strict-Transport-Security "max-age=31536000; includeSubDomains"
+            Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
         }
     }
 }
 ```
+
+Set `NATE_PASSWORD_HASH` in Caddy's service environment, validate the config,
+and reload Caddy. Because authentication covers `/nate/*`, the browser sends
+the same credentials to the page, images and same-origin API without exposing a
+write token in JavaScript.
+
+## Validation and deployment check
+
+Run the dependency-free checks before deployment:
+
+```sh
+python3 -m unittest discover -s tests -v
+```
+
+Deploy from a clean checkout of the intended commit. After the static files are
+copied, compare the live HTML byte-for-byte with that checkout:
+
+```sh
+sh scripts/verify-live.sh https://trip.arielzhu.space/nate/
+```
+
+The command exits non-zero and prints both SHA-256 hashes when the deployed page
+does not match the checkout. This is intentionally a post-deploy check rather
+than a GitHub Action because the live site may be updated after a commit lands.
 
 ## Content
 
