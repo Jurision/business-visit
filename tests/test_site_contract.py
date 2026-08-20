@@ -30,6 +30,28 @@ class SiteContractTests(unittest.TestCase):
         self.assertIn("Return to hotel · ", self.html)
         self.assertNotIn("Math.min(t+(first.at?legMin(first):0),19*60)", self.html)
 
+    def test_map_is_mobile_safe_and_schedule_aware(self):
+        self.assertIn("Schematic Visit Map", self.html)
+        self.assertIn('id="readout" role="status" aria-live="polite"', self.html)
+        self.assertIn('data-map-day="', self.html)
+        self.assertIn("var A=null,B=null,MAP_DAY=0", self.html)
+        self.assertIn(
+            "dock.dataset.state==='mini'||dock.dataset.state==='open'",
+            self.html,
+        )
+        self.assertIn("var initial=phone()?'peek'", self.html)
+        self.assertIn("Select a hotel to calculate travel time", self.html)
+
+    def test_map_controls_and_pins_are_keyboard_accessible(self):
+        self.assertIn('aria-controls="mapPanel" aria-expanded="false"', self.html)
+        self.assertIn(
+            'class="pinhit" role="button" tabindex="0"',
+            self.html,
+        )
+        self.assertIn("e.key!=='Enter'&&e.key!==' '", self.html)
+        self.assertIn("Open visit map", self.html)
+        self.assertIn("width:44px;height:44px", self.html)
+
 
 if __name__ == "__main__":
     unittest.main()
