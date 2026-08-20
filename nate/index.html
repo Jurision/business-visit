@@ -539,7 +539,7 @@ var P={
  hongtai:{n:'Hongsheng Glass',zh:'鸿盛玻璃',e:'🫙',xy:[280,138],km:[-5,-19],est:1,nav:{q:'广东省广州市花都区花东镇京塘村荷塘路15号8栋201房',ct:'广州'}},
  bright:{n:'Bright Glassware',zh:'柏莱特玻璃',e:'🫙',xy:[236,339],km:[95,55],nav:{q:'深圳市龙华区观湖街道观城社区观澜大道398号307',ct:'深圳'}},
  guyu:{rail:1,n:'Guyu Tubes',zh:'谷羽软管 · 汕头',e:'🧴',xy:[100,339],km:[345,-15],est:1,nav:{q:'广东省汕头市潮南区司马浦镇温美工业区松泰兴大厦',ct:'汕头'}},
- city:{n:'Pearl River New Town',zh:'珠江新城',e:'🌃',xy:[150,272],km:[0,0],est:1}
+  city:{n:'City Centre',zh:'市中心',e:'🌃',xy:[150,272],km:[0,0],est:1}
 };
 var ORDER=['air','hansen','zhigong','us','hongtai','bright','guyu','city','hotel'];
 var LAY={
@@ -551,7 +551,7 @@ var SPOKES=['air','hansen','zhigong','us','hongtai','bright','guyu','city'];
 function dist(a,b){var A=P[a].km,B=P[b].km;return Math.round(Math.sqrt(Math.pow(A[0]-B[0],2)+Math.pow(A[1]-B[1],2))*1.2);}
 function drive(km){var sp=km<=15?28:(km<=40?45:70);return Math.max(5,Math.round(km/sp*60)+5);}
 function fmt(m){return m<60?m+' min':(Math.floor(m/60)+'h '+(m%60?(m%60)+'m':'')).trim();}
-function cityLine(p){var A=P.city.km,B=p.km,d=Math.round(Math.sqrt(Math.pow(A[0]-B[0],2)+Math.pow(A[1]-B[1],2))*1.2);return '≈ '+d+' km · '+fmt(drive(d))+' to Pearl River New Town';}
+function cityLine(p){var A=P.city.km,B=p.km,d=Math.round(Math.sqrt(Math.pow(A[0]-B[0],2)+Math.pow(A[1]-B[1],2))*1.2);return '≈ '+d+' km · '+fmt(drive(d))+' to City Centre';}
 var CATS=[{k:'pack',t:'Packaging',s:'boxes, card stock and tubes'},{k:'glass',t:'Glassware',s:'candle jars and diffuser bottles'},{k:'mach',t:'Candle pouring &amp; liquid filling machinery',s:''}];
 var VISITS=[
  {k:'us',cat:'pack',n:'Bohe Printing',short:'Bohe Printing',cn:'博和印刷',at:'us',d:.5,tag:'host visit',s:'Review card stocks and finishes',a:'2F Office, Bohe Printing, No. 2 Tongfu North Street, Renhe Daxiang Village, Renhe Town, Baiyun District, Guangzhou, Guangdong, China',az:'广州市白云区人和镇人和大巷村同富北街2号，博和印刷二楼办公室'},
