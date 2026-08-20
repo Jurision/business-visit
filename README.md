@@ -49,19 +49,13 @@ once, no day may contain more than three visits, and checklist keys are
 allow-listed. The store path, bind host and port can be overridden with
 `TRIP_PLAN_STORE`, `TRIP_PLAN_HOST` and `TRIP_PLAN_PORT` for testing.
 
-## Privacy and access control
+## Public access
 
-This is a customer-specific itinerary containing travel and supplier details.
-`robots.txt` and the page's `noindex` metadata reduce accidental discovery but
-are not access control. Protect the complete `/nate` route, including static
-assets and the sync API, at the reverse proxy.
-
-Generate a password hash on the host (do not commit the plaintext password or
-the generated hash):
-
-```sh
-caddy hash-password
-```
+The `/nate` page and its sync API are intentionally public and do not require
+a username or password. `robots.txt` and the page's `noindex` metadata reduce
+accidental search-engine discovery, but they are not access control. Because
+`PUT /nate/api/plan` is also public, deploy only itinerary information that is
+appropriate for anyone with the URL to view and edit.
 
 Run it on the host (here `python3 /usr/local/bin/trip-plan-sync.py`), bind to
 an interface Caddy can reach, and reverse-proxy `/nate/api/*` to it.
@@ -71,11 +65,6 @@ an interface Caddy can reach, and reverse-proxy `/nate/api/*` to it.
 ```
 trip.arielzhu.space {
     encode zstd gzip
-
-    @private path /nate /nate/*
-    basic_auth @private {
-        nate {$NATE_PASSWORD_HASH}
-    }
 
     handle /nate/api/* {
         uri strip_prefix /nate/api
@@ -95,11 +84,6 @@ trip.arielzhu.space {
     }
 }
 ```
-
-Set `NATE_PASSWORD_HASH` in Caddy's service environment, validate the config,
-and reload Caddy. Because authentication covers `/nate/*`, the browser sends
-the same credentials to the page, images and same-origin API without exposing a
-write token in JavaScript.
 
 ## Validation and deployment check
 
