@@ -24,6 +24,15 @@ class SiteContractTests(unittest.TestCase):
         missing = [ref for ref in refs if not (ROOT / "nate" / ref).is_file()]
         self.assertEqual(missing, [])
 
+    def test_tab_icon_is_linked_and_available(self):
+        self.assertIn(
+            '<link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">',
+            self.html,
+        )
+        icon = ROOT / "nate" / "favicon.svg"
+        self.assertTrue(icon.is_file())
+        self.assertIn('viewBox="0 0 64 64"', icon.read_text(encoding="utf-8"))
+
     def test_schedule_contains_rail_and_inter_visit_travel_paths(self):
         self.assertIn("High-speed rail day trip to Shantou", self.html)
         self.assertIn("Travel to ", self.html)
