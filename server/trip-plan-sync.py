@@ -1,14 +1,30 @@
 #!/usr/bin/env python3
 """Tiny sync service for the Guangzhou trip plan and pre-departure checklist.
 Serves and accepts one small JSON document. Nothing else is writable."""
-import json, os, threading, http.server, socketserver
+import http.server
+import json
+import os
+import socketserver
+import threading
+from urllib.parse import urlsplit
 
-STORE = "/opt/caddy-gateway/caddy_data/trip/nate/plan.json"
-KEYS  = {"us", "machines", "zhigong", "hongtai", "bright", "tube"}
+STORE = os.environ.get(
+    "TRIP_PLAN_STORE", "/opt/caddy-gateway/caddy_data/trip/nate/plan.json"
+)
+HOST = os.environ.get("TRIP_PLAN_HOST", "172.19.0.1")
+PORT = int(os.environ.get("TRIP_PLAN_PORT", "8791"))
+KEYS  = {"us", "junshuo", "machines", "zhigong", "hongtai", "bright", "tube"}
 CHECKS = {"c%d" % i for i in range(1, 8)}
 DAYS  = 5
 MAXPD = 3
 LOCK  = threading.Lock()
+DEFAULT_PLAN = [
+    ["us", "hongtai"],
+    ["zhigong", "machines"],
+    ["bright"],
+    ["tube"],
+    ["junshuo"],
+]
 
 def load():
     try:
@@ -16,9 +32,20 @@ def load():
             d = json.load(f)
     except Exception:
         d = {}
-    d.setdefault("plan", [["tube"], ["bright"], ["machines"], ["hongtai", "us"], []])
+    d.setdefault("plan", [day[:] for day in DEFAULT_PLAN])
     d.setdefault("check", {})
     d.setdefault("rev", 1)
+    legacy_keys = KEYS - {"junshuo"}
+    plan = d.get("plan")
+    flat = [key for day in plan for key in day] if isinstance(plan, list) and all(isinstance(day, list) for day in plan) else []
+    if len(flat) == len(set(flat)) and set(flat) == legacy_keys:
+        migrated = [day[:] for day in plan]
+        target = next((day for day in reversed(migrated) if len(day) < MAXPD), None)
+        if target is not None:
+            target.append("junshuo")
+            d["plan"] = migrated
+            d["rev"] = int(d.get("rev", 1)) + 1
+            write(d)
     return d
 
 def valid_plan(plan):
@@ -32,7 +59,7 @@ def valid_plan(plan):
             if k not in KEYS or k in seen:
                 return False
             seen.add(k)
-    return True
+    return seen == KEYS
 
 def valid_check(check):
     if not isinstance(check, dict):
@@ -51,17 +78,26 @@ def write(d):
 
 class H(http.server.BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
+    server_version = "TripPlanSync"
+    sys_version = ""
+
+    def _is_plan_path(self):
+        return urlsplit(self.path).path.rstrip("/") == "/plan"
+
     def _send(self, code, obj):
         b = json.dumps(obj).encode()
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(b)))
         self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Referrer-Policy", "no-referrer")
+        self.send_header("Cross-Origin-Resource-Policy", "same-origin")
         self.end_headers()
         self.wfile.write(b)
 
     def do_GET(self):
-        if self.path.rstrip("/").endswith("/plan"):
+        if self._is_plan_path():
             with LOCK:
                 d = load()
             self._send(200, {"plan": d["plan"], "check": d["check"], "rev": d["rev"]})
@@ -69,9 +105,12 @@ class H(http.server.BaseHTTPRequestHandler):
             self._send(404, {"error": "not found"})
 
     def do_PUT(self):
-        if not self.path.rstrip("/").endswith("/plan"):
+        if not self._is_plan_path():
             return self._send(404, {"error": "not found"})
-        n = int(self.headers.get("Content-Length") or 0)
+        try:
+            n = int(self.headers.get("Content-Length") or 0)
+        except (TypeError, ValueError):
+            return self._send(400, {"error": "bad content length"})
         if n <= 0 or n > 8192:
             return self._send(413, {"error": "too big"})
         try:
@@ -108,4 +147,4 @@ class S(socketserver.ThreadingTCPServer):
     daemon_threads = True
 
 if __name__ == "__main__":
-    S(("172.19.0.1", 8791), H).serve_forever()
+    S((HOST, PORT), H).serve_forever()
