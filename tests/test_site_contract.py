@@ -33,6 +33,13 @@ class SiteContractTests(unittest.TestCase):
         self.assertTrue(icon.is_file())
         self.assertIn('viewBox="0 0 64 64"', icon.read_text(encoding="utf-8"))
 
+    def test_junshuo_supplier_is_available_in_packaging_map_and_schedule(self):
+        self.assertIn("Guangzhou Junshuo Plastic Products Co., Ltd.", self.html)
+        self.assertIn("广州骏烁塑料制品有限公司", self.html)
+        self.assertIn("广从七路28号之四", self.html)
+        self.assertIn("junshuo:[430,286]", self.html)
+        self.assertIn("'junshuo|marriott':[26,45]", self.html)
+
     def test_schedule_contains_rail_and_inter_visit_travel_paths(self):
         self.assertIn("High-speed rail day trip to Shantou", self.html)
         self.assertIn("Travel to ", self.html)

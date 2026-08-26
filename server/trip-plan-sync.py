@@ -13,11 +13,18 @@ STORE = os.environ.get(
 )
 HOST = os.environ.get("TRIP_PLAN_HOST", "172.19.0.1")
 PORT = int(os.environ.get("TRIP_PLAN_PORT", "8791"))
-KEYS  = {"us", "machines", "zhigong", "hongtai", "bright", "tube"}
+KEYS  = {"us", "junshuo", "machines", "zhigong", "hongtai", "bright", "tube"}
 CHECKS = {"c%d" % i for i in range(1, 8)}
 DAYS  = 5
 MAXPD = 3
 LOCK  = threading.Lock()
+DEFAULT_PLAN = [
+    ["us", "hongtai"],
+    ["zhigong", "machines"],
+    ["bright"],
+    ["tube"],
+    ["junshuo"],
+]
 
 def load():
     try:
@@ -25,9 +32,20 @@ def load():
             d = json.load(f)
     except Exception:
         d = {}
-    d.setdefault("plan", [["tube"], ["bright"], ["machines"], ["hongtai", "us"], []])
+    d.setdefault("plan", [day[:] for day in DEFAULT_PLAN])
     d.setdefault("check", {})
     d.setdefault("rev", 1)
+    legacy_keys = KEYS - {"junshuo"}
+    plan = d.get("plan")
+    flat = [key for day in plan for key in day] if isinstance(plan, list) and all(isinstance(day, list) for day in plan) else []
+    if len(flat) == len(set(flat)) and set(flat) == legacy_keys:
+        migrated = [day[:] for day in plan]
+        target = next((day for day in reversed(migrated) if len(day) < MAXPD), None)
+        if target is not None:
+            target.append("junshuo")
+            d["plan"] = migrated
+            d["rev"] = int(d.get("rev", 1)) + 1
+            write(d)
     return d
 
 def valid_plan(plan):
