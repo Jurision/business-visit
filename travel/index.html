@@ -99,6 +99,24 @@ h1 span{display:block}
 .seg.transit .seg-text b{font-size:13.5px;font-weight:650;color:#7a3a2a}
 .seg.transit .seg-text span{font-size:12px}
 .seg-nights{font-size:15px;font-weight:750;color:var(--c);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.tk-body{min-width:0}
+.tk-body .tk+.tk{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.tk{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:8px}
+.tk-end{display:block;min-width:0}
+.tk-end b{display:block;font-size:17px;line-height:1.25;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+.tk-end b em{font-style:normal;font-size:10.5px;font-weight:750;color:var(--red);margin-right:3px;vertical-align:2px}
+.tk-end span{display:block;font-size:12px;line-height:1.35;color:var(--muted);white-space:nowrap}
+.tk-end.r{text-align:right}
+.tk-mid{display:block;min-width:0;text-align:center}
+.tk-mid small{display:block;font-size:11px;line-height:1.35;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tk-mid i{display:block;position:relative;height:1.5px;margin:3px 2px;background:var(--red);opacity:.7}
+.tk-mid i:after{content:"";position:absolute;right:-1px;top:-3px;border:4px solid transparent;border-left:6px solid var(--red);border-right:0}
+.seg.transit .seg-main{padding:9px 0}
+.overview.editing .seg.transit{flex-wrap:wrap}
+.overview.editing .seg.transit .modes{margin:0 0 8px 32px}
+.sum-legs{border-top:1px solid var(--line);padding:10px 14px}
+.leg-tk+.leg-tk{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
 .seg-chev{color:var(--faint);font-size:17px;line-height:1;justify-self:end;transition:transform .2s}
 .seg.open .seg-chev{transform:rotate(90deg);color:var(--ink)}
 .seg-panel{position:relative;padding:2px 0 12px 32px}
@@ -207,7 +225,7 @@ h1 span{display:block}
 .state-line{display:flex;flex-wrap:wrap;gap:4px}
 .state-chip{display:inline-block;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:650;line-height:1.5;background:var(--sea-soft);color:var(--sea)}
 .state-chip.moving{background:var(--red-soft);color:var(--red)}
-.day-budget{border-top:1px solid var(--line);padding:10px 14px 11px}
+.day-budget{padding:10px 14px 11px}
 .day-budget b{display:block;color:var(--red);font-size:21px;line-height:1.3;font-weight:750;font-variant-numeric:tabular-nums}
 .day-budget small{display:block;color:var(--muted);font-size:12px;line-height:1.5;margin-top:2px}
 .unknown{display:block;border-top:1px solid #ecdfc3;background:var(--gold-soft);color:var(--gold);padding:9px 14px 9px 36px;position:relative;font-size:12.5px;font-weight:650;line-height:1.5}
@@ -313,11 +331,7 @@ html.has-bar .shell{padding-bottom:150px}
   .day-visual{aspect-ratio:21/8}
   .day-head{padding:20px 26px 0}
   .day-title{font-size:26px}
-  .day-summary{margin:16px 26px 0;display:grid;grid-template-columns:1.4fr 1fr}
-  .sum-route{grid-column:1/-1}
-  .sum-grid{border-right:1px solid var(--line)}
-  .day-budget{border-top:1px solid var(--line)}
-  .unknown{grid-column:1/-1}
+  .day-summary{margin:16px 26px 0}
   .steps-label{padding:20px 26px 0}
   .steps{padding:0 20px 4px}
   .nav-row{padding:12px 26px 24px}
@@ -379,14 +393,10 @@ html.has-bar .shell{padding-bottom:150px}
             <span class="summary-label">今天怎么走</span>
             <div class="route-chain" id="routeChain"></div>
           </div>
+          <div class="sum-legs" id="dayLegs"></div>
           <div class="sum-grid">
-            <div class="sum-cell"><span class="summary-label">状态</span><div class="state-line" id="stateLine"></div></div>
             <div class="sum-cell"><span class="summary-label">今晚</span><b id="dayNight"></b><small id="dayNightSub"></small></div>
-          </div>
-          <div class="day-budget">
-            <span class="summary-label">当天预算</span>
-            <b id="dayBudget"></b>
-            <small id="budgetBasis"></small>
+            <div class="sum-cell day-budget"><span class="summary-label">当天预算</span><b id="dayBudget"></b><small id="budgetBasis"></small></div>
           </div>
           <small class="unknown" id="budgetUnknown"></small>
         </section>
@@ -499,16 +509,16 @@ days.forEach(function(d,i){Object.assign(d,baseMeta[i])});
 var baseDays=days;
 function cloneDay(d){return JSON.parse(JSON.stringify(d))}
 var dalianDays=baseDays.slice(0,5).map(cloneDay).concat([
- {d:"10/17",w:"周六",city:"青岛 → 烟台 → 海上",title:"去烟台，在夜船上睡一晚",note:"白天铁路到烟台，晚间前往烟台北站候船；参考22:00开航，具体航班与铺位以12306“船票”为准。",route:["青岛酒店","青岛北站","烟台站","烟台北站","夜船 → 旅顺西"],states:["铁路＋轮渡","候船预留90分钟","轮渡过夜"],budget:[380,660],basis:"动车＋港口接驳＋餐饮＋三等舱；不计酒店",unknown:"目标日船班、上下铺与港口接驳价待核",photo:photos.yantai,steps:[
-  {t:"09:30",n:"退房前往青岛北站",s:"保留行李与周末交通时间",tag:"交通日",kind:"交通",cost:"市内交通约 ¥20–50",detail:"实际出发车次未锁定，目标是午后前抵达烟台。"},
-  {t:"11:00前后",n:"青岛北 → 烟台",s:"动车通常约1–2小时，具体车次待选",tag:"铁路",kind:"火车",cost:"预留 ¥60–100",detail:"这是路线预算，不代表已查询到10月17日余票。"},
-  {t:"下午",n:"烟台站周边休息与晚餐",s:"不安排远距离景点，给夜船留余量",tag:"烟台",kind:"停留",cost:"餐饮约 ¥60–100",detail:"行李优先寄存，傍晚再前往烟台北站。"},
+ {d:"10/17",w:"周六",city:"青岛 → 烟台 → 海上",title:"去烟台，在夜船上睡一晚",note:"13:40乘C6571从青岛北到烟台站，14:54抵达；晚间前往烟台北站，参考22:00开航、次日约05:00到旅顺西，车船与铺位均需在12306复核。",route:["青岛酒店","青岛北站","C6571","烟台站","烟台北站","夜船 → 旅顺西"],states:["城际动车＋轮渡","候船预留90分钟","轮渡过夜"],budget:[390,670],basis:"C6571二等座＋港口接驳＋餐饮＋三等舱；不计酒店",unknown:"C6571目标日开行、余票与执行票价待12306核实；22:00船班、上下铺与港口接驳价待核",photo:photos.yantai,steps:[
+  {t:"12:20",n:"退房前往青岛北站",s:"预留行李、午间交通与进站时间",tag:"交通日",kind:"交通",cost:"市内交通约 ¥20–50",detail:"目标发车13:40，建议13:00前到青岛北站；停留天数改变后，必须按实际日期重新核对车次。"},
+  {t:"13:40参考",n:"C6571 青岛北 → 烟台",s:"参考14:54到烟台站 · 约1小时14分",tag:"城际动车 · 待12306核",kind:"火车",cost:"二等座公开参考约 ¥74–81",detail:"公开的2026年10月16日开行计划显示C6571运行，13:40从青岛北发、14:54到烟台站（不是烟台南站）。公开票价页面存在¥74与¥81差异，以12306实际车次、余票和执行价为准；当前公开直达表未列合适的K/T/Z普速直达。",link:"https://trains.ctrip.com/TrainSchedule/C6571",linkText:"C6571公开时刻"},
+  {t:"14:54后",n:"烟台站休息、晚餐后去港口",s:"约19:30打车前往烟台北站",tag:"换港",kind:"交通",cost:"餐饮约 ¥60–100；打车价待核",detail:"百度地图查询烟台站至烟台北站（轮渡站）约6.4公里、驾车约17分钟；带行李按30–45分钟预留。目的地要写全“中铁渤海铁路轮渡烟台北站，环海路86号”，不要误去烟台南站或其他客运港。"},
   {t:"20:30前",n:"抵达中铁轮渡烟台北站",s:"芝罘区环海路86号 · 安检候船",tag:"港口",kind:"轮渡",cost:"接驳价待核",detail:"官方规则为开船前40分钟开始检票、前10分钟停止检票；计划提前约90分钟到港。",link:"https://www.yantai.gov.cn/col/col65483/index.html",linkText:"烟台市政府公开信息"},
-  {t:"22:00参考",n:"烟台北站 → 旅顺西站",s:"海上约6–7小时 · 船上过夜",tag:"三等舱优先",kind:"轮渡",cost:"官方挂牌三等舱约 ¥180–200",detail:"官方公开班期含22:00，三等舱挂牌180–200元、坐席150元。本方案按三等舱预算，未用坐席最低价冒充卧铺；目标日班次、具体房型和上下铺仍需在12306核验。",link:"https://www.yantai.gov.cn/art/2024/12/2/art_85995_3230897.html",linkText:"中铁轮渡运营服务与挂牌价"}
+  {t:"22:00参考",n:"烟台北站 → 旅顺西站",s:"航行约7小时 · 次日约05:00到",tag:"三等舱优先",kind:"轮渡",cost:"官方挂牌三等舱约 ¥180–200",detail:"官方公开班期含22:00、航行时间约7小时；第三方船票页据此列出次日05:00预计到旅顺西。到港时间受天气、调度和靠泊影响，必须在12306“船票”或向运营方核实。本方案按三等舱预算，未用坐席最低价冒充卧铺；具体房型和上下铺仍需核验。",link:"https://www.yantai.gov.cn/art/2024/12/2/art_85995_3230897.html",linkText:"中铁轮渡运营服务与挂牌价"}
  ]},
- {d:"10/18",w:"周日",city:"旅顺 → 大连",title:"清晨靠岸，慢慢进入大连",note:"海上约6–7小时后到旅顺西站；港口到大连市区仍是一段接驳，今天只安排星海广场附近。",route:["夜船","旅顺西站","大连星海广场酒店","星海广场"],states:["抵达日","半日游览","酒店过夜"],budget:[190,360],basis:"港口接驳＋餐饮＋大连酒店第1晚（≤¥150）",unknown:"靠岸时刻、接驳班次与目标日房价待核",photo:photos.dalian,steps:[
-  {t:"清晨",n:"抵达旅顺西站",s:"辽宁大连旅顺口区海韵路1020号",tag:"到港",kind:"轮渡",cost:"船票已在前一日计入",detail:"实际到港时间受班期和天气影响，不在页面承诺固定时刻。"},
-  {t:"07:00后",n:"旅顺西站 → 大连市区",s:"预留1.5–2小时转运缓冲",tag:"接驳待核",kind:"交通",cost:"预留 ¥50–120",detail:"具体公交、地铁或网约车组合尚未锁定；价格未知部分不按0元处理。"},
+ {d:"10/18",w:"周日",city:"旅顺 → 大连",title:"清晨靠岸，慢慢进入大连",note:"22:00船班公开航行时间约7小时，预计次日约05:00到旅顺西站；港口到大连市区仍是一段接驳，今天只安排星海广场附近。",route:["夜船","旅顺西站","大连星海广场酒店","星海广场"],states:["抵达日","半日游览","酒店过夜"],budget:[190,360],basis:"港口接驳＋餐饮＋大连酒店第1晚（≤¥150）",unknown:"05:00为预计到港；实际靠岸、下船和接驳班次及目标日房价待核",photo:photos.dalian,steps:[
+  {t:"约05:00",n:"抵达旅顺西站",s:"辽宁大连旅顺口区海韵路1020号",tag:"预计到港 · 待核",kind:"轮渡",cost:"船票已在前一日计入",detail:"22:00加约7小时得到05:00，仅为参考；实际到港、靠泊和下船时间受班期、天气与调度影响。"},
+  {t:"06:00后",n:"旅顺西站 → 大连市区",s:"预留1.5–2小时转运缓冲",tag:"接驳待核",kind:"交通",cost:"预留 ¥50–120",detail:"具体公交、地铁或网约车组合尚未锁定；价格未知部分不按0元处理。"},
   {t:"上午",n:"酒店寄存行李与休息",s:"星海广场一带 · 每晚≤¥150，酒店待选定",tag:"待选酒店",kind:"住宿",cost:"预算 ≤¥150 / 晚",detail:"原候选如家精选（大连星海广场会展中心店，沙河口区星海广场E区43号）估算约¥260–450/晚，超出每晚¥150的预算，需要另选；可放宽到地铁沿线的经济型酒店。",link:"https://www.bthhotels.com/list/dalian?SeoParams=a1",linkText:"首旅如家大连酒店列表"},
   {t:"16:00",n:"星海广场与海湾散步",s:"只走酒店周边，补足睡眠",tag:"半日",kind:"景点",cost:"步行免费",detail:"第一天不跨城追景点，避免夜船后过度消耗。"}
  ]},
@@ -596,9 +606,25 @@ var legModes={
   rail:{name:"普速卧铺",train:"K441",time:"新干站16:29发 · 次日07:00到广州白云",dur:"14小时31分",fare:"硬卧约 ¥300–340",effect:"车上睡一晚，第二天早上到家",min:871},
   hsr:{name:"高铁",train:"G3065",time:"新干东16:34发 · 当天20:37到广州东",dur:"约4小时03分",fare:"分段票价未查到，按 ¥400–494 预留",effect:"当晚到家",min:243}}}
 };
+var tickets={
+ "gzqd:rail":{dep:"18:57",from:"广州白云站",arr:"22:45",to:"青岛北站",plus:1,dur:"27小时48分",train:"Z168 卧铺"},
+ "gzqd:hsr":{dep:"09:45",from:"广州南站",arr:"18:36",to:"青岛北站",plus:0,dur:"8小时51分",train:"G566 高铁"},
+ "ferry":[
+  {dep:"13:40",from:"青岛北站",arr:"14:54",to:"烟台站",plus:0,dur:"1小时14分",train:"C6571"},
+  {dep:"22:00",from:"烟台北站",arr:"约05:00",to:"旅顺西站",plus:1,dur:"约7小时0分",train:"中铁轮渡夜船"}
+ ],
+ "dlnc:hsr":{dep:"08:10",from:"大连北站",arr:"22:53",to:"南昌西站",plus:0,dur:"14小时43分",train:"G2625 · 武汉换乘"},
+ "dlnc:rail":{dep:"20:35",from:"大连站",arr:"07:26",to:"南昌站",plus:2,dur:"34小时51分",train:"K682 → 北京 → T167"},
+ "ncxg:rail":{dep:"14:50",from:"南昌站",arr:"16:31",to:"新干站",plus:0,dur:"1小时41分",train:"K8723"},
+ "ncxg:hsr":{dep:"15:54",from:"南昌西站",arr:"16:32",to:"新干东站",plus:0,dur:"0小时38分",train:"G3065 高铁"},
+ "xggz:rail":{dep:"16:29",from:"新干站",arr:"07:00",to:"广州白云站",plus:1,dur:"14小时31分",train:"K441 卧铺"},
+ "xggz:hsr":{dep:"16:34",from:"新干东站",arr:"20:37",to:"广州东站",plus:0,dur:"4小时03分",train:"G3065 高铁"}
+};
+function ticketsOf(x){var list=tickets[x.leg?x.leg+":"+tripModes[x.leg]:"ferry"];return [].concat(list).map(function(raw){var k=Object.assign({},raw),arr=Math.min(days.length-1,x.start+k.plus);k.depDate=days[x.start].d;k.arrDate=days[arr].d;return k})}
+function ticketHtml(k){return '<span class="tk"><span class="tk-end"><b><em>'+esc(k.depDate)+'</em>'+esc(k.dep)+'</b><span>'+esc(k.from)+'</span></span><span class="tk-mid"><small>'+esc(k.dur)+'</small><i aria-hidden="true"></i><small>'+esc(k.train)+'</small></span><span class="tk-end r"><b><em>'+esc(k.arrDate)+'</em>'+esc(k.arr)+'</b><span>'+esc(k.to)+'</span></span></span>'}
 var tripModes={gzqd:"rail",dlnc:"hsr",ncxg:"rail",xggz:"rail"};
 function hm(m){return Math.floor(m/60)+"小时"+(m%60)+"分"}
-function trunkMinutes(){var t=Object.keys(legModes).reduce(function(a,k){return a+legModes[k].opts[tripModes[k]].min},0);return[t+420,t+540]}
+function trunkMinutes(){var t=Object.keys(legModes).reduce(function(a,k){return a+legModes[k].opts[tripModes[k]].min},0);return[t+494,t+554]}
 function ncxgDay(arriveByRail){
  var d=cloneDay(dalianDays[10]),hsr=tripModes.ncxg==="hsr";
  if(arriveByRail){d.steps[0]={t:"07:26参考",n:"T167 抵达南昌站",s:"在车站寄存行李，吃早饭",tag:"到站",kind:"火车",cost:"车票已在前一日计入",detail:"夜车到站时间以实际运行为准。"+(hsr?"下午要去南昌西站坐高铁，行李也可以带到南昌西站寄存。":"下午还从南昌站坐K8723，行李寄存在南昌站最方便。")};d.title="清晨到南昌，逛完老城坐车去新干";d.route[0]="南昌站"}
@@ -655,7 +681,7 @@ function buildPlan(){
  var segments=[
   m.gzqd==="rail"?{kind:"transit",leg:"gzqd",label:"去青岛火车",via:"Z168卧铺",duration:"普速Z168 · 27小时48分 · 车上过夜",range:built[0].d+"晚—"+built[1].d+"晚",start:0,end:1}:{kind:"transit",leg:"gzqd",label:"去青岛高铁",via:"G566高铁",duration:"高铁G566 · 8小时51分 · 当天到",range:built[0].d,start:0,end:0},
   {kind:"stay",label:"青岛",duration:(stayPrefs.qingdao+1)+"晚 · "+stayPrefs.qingdao+"个完整白天",range:built[qdArr].d+"夜—"+qdEnd+"上午",start:qdArr,end:ferryIndex},
-  {kind:"transit",label:"烟台夜船",via:"铁路＋夜船",duration:"铁路1–2小时＋航行6–7小时",range:built[ferryIndex].d+"—"+built[dalianArrival].d+" · 候船/接驳待核",start:ferryIndex,end:dalianArrival},
+  {kind:"transit",label:"烟台夜船",via:"C6571＋22:00夜船",duration:"C6571约1小时14分＋换港候船＋航行约7小时",range:built[ferryIndex].d+" 13:40—"+built[dalianArrival].d+" 约05:00 · 车船待核",start:ferryIndex,end:dalianArrival},
   {kind:"stay",label:"大连",duration:(stayPrefs.dalian+1)+"晚 · "+stayPrefs.dalian+"个完整白天＋到达大半日"+(m.dlnc==="rail"?"＋离开日白天":""),range:built[dalianArrival].d+"上午—"+built[longRail].d+(m.dlnc==="rail"?"晚上":"清晨"),start:dalianArrival,end:longRail},
   m.dlnc==="hsr"?{kind:"transit",leg:"dlnc",label:"大连→南昌",via:"高铁中转",duration:"高铁 · 公开样本14小时43分 · 含中转",range:built[longRail].d+" · 22:53到南昌西",start:longRail,end:longRail}:{kind:"transit",leg:"dlnc",label:"大连→北京→南昌",via:"K682＋T167卧铺",duration:"普速卧铺K682＋T167 · 车上两晚",range:built[longRail].d+"晚—"+built[ncStart].d+"早上",start:longRail,end:ncStart},
   {kind:"stay",label:"南昌",duration:ncNights+"晚 · "+(m.dlnc==="hsr"?stayPrefs.nanchang+"个完整日＋次日上午":"07:26到 · "+stayPrefs.nanchang+"个完整日＋上午"),range:(m.dlnc==="hsr"?built[longRail].d+"夜":built[ncStart].d+"早上")+"—"+built[xinganArrival].d+"下午",start:m.dlnc==="hsr"?longRail:ncStart,end:xinganArrival},
@@ -664,7 +690,7 @@ function buildPlan(){
   m.xggz==="rail"?{kind:"transit",leg:"xggz",label:"返穗卧铺",via:"K441卧铺",duration:"普速K441 · 约14小时31分 · 车上过夜",range:xaEnd+"傍晚—"+end+"早上",start:xinganDeparture,end:returnIndex}:{kind:"transit",leg:"xggz",label:"返穗高铁",via:"G3065高铁",duration:"高铁G3065 · 约4小时03分 · 当晚到",range:xaEnd+"傍晚",start:xinganDeparture,end:returnIndex}
  ];
  var at=function(day,hm){var q=hm.split(":");return day*24+(+q[0])+q[1]/60};
- var tGo=m.gzqd==="rail"?at(0,"18:57"):at(0,"09:45"),tQd=m.gzqd==="rail"?at(1,"22:45"):at(0,"18:36"),tFerry=at(ferryIndex,"09:30"),tDl=at(dalianArrival,"09:00");
+ var tGo=m.gzqd==="rail"?at(0,"18:57"):at(0,"09:45"),tQd=m.gzqd==="rail"?at(1,"22:45"):at(0,"18:36"),tFerry=at(ferryIndex,"13:40"),tDl=at(dalianArrival,"05:00");
  var tDlGo=m.dlnc==="hsr"?at(longRail,"08:10"):at(longRail,"20:35"),tNc=m.dlnc==="hsr"?at(longRail,"22:53"):at(longRail+2,"07:26");
  var tNcGo=m.ncxg==="rail"?at(xinganArrival,"14:50"):at(xinganArrival,"15:54"),tXg=m.ncxg==="rail"?at(xinganArrival,"16:31"):at(xinganArrival,"16:32");
  var tXgGo=m.xggz==="rail"?at(xinganDeparture,"16:29"):at(xinganDeparture,"16:34"),tHome=m.xggz==="rail"?at(xinganDeparture+1,"07:00"):at(xinganDeparture,"20:37");
@@ -681,6 +707,7 @@ function buildPlan(){
 var evidence={
  train:[
   ["Z168/Z169 公开时刻与票价","https://www.gaotie.com.cn/checi/Z168/Z169.html"],
+  ["C6571 青岛北至烟台公开时刻","https://trains.ctrip.com/TrainSchedule/C6571"],
   ["K8725 公开时刻与票价","https://www.gaotie.com.cn/checi/K8725.html"],
   ["K1666 公开时刻","https://www.gaotie.com.cn/checi/K1666.html"],
   ["K1665 公开时刻","https://www.gaotie.com.cn/lieche/nanchang-guangzhoubaiyun.html"]
@@ -791,14 +818,14 @@ function panelHtml(x,i){
  }
  var list='<ol class="sp-days">'+idx.map(function(k){var d=days[k];return '<li><button data-goto="'+k+'"><span class="sp-date">'+esc(d.d+" "+d.w)+'</span><span class="sp-title">'+esc(d.title)+'</span><span class="sp-bud">'+dayBudget(d)+'</span><span class="sp-go" aria-hidden="true">›</span></button></li>'}).join("")+'</ol>';
  var unk=[];idx.forEach(function(k){if(unk.indexOf(days[k].unknown)<0)unk.push(days[k].unknown)});
- return '<div class="seg-panel '+x.kind+'" id="segPanel'+i+'" role="region" aria-label="'+esc(x.label)+'详情">'+info+'<span class="sp-label">'+(x.kind==="stay"?esc(x.duration.split(" · ").slice(1).join(" · "))+' · ':esc(x.duration)+' · ')+'逐日 · 点按查看当天安排</span>'+list+'<p class="sp-unknown">待核：'+esc(unk.join("；"))+'</p></div>';
+ return '<div class="seg-panel '+x.kind+'" id="segPanel'+i+'" role="region" aria-label="'+esc(x.label)+'详情">'+info+'<span class="sp-label">'+(x.kind==="stay"?esc(x.duration.split(" · ").slice(1).join(" · "))+' · ':esc(x.duration)+' · 计入路上约'+x.days.toFixed(1)+'天 · ')+'逐日 · 点按查看当天安排</span>'+list+'<p class="sp-unknown">待核：'+esc(unk.join("；"))+'</p></div>';
 }
 function segHtml(x,i,activePhase){
  var cur=i===activePhase?' is-current':'',open=i===expanded,parts=x.duration.split(" · ");
  var btnAttr='data-phase="'+i+'" aria-current="'+(cur?'step':'false')+'" aria-expanded="'+open+'" aria-controls="segPanel'+i+'"',chev='<span class="seg-chev" aria-hidden="true">›</span>',panel=open?panelHtml(x,i):"";
  if(x.kind==="transit"){
   var icon=/船/.test(x.label)?icons.ferry:icons.train;
-  return '<div class="seg transit'+cur+(open?' open':'')+'"><button class="seg-main" '+btnAttr+'><span class="seg-mark" aria-hidden="true">'+icon+'</span><span class="seg-text"><b>'+esc(x.label)+'</b><span>'+(x.days<0.05?'路上不到0.1天':'路上约'+x.days.toFixed(1)+'天')+' · '+esc(x.via)+'</span></span><span></span>'+chev+'</button>'+(x.leg?modeToggle(x.leg):'')+'</div>'+panel;
+  return '<div class="seg transit'+cur+(open?' open':'')+'"><button class="seg-main" '+btnAttr+'><span class="seg-mark" aria-hidden="true">'+icon+'</span><span class="tk-body"><span class="seg-text sr"><b>'+esc(x.label)+'</b></span>'+ticketsOf(x).map(ticketHtml).join("")+'</span><span></span>'+chev+'</button>'+(x.leg?modeToggle(x.leg):'')+'</div>'+panel;
  }
  var key=stayKeyOf[x.label],c=colorOf(x.label),nights=parts.shift(),sub=parts.join(" · ");
  var stepper="";
@@ -847,12 +874,13 @@ function render(opts){
  }
  $("routeChain").innerHTML=routeHtml(d.route);
  var night=nightOf(d);
- $("stateLine").innerHTML=d.states.filter(function(x){return x!==night.b}).map(function(x){return '<span class="state-chip'+(/交通|铁路|轮渡|换乘|返程|中转|转场/.test(x)?' moving':'')+'">'+esc(x)+'</span>'}).join("");
+ var legsToday=plan.segments.filter(function(x){return x.kind==="transit"&&selected>=x.start&&selected<=x.end});
+ $("dayLegs").innerHTML=legsToday.length?'<span class="summary-label">今天的车船</span>'+legsToday.map(function(x){return ticketsOf(x).filter(function(k){return selected<=x.start+k.plus}).map(function(k){return '<div class="leg-tk">'+ticketHtml(k)+'</div>'}).join("")}).join(""):"";$("dayLegs").hidden=!legsToday.length;
  $("dayNight").textContent=night.b;$("dayNightSub").textContent=night.sub;
  $("dayBudget").textContent=dayBudget(d);
  $("budgetBasis").textContent=d.basis;
  $("budgetUnknown").textContent="待核： "+d.unknown;
- steps.innerHTML=d.steps.map(function(s,i){return '<button class="step" data-step="'+i+'" style="--dot:'+kindColor(s.kind)+'"><span class="step-time">'+timeHtml(s.t)+'</span><span class="step-dot" aria-hidden="true"></span><span class="step-main"><b>'+esc(s.n)+'</b><span>'+esc(s.s)+'</span><em>'+esc(s.kind)+' · '+esc(s.tag)+'</em></span><span class="step-go" aria-hidden="true">›</span></button>'}).join("");
+ steps.innerHTML=d.steps.map(function(s,i){return '<button class="step" data-step="'+i+'" style="--dot:'+kindColor(s.kind)+'"><span class="step-time">'+timeHtml(s.t)+'</span><span class="step-dot" aria-hidden="true"></span><span class="step-main"><b>'+esc(s.n)+'</b><span>'+esc(s.s)+'</span><em>'+esc(s.tag)+'</em></span><span class="step-go" aria-hidden="true">›</span></button>'}).join("");
  var prev=$("prevDay"),next=$("nextDay"),p=days[selected-1],q=days[selected+1];
  prev.disabled=!p;next.disabled=!q;
  prev.innerHTML='<small>← 前一天</small>'+(p?esc(p.d+" "+p.w+" · "+chipCity(p)):"已是第一天");

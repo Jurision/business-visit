@@ -101,7 +101,7 @@ class SiteContractTests(unittest.TestCase):
         for element_id in (
             "dateRail",
             "routeChain",
-            "stateLine",
+            "dayLegs",
             "dayBudget",
             "budgetBasis",
             "budgetUnknown",
@@ -121,10 +121,16 @@ class SiteContractTests(unittest.TestCase):
 
     def test_ferry_uses_real_ports_and_berth_price_not_seat_floor(self):
         for token in (
+            "C6571 青岛北 → 烟台",
+            "13:40参考",
+            "14:54到烟台站",
+            "不是烟台南站",
+            "二等座公开参考约 ¥74–81",
             "烟台北站",
             "旅顺西站",
             "环海路86号",
             "海韵路1020号",
+            "次日约05:00到",
             "官方挂牌三等舱约 ¥180–200",
             "未用坐席最低价冒充卧铺",
             "候船预留90分钟",
@@ -163,6 +169,12 @@ class SiteContractTests(unittest.TestCase):
     def test_time_ledger_adds_up_to_calendar_days(self):
         for token in ("时间怎么分", "出发前/到家后", "var hrs=[tGo,", "total*24-tHome", "广州出发", "回到广州"):
             self.assertIn(token, self.html)
+
+
+    def test_transit_shows_departure_and_arrival_like_a_ticket(self):
+        for token in ("function ticketHtml(", 'from:"广州白云站",arr:"22:45",to:"青岛北站"', 'from:"新干站",arr:"07:00",to:"广州白云站"', "k.depDate=days[x.start].d", "k.arrDate=days[arr].d", "今天的车船"):
+            self.assertIn(token, self.html)
+        self.assertNotIn('<span class="summary-label">状态</span>', self.html)
 
 
 if __name__ == "__main__":
