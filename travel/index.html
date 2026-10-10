@@ -15,205 +15,402 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#f4f0e7">
+<link rel="preconnect" href="https://commons.wikimedia.org">
+<link rel="preconnect" href="https://upload.wikimedia.org">
 <style>
 :root{
-  --paper:#f4f0e7;--card:#fffdf8;--ink:#173b43;--muted:#6a706b;--line:#d9d0c2;
-  --sea:#2e7f83;--sea-soft:#dceceb;--red:#b84e36;--gold:#b48a45;--shadow:0 18px 50px rgba(35,57,55,.13)
+  --paper:#f4f0e7;--card:#fffdf8;--ink:#173b43;--muted:#5f6a66;--faint:#8c928d;--line:#e4dccf;--line-strong:#cfc3b1;
+  --sea:#2e7f83;--sea-soft:#e2eeec;--red:#b84e36;--red-soft:#f8e8e2;--gold:#8f6320;--gold-soft:#f7eedc;
+  --c-gz:#86735e;--c-qd:#2e7f83;--c-dl:#3d6797;--c-xg:#5b8743;--c-nc:#b3762a;
+  --shadow:0 1px 2px rgba(23,59,67,.05),0 10px 30px rgba(23,59,67,.07);
+  color-scheme:light;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:96px}
+html.locked,html.locked body{overflow:hidden}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Segoe UI","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 button,a{font:inherit}
-button{color:inherit}
-.shell{max-width:1080px;margin:auto;padding:22px clamp(16px,4vw,44px) 70px}
-.mast{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:end;padding:10px 0 22px;border-bottom:1px solid var(--line)}
-.eyebrow{color:var(--red);font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-h1{font-family:Georgia,"Noto Serif SC",serif;font-size:clamp(32px,5vw,62px);line-height:1.02;letter-spacing:-.035em;margin:10px 0 14px;font-weight:600}
-.lede{max-width:620px;color:var(--muted);margin:0;font-size:15px}
-.hero-art{position:relative;height:200px;border-radius:22px;overflow:hidden;background:#cddfdb;box-shadow:var(--shadow)}
-.hero-art img{width:100%;height:100%;object-fit:cover;display:block}
-.date-rail::-webkit-scrollbar,.phase-rail::-webkit-scrollbar{display:none}
-.place{white-space:nowrap;font-size:13px;font-weight:750}.arrow{color:var(--red)}
-.plan-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:20px 0 0}
-.plan-label{font-size:12px;color:var(--muted);font-weight:750}
-.plan-switch{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:16px;background:rgba(255,253,248,.74)}
-.plan-choice{border:0;background:transparent;border-radius:12px;padding:9px 13px;cursor:pointer;font-size:13px;font-weight:800}
-.plan-choice[aria-pressed="true"]{background:var(--ink);color:white}
-.stay-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
-.stay-control{display:grid;gap:9px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:11px}
-.stay-name b,.stay-name small{display:block}.stay-name b{font-size:13px}.stay-name small{font-size:10px;color:var(--muted);margin-top:2px}
-.counter{display:grid;grid-template-columns:34px 1fr 34px;gap:5px;align-items:center}.counter button{width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-size:18px}.counter button:disabled{opacity:.3;cursor:not-allowed}.counter strong{text-align:center;font-size:12px;line-height:1.25}
-.limit-note{border-radius:12px;padding:9px 11px;background:var(--sea-soft);color:var(--sea);font-size:12px;font-weight:750}.limit-note.over{background:#f6dfd8;color:#943c2b}
-.allocation{margin-top:14px;border:1px solid var(--line);border-radius:20px;background:rgba(255,253,248,.68);padding:16px}
-.allocation-head{display:grid;gap:12px;margin-bottom:13px}
-.allocation-head h2{font:600 21px/1.2 Georgia,"Noto Serif SC",serif;margin:0 0 4px}
-.allocation-head p{margin:0;color:var(--muted);font-size:12px}
-.allocation-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%}
-.metric{border:1px solid var(--line);border-radius:12px;padding:7px 10px;background:var(--card);min-width:0}
-.metric b,.metric span{display:block}.metric b{font-size:13px}.metric span{color:var(--muted);font-size:10px;margin-top:1px}
-.phase-rail{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;padding:1px 1px 5px;scrollbar-width:none}
-.phase{position:relative;flex:1 0 148px;min-height:86px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:10px 11px;text-align:left;cursor:pointer;scroll-snap-align:start}
-.phase:before{content:"●";display:block;color:var(--sea);font-size:12px;margin-bottom:4px}.phase.transit:before{content:"→";color:var(--red);font-size:17px;line-height:12px}
-.phase b,.phase span,.phase small{display:block}.phase b{font-size:13px}.phase span{color:var(--muted);font-size:11px;line-height:1.35;margin-top:3px}.phase small{color:var(--sea);font-size:10px;font-weight:800;margin-top:5px}
-.phase.transit{background:#fff8f1;border-color:#dfc3b8}.phase[aria-current="step"]{outline:3px solid rgba(46,127,131,.22);border-color:var(--sea)}
-.rail-wrap{position:sticky;top:0;z-index:20;background:linear-gradient(var(--paper) 82%,transparent);padding:14px 0 12px}
-.date-rail{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;padding:1px 2px 6px}
-.date{flex:0 0 78px;border:1px solid var(--line);border-radius:16px;background:rgba(255,253,248,.75);padding:9px 8px 8px;cursor:pointer;text-align:left;scroll-snap-align:center;transition:.2s ease}
-.date b,.date span{display:block}.date b{font-size:15px}.date span{font-size:11px;color:var(--muted);margin-top:2px}
-.date[aria-selected="true"]{background:var(--ink);color:white;border-color:var(--ink);transform:translateY(-2px)}
+button{color:inherit;touch-action:manipulation}
+:focus-visible{outline:3px solid rgba(46,127,131,.45);outline-offset:2px}
+.shell{max-width:680px;margin:0 auto;padding:0 16px calc(36px + env(safe-area-inset-bottom))}
+
+/* 顶部 */
+.mast{padding:env(safe-area-inset-top) 4px 16px}
+.hero-art{display:block;margin:0 -20px -4px;height:112px;overflow:hidden;line-height:0}
+.hero-art img{width:100%;height:100%;object-fit:cover;object-position:50% 62%;mix-blend-mode:multiply;-webkit-mask-image:linear-gradient(180deg,#000 72%,transparent);mask-image:linear-gradient(180deg,#000 72%,transparent)}
+.eyebrow{font-size:13px;font-weight:650;color:var(--red);font-variant-numeric:tabular-nums}
+h1{margin:4px 0 10px;font-size:27px;line-height:1.22;font-weight:750;letter-spacing:-.01em}
+h1 span{display:block}
+.h1-days{color:var(--sea)}
+.plan-label{display:inline-flex;align-items:center;gap:6px;margin:0;border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:650;color:var(--gold);background:var(--gold-soft)}
+.plan-label:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.plan-label.over{color:#9a3a26;background:var(--red-soft)}
+.mast-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.today-btn{border:0;border-radius:999px;background:var(--ink);color:#fff;font-size:12.5px;font-weight:700;min-height:32px;padding:0 13px;cursor:pointer}
+
+/* 总览 */
+.overview{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px 16px 14px;box-shadow:var(--shadow)}
+.ov-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.ov-head h2{font-size:17px;line-height:1.3;margin:0;font-weight:750}
+.ov-tools{display:flex;gap:6px}
+.pill-btn.alt{background:var(--ink);color:#fff}
+.pill-btn.alt[aria-pressed="true"]{background:var(--red)}
+.pill-btn{border:0;background:var(--sea-soft);color:var(--sea);border-radius:999px;padding:0 14px;min-height:36px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.allocation-summary{display:grid;grid-template-columns:.82fr 1.36fr .92fr;gap:8px}
+.stat{min-width:0;border:0;border-radius:14px;background:var(--paper);padding:10px 11px 9px;text-align:left;color:inherit}
+.stat small,.stat b,.stat span{display:block}
+.stat small{font-size:11.5px;font-weight:650;color:var(--muted)}
+.stat b{font-size:19px;line-height:1.3;margin-top:2px;font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat span{font-size:11px;line-height:1.4;color:var(--faint);margin-top:1px}
+.stat-btn{cursor:pointer;background:var(--red-soft)}
+.stat-btn b{color:var(--red)}
+.stat-btn small:after{content:" ›";font-weight:800}
+.stat.over b{color:#9a3a26}
+
+.phase-rail{display:flex;flex-direction:column;margin-top:10px}
+.seg{position:relative;display:flex;align-items:center;gap:8px}
+.seg:before{content:"";position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--line-strong)}
+.seg-end{position:relative;display:grid;grid-template-columns:22px minmax(0,1fr);column-gap:10px;align-items:center;min-height:40px;padding:4px 0}
+.seg-end:first-child:before,.seg-end:last-child:before{content:"";position:absolute;left:10px;width:2px;background:var(--line-strong)}
+.seg-end:first-child:before{top:50%;bottom:0}.seg-end:last-child:before{top:0;bottom:50%}
+.seg-end .seg-mark{position:relative;z-index:1;justify-self:center;width:12px;height:12px;border-radius:3px;background:var(--c-gz);box-shadow:0 0 0 3px var(--card)}
+.seg-end b{display:block;font-size:14px;font-weight:750;line-height:1.35}
+.seg-end span span{display:block;font-size:12px;color:var(--muted);line-height:1.4;font-variant-numeric:tabular-nums}
+.ledger{margin-top:12px}
+.lg-head{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--faint)}
+.lg-bar{display:flex;height:28px;border-radius:9px;overflow:hidden;margin-top:6px;background:var(--paper)}
+.lg-bar i{display:flex;align-items:center;justify-content:center;min-width:3px;font-style:normal;font-size:10.5px;font-weight:750;color:#fff;white-space:nowrap;overflow:hidden;box-shadow:inset -1px 0 0 var(--card);font-variant-numeric:tabular-nums}
+.lg-bar i.t{background:repeating-linear-gradient(135deg,#dcae9f 0 4px,#f0dcd4 4px 8px);color:#7a3a2a}
+.lg-bar i.o{background:#e3ddd1;color:var(--muted)}
+.lg-sum{margin:6px 0 0;font-size:12.5px;line-height:1.5;color:var(--muted)}
+.lg-sum b{color:var(--ink);font-variant-numeric:tabular-nums}
+.lg-sum b.lg-t{color:var(--red)}
+.seg:first-child:before{top:50%}.seg:last-child:before{bottom:50%}
+.seg.transit:before{background:repeating-linear-gradient(180deg,var(--red) 0 4px,transparent 4px 8px);opacity:.55}
+.seg.is-current:after{content:"";position:absolute;inset:3px -8px;border-radius:12px;background:var(--sea-soft);z-index:0}
+.seg-main{position:relative;z-index:1;flex:1;min-width:0;display:grid;grid-template-columns:22px minmax(0,1fr) auto 14px;column-gap:10px;align-items:center;border:0;background:none;padding:9px 0;text-align:left;cursor:pointer;color:inherit;min-height:48px}
+.seg-mark{justify-self:center;width:14px;height:14px;border-radius:50%;background:var(--c);box-shadow:0 0 0 3px var(--card)}
+.seg.transit .seg-mark{width:20px;height:20px;background:var(--card);color:var(--red);box-shadow:none;display:grid;place-items:center}
+.seg.transit .seg-mark svg{width:15px;height:15px}
+.seg-text b,.seg-text span{display:block}
+.seg-text b{font-size:15.5px;font-weight:750;line-height:1.35}
+.seg-text span{font-size:12.5px;color:var(--muted);line-height:1.45;margin-top:1px;font-variant-numeric:tabular-nums}
+.seg.transit .seg-main{padding:6px 0;min-height:44px}
+.seg.transit .seg-text b{font-size:13.5px;font-weight:650;color:#7a3a2a}
+.seg.transit .seg-text span{font-size:12px}
+.seg-nights{font-size:15px;font-weight:750;color:var(--c);font-variant-numeric:tabular-nums;white-space:nowrap}
+.seg-chev{color:var(--faint);font-size:17px;line-height:1;justify-self:end;transition:transform .2s}
+.seg.open .seg-chev{transform:rotate(90deg);color:var(--ink)}
+.seg-panel{position:relative;padding:2px 0 12px 32px}
+.seg-panel:before{content:"";position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--line-strong)}
+.seg-panel.transit:before{background:repeating-linear-gradient(180deg,var(--red) 0 4px,transparent 4px 8px);opacity:.55}
+.seg-panel:last-child:before{bottom:calc(100% - 8px)}
+.sp-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.sp-facts>div{background:var(--paper);border-radius:12px;padding:8px 10px;min-width:0}
+.sp-facts small{display:block;font-size:11px;font-weight:650;color:var(--faint);line-height:1.4}
+.sp-facts b{display:block;font-size:14px;font-weight:750;line-height:1.4;font-variant-numeric:tabular-nums}
+.sp-facts b+small{color:var(--muted);font-weight:500;margin-top:1px}
+.sp-fact-money b{color:var(--red)}
+.sp-legs{display:grid;gap:6px;margin-bottom:10px}
+.sp-leg{display:grid;grid-template-columns:48px minmax(0,1fr);gap:8px;background:var(--paper);border-radius:12px;padding:8px 10px}
+.sp-t{font-size:12.5px;font-weight:750;color:var(--red);font-variant-numeric:tabular-nums;line-height:1.4}
+.sp-t small{display:block;font-size:10.5px;color:var(--faint);font-weight:650}
+.sp-leg b{display:block;font-size:13.5px;line-height:1.4}
+.sp-leg small{display:block;font-size:12px;color:var(--muted);line-height:1.45}
+.sp-leg em{display:block;font-style:normal;font-size:12px;font-weight:650;color:var(--sea);line-height:1.45;margin-top:1px}
+.sp-label{display:block;font-size:11px;font-weight:700;color:var(--faint);margin:2px 0 4px}
+.sp-days{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+.sp-days li+li{border-top:1px solid var(--line)}
+.sp-days button{display:grid;grid-template-columns:auto minmax(0,1fr) auto 10px;gap:8px;align-items:center;width:100%;min-height:44px;border:0;background:none;padding:8px 10px;text-align:left;cursor:pointer;color:inherit;font-size:13px;line-height:1.4}
+.sp-days button:active{background:var(--paper)}
+.sp-date{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sp-title{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-bud{color:var(--red);font-weight:700;font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sp-go{color:var(--faint)}
+.sp-unknown{margin:8px 0 0;font-size:12px;line-height:1.5;color:var(--gold)}
+.modes{position:relative;z-index:1;display:none;padding:3px;gap:2px;border-radius:12px;background:var(--paper);flex:none}
+.modes button{min-width:48px;min-height:38px;border:0;border-radius:9px;background:none;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer}
+.modes button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(23,59,67,.16)}
+.overview.editing .modes{display:flex}
+.mode-cmp{display:grid;gap:6px;margin-bottom:10px}
+.mode-opt{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:9px 11px;cursor:pointer;color:inherit}
+.mode-opt[aria-pressed="true"]{border-color:var(--sea);background:var(--sea-soft);box-shadow:inset 0 0 0 1px var(--sea)}
+.mo-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.mo-head b{font-size:14px;font-weight:750}
+.mo-head span{font-size:12px;font-weight:700;color:var(--muted)}
+.mo-line{display:block;font-size:12.5px;color:var(--muted);line-height:1.5}
+.mo-eff{display:block;font-size:12px;font-weight:650;color:var(--ink);line-height:1.5;margin-top:3px}
+.mo-eff b.up{color:var(--red)}.mo-eff b.down{color:#2b7a5a}
+.mode-opt[aria-pressed="true"] .mo-eff{color:var(--sea)}
+.stepper{position:relative;z-index:1;display:none;align-items:center;gap:2px}
+.stepper button{width:44px;height:44px;border:1px solid var(--line-strong);border-radius:12px;background:var(--card);font-size:20px;line-height:1;cursor:pointer;color:var(--ink)}
+.stepper button:disabled{color:#b9b3a8;background:var(--paper);border-color:var(--line);cursor:not-allowed}
+.stepper output{min-width:42px;text-align:center;font-weight:750;font-variant-numeric:tabular-nums}
+.overview.editing .stepper{display:flex}
+.overview.editing .seg.adjustable .seg-nights{display:none}
+.overview.editing .seg.stay:not(.adjustable) .seg-nights{color:var(--faint)}
+.ov-actions{display:flex;gap:8px;margin-top:10px}
+.adjust-toggle{flex:1;min-height:44px;border:1px solid var(--line-strong);border-radius:13px;background:transparent;font-weight:700;font-size:14px;cursor:pointer}
+.adjust-toggle[aria-expanded="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.reset-btn{min-height:44px;border:0;border-radius:13px;background:var(--paper);padding:0 14px;font-weight:650;font-size:13.5px;color:var(--muted);cursor:pointer}
+.limit-note{margin-top:10px;border-radius:12px;padding:9px 12px;background:var(--sea-soft);color:var(--sea);font-size:12.5px;font-weight:650;line-height:1.5}
+.limit-note.over{background:var(--red-soft);color:#943c2b}
+[hidden]{display:none!important}
+
+/* 日期条 */
+.rail-wrap{position:sticky;top:0;z-index:20;margin:14px -16px 0;padding:8px 0;background:rgba(244,240,231,.9);-webkit-backdrop-filter:saturate(1.3) blur(14px);backdrop-filter:saturate(1.3) blur(14px);box-shadow:0 1px 0 var(--line)}
+.date-rail{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;padding:2px 16px;scroll-padding-inline:16px;overscroll-behavior-x:contain}
+.date-rail::-webkit-scrollbar{display:none}
+.date{flex:0 0 56px;position:relative;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:10px 0 6px;text-align:center;cursor:pointer;scroll-snap-align:center;color:inherit}
+.date:before{content:"";position:absolute;left:12px;right:12px;top:4px;height:3px;border-radius:3px;background:var(--c)}
+.date.moving:before{background:repeating-linear-gradient(90deg,var(--c) 0 5px,transparent 5px 8px)}
+.date b,.date span,.date i{display:block;white-space:nowrap}
+.date b{font-size:17px;line-height:1.2;font-weight:750;font-variant-numeric:tabular-nums}
+.date span{font-size:11px;color:var(--muted);line-height:1.3}
+.date i{font-style:normal;font-size:11px;font-weight:700;color:var(--c);line-height:1.4;margin-top:1px}
+.date[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
 .date[aria-selected="true"] span{color:#c8d8d8}
-.stage{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;margin-top:8px;align-items:start}
-.day{background:var(--card);border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:var(--shadow);min-height:520px}
-.day-head{padding:26px 28px 21px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
-.day-kicker{font-size:12px;color:var(--red);font-weight:800;letter-spacing:.12em}
-.day-title{font-family:Georgia,"Noto Serif SC",serif;font-size:clamp(28px,4vw,43px);line-height:1.13;margin:5px 0 5px;font-weight:600}
-.day-note{color:var(--muted);margin:0;max-width:580px}
-.day-count{flex:none;border:1px solid var(--line);border-radius:50%;width:52px;height:52px;display:grid;place-items:center;color:var(--sea);font:700 17px Georgia,serif}
-.day-visual{position:relative;margin:0;height:238px;background:var(--sea-soft);overflow:hidden}
+.date[aria-selected="true"] i{color:#fff}
+.date.today:after{content:"今天";position:absolute;top:-7px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-size:9.5px;font-weight:700;border-radius:6px;padding:0 5px;line-height:15px}
+
+/* 每日卡片 */
+.stage{margin-top:12px}
+.day{background:var(--card);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:var(--shadow);touch-action:pan-y}
+.day.swap{animation:swap .26s ease-out}
+@keyframes swap{from{opacity:.25;transform:translateX(var(--dx,0))}to{opacity:1;transform:none}}
+.day-visual{position:relative;margin:0;aspect-ratio:16/7;background:linear-gradient(135deg,#e4ece9,#eef2ee);overflow:hidden}
 .photo-btn{display:block;width:100%;height:100%;padding:0;border:0;background:none;cursor:zoom-in}
-.day-photo{display:block;width:100%;height:100%;object-fit:cover}
-.day-visual.photo-fail:before{content:"图片暂时无法加载";position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-weight:750}
-.day-visual.photo-fail .day-photo{display:none}
-.photo-credit{position:absolute;right:12px;bottom:10px;max-width:80%;color:white;background:rgba(17,43,48,.78);border-radius:999px;padding:5px 9px;font-size:10px;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.day-summary{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:18px;padding:18px 28px;border-bottom:1px solid var(--line);background:#fbf8f1}
-.summary-label{display:block;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.08em;margin-bottom:7px}
-.route-chain{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.route-node{font-weight:800;font-size:13px}.route-arrow{color:var(--red);font-weight:900}
-.state-line{margin-top:9px}
-.state-chip{display:inline-block;margin:2px 5px 2px 0;border:1px solid #bdd5d2;color:var(--sea);border-radius:999px;padding:3px 8px;font-size:11px;font-weight:800}
-.day-budget{border-left:1px solid var(--line);padding-left:18px}
-.day-budget b{display:block;color:var(--red);font:600 25px/1.1 Georgia,serif}
-.day-budget small{display:block;color:var(--muted);font-size:11px;line-height:1.45;margin-top:5px}
-.unknown{color:#8d6430!important;font-weight:750}
-.steps{padding:7px 28px 26px}
-.step{display:grid;grid-template-columns:72px 18px 1fr;gap:12px;width:100%;border:0;background:none;padding:18px 0;text-align:left;cursor:pointer;border-bottom:1px solid var(--line)}
-.step:last-child{border-bottom:0}
-.step-time{font-weight:800;font-variant-numeric:tabular-nums;color:var(--red)}
-.step-dot{width:12px;height:12px;border:3px solid var(--card);background:var(--sea);border-radius:50%;box-shadow:0 0 0 1px var(--sea);margin-top:5px;position:relative}
-.step:not(:last-child) .step-dot:after{content:"";position:absolute;top:12px;left:4px;width:1px;height:64px;background:var(--line)}
-.step-main b{display:block;font-size:17px}.step-main span{color:var(--muted);display:block;margin-top:3px}
-.step-main em{font-style:normal;display:inline-block;color:var(--sea);font-size:12px;font-weight:750;margin-top:7px}
-.step:hover .step-main b,.step:focus-visible .step-main b{color:var(--red)}
-.side{display:grid;gap:12px}
-.side-card{border:1px solid var(--line);background:rgba(255,253,248,.62);border-radius:18px;padding:18px}
-.side-card h2{font:600 22px/1.15 Georgia,"Noto Serif SC",serif;margin:0 0 7px}
-.side-card p{margin:0;color:var(--muted);font-size:13px}
-.actions{display:grid;gap:9px;margin-top:15px}
-.action{border:1px solid var(--ink);border-radius:13px;background:transparent;min-height:44px;text-align:left;padding:10px 13px;cursor:pointer;font-weight:750}
-.action:hover,.action:focus-visible{background:var(--ink);color:white}
-.status{display:flex;gap:8px;align-items:flex-start}.status i{width:8px;height:8px;border-radius:50%;background:var(--gold);margin-top:7px;flex:none}
-.privacy{border-left:3px solid var(--gold);padding-left:12px}
-.nav-row{display:flex;justify-content:space-between;gap:12px;margin-top:14px}
-.nav{border:0;border-bottom:1px solid var(--ink);background:none;padding:9px 0;cursor:pointer;font-weight:800}
-.nav:disabled{opacity:.3;cursor:not-allowed}
-.overlay{position:fixed;inset:0;z-index:60;background:rgba(17,32,31,.46);opacity:0;pointer-events:none;transition:opacity .22s}
+.day-photo{display:block;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s}
+.day-photo.ready{opacity:1}
+.day-visual.photo-fail:before{content:"图片暂时无法加载\A" attr(data-alt);white-space:pre-line;position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:0 24px;color:var(--muted);font-size:13px;font-weight:650;line-height:1.7}
+.day-visual.photo-fail .photo-btn{display:none}
+.photo-credit{position:absolute;right:8px;bottom:8px;max-width:75%;color:#fff;background:rgba(17,43,48,.62);border-radius:999px;padding:3px 9px;font-size:10.5px;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zoom-hint{position:absolute;left:8px;bottom:8px;width:28px;height:28px;border-radius:50%;background:rgba(17,43,48,.55);color:#fff;display:grid;place-items:center;pointer-events:none}
+.zoom-hint svg{width:15px;height:15px}
+.day-visual.photo-fail .zoom-hint{display:none}
+.day-head{padding:14px 18px 0}
+.day-kicker{font-size:12.5px;font-weight:700;color:var(--red);font-variant-numeric:tabular-nums}
+.day-title{font-size:22px;line-height:1.3;margin:3px 0 6px;font-weight:750}
+.day-note{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
+.day-summary{margin:14px 18px 0;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.summary-label{display:block;color:var(--faint);font-size:11.5px;font-weight:700;margin-bottom:4px}
+.sum-route{padding:11px 14px 12px}
+.route-chain{display:flex;flex-wrap:wrap;align-items:center;gap:3px 6px}
+.route-node{font-size:14px;font-weight:600;line-height:1.45}
+.route-node.is-end{font-weight:750}
+.route-arrow{color:var(--red);font-size:12px;opacity:.75}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+.sum-cell{padding:10px 14px;min-width:0}
+.sum-cell+.sum-cell{border-left:1px solid var(--line)}
+.sum-cell b{display:block;font-size:15px;font-weight:750;line-height:1.4}
+.sum-cell small{display:block;font-size:12px;color:var(--muted);line-height:1.4;margin-top:1px}
+.state-line{display:flex;flex-wrap:wrap;gap:4px}
+.state-chip{display:inline-block;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:650;line-height:1.5;background:var(--sea-soft);color:var(--sea)}
+.state-chip.moving{background:var(--red-soft);color:var(--red)}
+.day-budget{border-top:1px solid var(--line);padding:10px 14px 11px}
+.day-budget b{display:block;color:var(--red);font-size:21px;line-height:1.3;font-weight:750;font-variant-numeric:tabular-nums}
+.day-budget small{display:block;color:var(--muted);font-size:12px;line-height:1.5;margin-top:2px}
+.unknown{display:block;border-top:1px solid #ecdfc3;background:var(--gold-soft);color:var(--gold);padding:9px 14px 9px 36px;position:relative;font-size:12.5px;font-weight:650;line-height:1.5}
+.unknown:before{content:"!";position:absolute;left:13px;top:10px;width:16px;height:16px;border-radius:50%;background:var(--gold);color:var(--gold-soft);font-size:11px;font-weight:800;line-height:16px;text-align:center}
+.steps-label{padding:18px 18px 0}
+.steps{padding:0 12px 2px}
+.step{position:relative;display:grid;grid-template-columns:50px 12px minmax(0,1fr) 10px;column-gap:10px;width:100%;border:0;background:none;padding:11px 6px;text-align:left;cursor:pointer;color:inherit;border-radius:14px;align-items:start}
+.step:before{content:"";position:absolute;left:71px;top:31px;bottom:-12px;width:2px;background:var(--line)}
+.step:last-child:before{display:none}
+.step:active{background:var(--paper)}
+@media(hover:hover){.step:hover{background:#faf6ee}}
+.step-time{font-size:13px;font-weight:750;color:var(--red);font-variant-numeric:tabular-nums;line-height:1.4;padding-top:2px}
+.step-time small{display:block;font-size:11px;font-weight:650;color:var(--faint)}
+.step-dot{position:relative;z-index:1;width:12px;height:12px;border-radius:50%;background:var(--card);border:3px solid var(--dot,var(--sea));margin-top:5px}
+.step-main b,.step-main span{display:block}
+.step-main b{font-size:15.5px;font-weight:700;line-height:1.45}
+.step-main span{color:var(--muted);font-size:13.5px;line-height:1.5;margin-top:1px}
+.step-main em{display:inline-block;font-style:normal;font-size:11.5px;font-weight:650;color:var(--sea);background:var(--sea-soft);border-radius:6px;padding:1px 7px;margin-top:6px}
+.step-go{color:var(--faint);font-size:20px;line-height:1;align-self:center}
+.nav-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 18px 18px}
+.nav{min-height:52px;border:1px solid var(--line);border-radius:14px;background:var(--paper);font-weight:700;font-size:13.5px;line-height:1.35;cursor:pointer;padding:6px 12px;text-align:left;color:inherit}
+.nav small{display:block;font-size:11.5px;color:var(--muted);font-weight:600}
+#nextDay{text-align:right}
+.nav:disabled{opacity:.45;cursor:not-allowed}
+
+.foot{margin:22px 4px 0;color:var(--muted);font-size:12.5px;line-height:1.65}
+.foot p{margin:0 0 8px}
+.foot b{color:var(--ink)}
+
+/* 抽屉 */
+.overlay{position:fixed;inset:0;z-index:60;background:rgba(17,32,31,.42);opacity:0;pointer-events:none;transition:opacity .22s}
 .overlay.open{opacity:1;pointer-events:auto}
-.sheet{position:absolute;right:0;top:0;height:100%;width:min(560px,100%);background:var(--card);padding:24px clamp(20px,5vw,38px) 40px;overflow:auto;transform:translateX(102%);transition:transform .28s cubic-bezier(.22,.8,.25,1);box-shadow:-20px 0 70px rgba(0,0,0,.19)}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:90vh;max-height:90dvh;background:var(--card);border-radius:22px 22px 0 0;padding:0 20px calc(26px + env(safe-area-inset-bottom));overflow:auto;overscroll-behavior:contain;transform:translateY(102%);transition:transform .3s cubic-bezier(.22,.8,.25,1);box-shadow:0 -12px 40px rgba(0,0,0,.16)}
 .overlay.open .sheet{transform:none}
-.sheet-top{display:flex;justify-content:space-between;gap:16px;align-items:center;position:sticky;top:-24px;background:linear-gradient(var(--card) 78%,transparent);padding:24px 0 18px;z-index:2}
-.close{border:1px solid var(--line);background:var(--card);border-radius:50%;width:44px;height:44px;cursor:pointer;font-size:22px}
-.sheet-label{font-size:12px;letter-spacing:.12em;color:var(--red);font-weight:850}
-.sheet h2{font:600 clamp(28px,5vw,46px)/1.08 Georgia,"Noto Serif SC",serif;margin:8px 0 12px}
-.sheet-copy{color:var(--muted);margin:0 0 22px}
-.sheet-photo{width:100%;max-height:52vh;object-fit:cover;border-radius:18px;background:var(--sea-soft)}
-.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:17px 0}
-.fact{background:var(--card);padding:13px}.fact small,.fact b{display:block}.fact small{color:var(--muted);font-size:11px}.fact b{margin-top:3px}
-.callout{background:var(--sea-soft);padding:14px 16px;border-radius:14px;margin:16px 0}
-.callout strong{display:block;margin-bottom:4px}
-.sheet h3{font:700 18px Georgia,"Noto Serif SC",serif;margin:27px 0 10px}
-.list{padding-left:20px;margin:0}.list li{margin:7px 0;color:var(--muted)}
-.evidence{display:block;color:var(--sea);margin:8px 0;text-underline-offset:3px}
-.budget-total{font:600 44px/1 Georgia,serif;color:var(--red);margin:11px 0}
-.budget-row{display:flex;justify-content:space-between;gap:15px;border-bottom:1px solid var(--line);padding:13px 0}.budget-row span{color:var(--muted)}
-.map{width:100%;height:auto;background:#edf2ed;border:1px solid var(--line);border-radius:20px;margin:10px 0}
-.map .line{fill:none;stroke:var(--red);stroke-width:3;stroke-dasharray:7 6}.map .point{fill:var(--ink);stroke:#fff;stroke-width:3}.map text{font:700 12px sans-serif;fill:var(--ink)}
-.extension{border:1px solid var(--line);border-radius:18px;padding:16px;margin:10px 0}.extension h3{margin:0 0 5px}.extension p{color:var(--muted);margin:0 0 9px}
-.tag{display:inline-block;background:var(--sea-soft);color:var(--sea);border-radius:99px;padding:4px 8px;font-size:11px;font-weight:800;margin:3px 4px 3px 0}
-.foot{color:var(--muted);font-size:12px;text-align:center;padding-top:28px}
-@media(max-width:760px){
-  .shell{padding-top:15px}.mast{grid-template-columns:1fr}.hero-art{height:150px}.stage{grid-template-columns:1fr}.side{grid-template-columns:1fr 1fr}.side-card:first-child{grid-column:1/-1}
-  .plan-bar{align-items:flex-start;flex-direction:column}.plan-switch{width:100%}.plan-choice{flex:1;padding-left:8px;padding-right:8px}.allocation-summary{grid-template-columns:1fr 1fr}.metric:last-child{grid-column:1/-1}.stay-controls{grid-template-columns:1fr 1fr}.phase{flex-basis:178px}
-  .day{min-height:470px}.day-head,.steps{padding-left:19px;padding-right:19px}.day-visual{height:210px}.day-summary{grid-template-columns:1fr;padding:15px 19px;gap:13px}.day-budget{border-left:0;border-top:1px solid var(--line);padding:12px 0 0}.step{grid-template-columns:58px 15px 1fr;gap:9px}
-  .sheet{top:auto;bottom:0;height:min(88vh,760px);width:100%;border-radius:24px 24px 0 0;transform:translateY(102%)}
+.sheet-grip{position:sticky;top:0;z-index:3;height:20px;margin:0 -20px;display:grid;place-items:center;background:var(--card);cursor:grab;touch-action:none}
+.sheet-grip span{width:40px;height:5px;border-radius:3px;background:var(--line-strong)}
+.sheet-top{position:sticky;top:20px;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:16px;background:var(--card);padding:0 0 8px;touch-action:none}
+.close{flex:none;border:0;background:var(--paper);border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:22px;line-height:1;color:var(--ink)}
+.sheet-label{font-size:12.5px;color:var(--red);font-weight:700}
+.sheet h2{font-size:22px;line-height:1.3;font-weight:750;margin:2px 0 8px}
+.sheet-copy{color:var(--muted);margin:0 0 14px;font-size:14.5px;line-height:1.65}
+.zoom{margin:4px -20px 10px;background:#111;line-height:0;overflow:hidden;cursor:zoom-in;position:relative;min-height:120px}
+.zoom.zoomed{overflow:auto;cursor:zoom-out;max-height:72vh}
+.sheet-photo{display:block;width:100%;max-height:68vh;object-fit:contain}
+.zoom.zoomed .sheet-photo{width:220%;max-width:none;max-height:none}
+.zoom.photo-fail:before{content:"图片暂时无法加载";position:absolute;inset:0;display:grid;place-items:center;color:#ddd;font-size:13px;line-height:1.5}
+.zoom.photo-fail img{display:none}
+.zoom-tip{font-size:12px;color:var(--faint);margin:-4px 0 10px}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:4px 0 14px}
+.fact{background:var(--card);padding:11px 13px}
+.fact small,.fact b{display:block}
+.fact small{color:var(--faint);font-size:11.5px;font-weight:650}
+.fact b{margin-top:2px;font-size:14.5px;line-height:1.45}
+.callout{background:var(--sea-soft);padding:12px 14px;border-radius:14px;margin:14px 0;font-size:13.5px;line-height:1.6}
+.callout strong{display:block;margin-bottom:2px}
+.callout.warn{background:var(--gold-soft);color:#6d4a15}
+.sheet h3{font-size:15.5px;font-weight:750;margin:22px 0 8px}
+.list{padding-left:18px;margin:0}
+.list li{margin:6px 0;color:var(--muted);font-size:13.5px;line-height:1.55}
+.list b{color:var(--ink)}
+.evidence{display:flex;align-items:center;min-height:44px;color:var(--sea);font-weight:650;text-underline-offset:3px}
+.budget-total{font-size:32px;line-height:1.15;font-weight:750;color:var(--red);margin:4px 0 2px;font-variant-numeric:tabular-nums}
+.budget-sub{color:var(--muted);font-size:13px;margin:0 0 14px}
+.budget-rows{border-top:1px solid var(--line)}
+.budget-row{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;row-gap:6px;align-items:center;width:100%;border:0;border-bottom:1px solid var(--line);background:none;padding:10px 2px;text-align:left;cursor:pointer;color:inherit}
+.budget-row b{font-size:14px;font-weight:700}
+.budget-row b small{font-weight:600;color:var(--muted);font-size:12.5px;margin-left:6px}
+.budget-row span{font-size:14px;font-weight:700;color:var(--red);font-variant-numeric:tabular-nums}
+.budget-row i{grid-column:1/-1;position:relative;height:4px;border-radius:2px;background:var(--paper)}
+.budget-row i:after{content:"";position:absolute;top:0;bottom:0;left:var(--lo);right:calc(100% - var(--hi));border-radius:2px;background:var(--red);opacity:.55}
+.budget-row.cur{background:var(--sea-soft)}
+.map{width:100%;height:auto;background:#edf2ed;border:1px solid var(--line);border-radius:16px;margin:6px 0 10px}
+.map .line{fill:none;stroke:var(--red);stroke-width:3;stroke-dasharray:7 6}.map .point{fill:var(--ink);stroke:#fff;stroke-width:3}.map text{font:700 13px -apple-system,"PingFang SC",sans-serif;fill:var(--ink)}
+.sheet .route-chain{margin:8px 0 4px}
+
+.stat em{display:block;font-style:normal;font-size:11px;font-weight:750;line-height:1.35;margin-top:2px}
+.stat em:empty{display:none}
+.up{color:var(--red)}.down{color:#2b7a5a}
+.jump-pill{position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:39;min-height:42px;padding:0 15px;border:0;border-radius:999px;background:rgba(23,59,67,.92);color:#fff;font-size:13px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+html.locked .jump-pill{display:none}
+.change-bar{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:40;max-width:520px;margin:0 auto;background:var(--ink);color:#fff;border-radius:16px;padding:6px 8px 8px 12px;box-shadow:0 12px 34px rgba(0,0,0,.28)}
+.cb-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cb-title{font-size:12.5px;font-weight:700;color:#d6e6e5;line-height:1.4;min-width:0}
+.cb-close{flex:none;border:0;background:rgba(255,255,255,.12);color:#fff;width:40px;height:34px;border-radius:12px;font-size:18px;line-height:1;cursor:pointer}
+.cb-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-top:4px}
+.cb-cell{background:rgba(255,255,255,.08);border-radius:10px;padding:5px 8px;min-width:0}
+.cb-cell small,.cb-cell b,.cb-cell span{display:block}
+.cb-cell small{font-size:11px;font-weight:650;color:#a9c3c2}
+.cb-cell b{font-size:15px;font-weight:800;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.cb-cell span{font-size:10.5px;color:#d6e6e5;line-height:1.35;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cb-cell b.up{color:#ffb7a5}.cb-cell b.down{color:#9fe3c8}
+.cb-foot{margin-top:5px;font-size:11.5px;line-height:1.5;color:#d6e6e5}
+html.has-bar .shell{padding-bottom:150px}
+@media(min-width:1000px){
+  .change-bar{left:auto;right:24px;width:440px}
+  .shell{max-width:1220px;display:grid;grid-template-columns:390px minmax(0,1fr);column-gap:32px;align-items:start;padding:0 32px 60px}
+  .col-left{position:sticky;top:0;max-height:100vh;overflow:auto;padding:0 6px 28px;margin:0 -6px;scrollbar-width:thin}
+  .col-right{min-width:0}
+  .mast{padding-top:20px}
+  .rail-wrap{margin:0;padding:18px 0 10px;box-shadow:none;border-bottom:1px solid var(--line)}
+  .date-rail{padding:2px 2px;scroll-padding-inline:2px}
+  .date{flex:1 0 54px}
+  .day-visual{aspect-ratio:21/8}
+  .day-head{padding:20px 26px 0}
+  .day-title{font-size:26px}
+  .day-summary{margin:16px 26px 0;display:grid;grid-template-columns:1.4fr 1fr}
+  .sum-route{grid-column:1/-1}
+  .sum-grid{border-right:1px solid var(--line)}
+  .day-budget{border-top:1px solid var(--line)}
+  .unknown{grid-column:1/-1}
+  .steps-label{padding:20px 26px 0}
+  .steps{padding:0 20px 4px}
+  .nav-row{padding:12px 26px 24px}
+  .sheet{left:auto;top:0;height:100%;max-height:none;width:min(520px,100%);border-radius:0;padding:0 30px 40px;transform:translateX(102%)}
+  .sheet-grip{display:none}
+  .sheet-top{top:0;padding:22px 0 10px}
+  .zoom{margin:4px -30px 10px}
 }
-@media(max-width:480px){.side{grid-template-columns:1fr}.side-card:first-child{grid-column:auto}.hero-art{height:128px}.mast{gap:16px}.date{flex-basis:72px}.day-visual{height:190px}.day-title{font-size:30px}.allocation{padding:13px}.metric{flex:1;min-width:0}.stay-controls{grid-template-columns:1fr}.stay-control{grid-template-columns:1fr 150px;align-items:center}.phase{flex-basis:172px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <main class="shell">
-  <header class="mast">
-    <div>
-      <div class="eyebrow">2026年10月12日出发 · 候选行程</div>
-      <h1 id="heroTitle">广州—青岛—大连—江西 12日行程</h1>
-      <p class="lede" id="heroLede">10月12日至23日。青岛2个完整日，大连1个完整日加到达大半日，新干约2天探亲，南昌到达半日；停留可调，总程上限14天。</p>
-    </div>
-    <figure class="hero-art">
-      <img src="img/personal-trip-watercolor.png" alt="广州、青岛海岸与江西乡野的水彩旅行图">
-    </figure>
-  </header>
+  <div class="col-left">
+    <header class="mast">
+      <picture class="hero-art">
+        <source srcset="img/personal-trip-watercolor.webp" type="image/webp">
+        <img src="img/personal-trip-watercolor.png" alt="广州、青岛海岸与江西乡野的水彩旅行图" width="2161" height="728" decoding="async">
+      </picture>
+      <div class="eyebrow" id="heroDates">10月12日 周一 — 10月23日 周五</div>
+      <h1 id="heroTitle"><span>广州—青岛—大连—江西</span><span class="h1-days">12日行程</span></h1>
+      <div class="mast-row"><p class="plan-label" id="planStatus">12天 · 候选未订票</p><button class="today-btn" id="todayBtn" hidden></button></div>
+    </header>
 
-  <section class="plan-bar" aria-label="当前行程状态">
-    <span class="plan-label" id="planStatus">12天推荐 · 候选未订票</span>
-  </section>
-
-  <section class="allocation" aria-labelledby="allocationTitle">
-    <div class="allocation-head">
-      <div><h2 id="allocationTitle">行程分段与时间分配</h2><p>停留夜数、完整活动日和实际交通小时分开计算；点击阶段可跳到对应日期。</p></div>
-      <div class="allocation-summary" id="allocationSummary"></div>
-    </div>
-    <div class="stay-controls" id="stayControls" aria-label="调整各地停留时间"></div>
-    <div class="limit-note" id="limitNote" aria-live="polite"></div>
-    <nav class="phase-rail" id="phaseRail" aria-label="按阶段选择行程"></nav>
-  </section>
-
-  <div class="rail-wrap">
-    <nav class="date-rail" id="dateRail" aria-label="选择日期" role="tablist"></nav>
+    <section class="overview" id="overview" aria-labelledby="allocationTitle">
+      <div class="ov-head"><h2 id="allocationTitle">行程总览</h2><span class="ov-tools"><button class="pill-btn alt" id="adjustTop" aria-controls="phaseRail">调整</button><button class="pill-btn" id="mapBtn">路线图</button></span></div>
+      <div class="allocation-summary" id="allocationSummary">
+        <div class="stat" id="statDaysBox"><small>总天数</small><b id="statDays">12天</b><span id="statDaysSub">上限14天</span><em id="dDays"></em></div>
+        <button class="stat stat-btn" id="budgetBtn" aria-label="查看逐日预算"><small>预算估算</small><b id="statBudget">—</b><span>交通·住宿·餐饮·门票</span><em id="dBudget"></em></button>
+        <div class="stat"><small>路上</small><b id="statTransit">—</b><span id="statTransitSub"></span><em id="dTransit"></em></div>
+      </div>
+      <div class="ledger" id="timeLedger"></div>
+      <div id="stayControls" aria-label="各段停留与交通，可调整停留时间">
+        <nav class="phase-rail" id="phaseRail" aria-label="按阶段选择行程"></nav>
+      </div>
+      <div class="ov-actions">
+        <button class="adjust-toggle" id="adjustToggle" aria-expanded="false" aria-controls="phaseRail">调整天数与交通</button>
+        <button class="reset-btn" id="resetStays" hidden>恢复默认</button>
+      </div>
+      <div class="limit-note" id="limitNote" aria-live="polite" hidden></div>
+    </section>
   </div>
 
-  <section class="stage">
-    <article class="day" id="dayCard" aria-live="polite">
-      <header class="day-head">
-        <div><div class="day-kicker" id="dayKicker"></div><h2 class="day-title" id="dayTitle"></h2><p class="day-note" id="dayNote"></p></div>
-        <div class="day-count" id="dayCount" aria-hidden="true"></div>
-      </header>
-      <figure class="day-visual" id="dayVisual"></figure>
-      <section class="day-summary" aria-label="当天方向和预算">
-        <div>
-          <span class="summary-label">今天怎么走</span>
-          <div class="route-chain" id="routeChain"></div>
-          <div class="state-line" id="stateLine"></div>
-        </div>
-        <div class="day-budget">
-          <span class="summary-label">当天预算</span>
-          <b id="dayBudget"></b>
-          <small id="budgetBasis"></small>
-          <small class="unknown" id="budgetUnknown"></small>
-        </div>
-      </section>
-      <div class="steps" id="steps"></div>
-    </article>
+  <div class="col-right">
+    <div class="rail-wrap" id="railWrap">
+      <nav class="date-rail" id="dateRail" aria-label="选择日期" role="tablist"></nav>
+    </div>
 
-    <aside class="side">
-      <section class="side-card">
-        <h2>只看今天</h2>
-        <p>点日期切换；点任一步骤查看车次、住宿、预算、地图与核验状态。手机上也可以左右滑动主卡片。</p>
-        <div class="actions">
-          <button class="action" id="budgetBtn">¥ 查看总预算</button>
-          <button class="action" id="mapBtn">⌁ 打开完整路线图</button>
-        </div>
-        <div class="nav-row"><button class="nav" id="prevDay">← 前一天</button><button class="nav" id="nextDay">后一天 →</button></div>
-      </section>
-      <section class="side-card status"><i></i><div><h2>预订状态</h2><p>这是行程草案，不代表已出票或订房。出发前请在 12306 与酒店官方渠道再次核对。</p></div></section>
-      <section class="side-card privacy"><h2>隐私边界</h2><p>公开版只展示“新干县家中”，不公开村庄、门牌或家庭具体位置。</p></section>
-    </aside>
-  </section>
-  <p class="foot">最后更新：2026年10月10日 · 票价、班次与房价均为参考，不替代实时预订结果。</p>
+    <section class="stage">
+      <article class="day" id="dayCard" aria-live="polite">
+        <figure class="day-visual" id="dayVisual"></figure>
+        <header class="day-head">
+          <div class="day-kicker" id="dayKicker"></div>
+          <h2 class="day-title" id="dayTitle"></h2>
+          <p class="day-note" id="dayNote"></p>
+        </header>
+        <section class="day-summary" aria-label="当天方向和预算">
+          <div class="sum-route">
+            <span class="summary-label">今天怎么走</span>
+            <div class="route-chain" id="routeChain"></div>
+          </div>
+          <div class="sum-grid">
+            <div class="sum-cell"><span class="summary-label">状态</span><div class="state-line" id="stateLine"></div></div>
+            <div class="sum-cell"><span class="summary-label">今晚</span><b id="dayNight"></b><small id="dayNightSub"></small></div>
+          </div>
+          <div class="day-budget">
+            <span class="summary-label">当天预算</span>
+            <b id="dayBudget"></b>
+            <small id="budgetBasis"></small>
+          </div>
+          <small class="unknown" id="budgetUnknown"></small>
+        </section>
+        <div class="steps-label"><span class="summary-label">当天安排 · 点按查看车次、费用与核验</span></div>
+        <div class="steps" id="steps"></div>
+        <div class="nav-row"><button class="nav" id="prevDay"></button><button class="nav" id="nextDay"></button></div>
+      </article>
+    </section>
+
+    <footer class="foot">
+      <p><b>预订状态：</b>这是行程草案，不代表已出票或订房。班次、票价、船班与房价均为参考，出发前请在 12306、运营方与酒店官方渠道再次核对。</p>
+      <p><b>隐私边界：</b>公开版只展示“新干县家中”，不公开村庄、门牌或家庭具体位置。</p>
+      <p>最后更新：2026年10月10日 · 不替代实时预订结果。</p>
+    </footer>
+  </div>
 </main>
 
+<button class="jump-pill" id="jumpPill" hidden></button>
+<aside class="change-bar" id="changeBar" aria-live="polite" aria-label="调整带来的变化" hidden></aside>
+
 <div class="overlay" id="overlay" aria-hidden="true">
-  <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
-    <div class="sheet-top"><span class="sheet-label" id="sheetLabel">行程详情</span><button class="close" id="closeSheet" aria-label="关闭">×</button></div>
+  <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet-grip" id="sheetGrip" aria-hidden="true"><span></span></div>
+    <div class="sheet-top" id="sheetTop"><span class="sheet-label" id="sheetLabel">行程详情</span><button class="close" id="closeSheet" aria-label="关闭">×</button></div>
     <div id="sheetContent"></div>
   </section>
 </div>
@@ -228,7 +425,7 @@ var days=[
  ]},
  {d:"10/13",w:"周二",city:"青岛",title:"夜抵青岛，先安顿",note:"不安排景点，把体力留给接下来的三天海岸慢游。",steps:[
   {t:"22:45",n:"抵达青岛北站",s:"出站后前往市南区酒店",tag:"夜间到达",kind:"火车",cost:"打车 / 地铁按实时",detail:"末班地铁与行李情况可能影响选择；如果太晚，直接打车更稳妥。"},
-  {t:"23:40",n:"办理入住",s:"如家精选 · 八大关第三海水浴场店",tag:"住4晚",kind:"住宿",cost:"约 ¥260–420 / 晚",detail:"地址：青岛市市南区太平角三路2号甲。靠近第三海水浴场与太平角公园，适合三天慢行。",link:"https://www.bthhotels.com/hotel/J53214",linkText:"酒店官方页面"}
+  {t:"23:40",n:"办理入住",s:"市南区海边一带 · 每晚≤¥150，酒店待选定",tag:"住4晚",kind:"住宿",cost:"预算 ≤¥150 / 晚",detail:"原候选如家精选（八大关第三海水浴场店，市南区太平角三路2号甲）参考约¥260–420/晚，超出每晚¥150的预算，需要另选；可放宽到地铁或公交方便到海边的经济型酒店。",link:"https://www.bthhotels.com/hotel/J53214",linkText:"原候选酒店官方页面（超预算）"}
  ]},
  {d:"10/14",w:"周三",city:"青岛",title:"八大关到第三海水浴场",note:"第一天只走一条海岸线：建筑、林荫道、海湾和日落。",steps:[
   {t:"09:30",n:"八大关",s:"从酒店慢慢步行进入万国建筑群",tag:"慢走",kind:"景点",cost:"街区免费",detail:"不要赶景点清单，沿韶关路、嘉峪关路一带散步即可。"},
@@ -288,10 +485,10 @@ var photos={
 };
 var baseMeta=[
  {route:["广州住处","广州白云站","Z168夜车 → 青岛"],states:["交通日","火车过夜"],budget:[480,590],basis:"硬卧＋市内接驳＋餐饮；车票仅今天计入",unknown:"实际余票与铺位待12306确认",photo:photos.baiyun},
- {route:["Z168车上","青岛北站","市南酒店"],states:["抵达日","酒店过夜"],budget:[300,550],basis:"夜间接驳＋餐饮＋青岛酒店第1晚",unknown:"末班地铁与当日房价待核",photo:photos.qdsea},
- {route:["酒店","八大关","太平角","第三海水浴场","酒店"],states:["游览日","步行海岸","酒店过夜"],budget:[360,620],basis:"餐饮＋市内交通＋酒店第2晚",unknown:"不含临时付费项目",photo:photos.badaguan},
- {route:["酒店","大学路","小鱼山","鲁迅公园","琴屿路","酒店"],states:["游览日","老城慢走","酒店过夜"],budget:[360,650],basis:"餐饮＋交通＋门票预留＋酒店第3晚",unknown:"小鱼山票价以现场为准",photo:photos.qdsea},
- {route:["酒店","五四广场","奥帆中心","燕儿岛山","酒店"],states:["游览日","城市海湾","酒店过夜"],budget:[360,620],basis:"餐饮＋市内交通＋酒店第4晚",unknown:"游船等自选项目未计",photo:photos.may4},
+ {route:["Z168车上","青岛北站","市南酒店"],states:["抵达日","酒店过夜"],budget:[140,280],basis:"夜间接驳＋餐饮＋青岛酒店第1晚（≤¥150）",unknown:"末班地铁待核；酒店需按每晚≤¥150重新选定",photo:photos.qdsea},
+ {route:["酒店","八大关","太平角","第三海水浴场","酒店"],states:["游览日","步行海岸","酒店过夜"],budget:[200,350],basis:"餐饮＋市内交通＋酒店第2晚（≤¥150）",unknown:"不含临时付费项目",photo:photos.badaguan},
+ {route:["酒店","大学路","小鱼山","鲁迅公园","琴屿路","酒店"],states:["游览日","老城慢走","酒店过夜"],budget:[200,380],basis:"餐饮＋交通＋门票预留＋酒店第3晚（≤¥150）",unknown:"小鱼山票价以现场为准",photo:photos.qdsea},
+ {route:["酒店","五四广场","奥帆中心","燕儿岛山","酒店"],states:["游览日","城市海湾","酒店过夜"],budget:[200,350],basis:"餐饮＋市内交通＋酒店第4晚（≤¥150）",unknown:"游船等自选项目未计",photo:photos.may4},
  {route:["青岛酒店","青岛北站","T396夜车 → 南昌"],states:["交通日","火车过夜"],budget:[400,520],basis:"硬卧＋接驳＋餐饮；不计酒店",unknown:"车次与余票待12306复核",photo:photos.qdsea},
  {route:["T396车上","南昌站","新干站","新干县家中"],states:["换乘日","下午探亲","家中过夜"],budget:[120,230],basis:"K8725硬座＋乡镇接驳＋餐饮",unknown:"公开时刻有冲突；接驳价待确认",photo:photos.xingan},
  {route:["新干县家中"],states:["探亲完整日","家中过夜"],budget:[60,150],basis:"只计日常餐饮与本地零星交通",unknown:"礼物与家庭支出未计",photo:photos.jiangxi},
@@ -309,60 +506,119 @@ var dalianDays=baseDays.slice(0,5).map(cloneDay).concat([
   {t:"20:30前",n:"抵达中铁轮渡烟台北站",s:"芝罘区环海路86号 · 安检候船",tag:"港口",kind:"轮渡",cost:"接驳价待核",detail:"官方规则为开船前40分钟开始检票、前10分钟停止检票；计划提前约90分钟到港。",link:"https://www.yantai.gov.cn/col/col65483/index.html",linkText:"烟台市政府公开信息"},
   {t:"22:00参考",n:"烟台北站 → 旅顺西站",s:"海上约6–7小时 · 船上过夜",tag:"三等舱优先",kind:"轮渡",cost:"官方挂牌三等舱约 ¥180–200",detail:"官方公开班期含22:00，三等舱挂牌180–200元、坐席150元。本方案按三等舱预算，未用坐席最低价冒充卧铺；目标日班次、具体房型和上下铺仍需在12306核验。",link:"https://www.yantai.gov.cn/art/2024/12/2/art_85995_3230897.html",linkText:"中铁轮渡运营服务与挂牌价"}
  ]},
- {d:"10/18",w:"周日",city:"旅顺 → 大连",title:"清晨靠岸，慢慢进入大连",note:"海上约6–7小时后到旅顺西站；港口到大连市区仍是一段接驳，今天只安排星海广场附近。",route:["夜船","旅顺西站","大连星海广场酒店","星海广场"],states:["抵达日","半日游览","酒店过夜"],budget:[350,660],basis:"港口接驳＋餐饮＋大连酒店第1晚",unknown:"靠岸时刻、接驳班次与目标日房价待核",photo:photos.dalian,steps:[
+ {d:"10/18",w:"周日",city:"旅顺 → 大连",title:"清晨靠岸，慢慢进入大连",note:"海上约6–7小时后到旅顺西站；港口到大连市区仍是一段接驳，今天只安排星海广场附近。",route:["夜船","旅顺西站","大连星海广场酒店","星海广场"],states:["抵达日","半日游览","酒店过夜"],budget:[190,360],basis:"港口接驳＋餐饮＋大连酒店第1晚（≤¥150）",unknown:"靠岸时刻、接驳班次与目标日房价待核",photo:photos.dalian,steps:[
   {t:"清晨",n:"抵达旅顺西站",s:"辽宁大连旅顺口区海韵路1020号",tag:"到港",kind:"轮渡",cost:"船票已在前一日计入",detail:"实际到港时间受班期和天气影响，不在页面承诺固定时刻。"},
   {t:"07:00后",n:"旅顺西站 → 大连市区",s:"预留1.5–2小时转运缓冲",tag:"接驳待核",kind:"交通",cost:"预留 ¥50–120",detail:"具体公交、地铁或网约车组合尚未锁定；价格未知部分不按0元处理。"},
-  {t:"上午",n:"酒店寄存行李与休息",s:"如家精选 · 大连星海广场会展中心店",tag:"候选酒店",kind:"住宿",cost:"估算 ¥260–450 / 晚",detail:"地址：大连市沙河口区星海广场E区43号。官方页面可确认酒店与位置，但10月目标日价格仍需登录查询。",link:"https://www.bthhotels.com/list/dalian?SeoParams=a1",linkText:"首旅如家大连酒店列表"},
+  {t:"上午",n:"酒店寄存行李与休息",s:"星海广场一带 · 每晚≤¥150，酒店待选定",tag:"待选酒店",kind:"住宿",cost:"预算 ≤¥150 / 晚",detail:"原候选如家精选（大连星海广场会展中心店，沙河口区星海广场E区43号）估算约¥260–450/晚，超出每晚¥150的预算，需要另选；可放宽到地铁沿线的经济型酒店。",link:"https://www.bthhotels.com/list/dalian?SeoParams=a1",linkText:"首旅如家大连酒店列表"},
   {t:"16:00",n:"星海广场与海湾散步",s:"只走酒店周边，补足睡眠",tag:"半日",kind:"景点",cost:"步行免费",detail:"第一天不跨城追景点，避免夜船后过度消耗。"}
  ]},
- {d:"10/19",w:"周一",city:"大连",title:"东港与中山广场",note:"完整游览日，上午海港、下午城市街区，晚上回星海广场一带住宿。",route:["星海广场酒店","东港","威尼斯水城","中山广场","酒店"],states:["游览完整日","市内交通","酒店过夜"],budget:[360,650],basis:"餐饮＋交通＋大连酒店第2晚",unknown:"自选游船与展馆门票未计",photo:photos.dalian,steps:[
+ {d:"10/19",w:"周一",city:"大连",title:"东港与中山广场",note:"完整游览日，上午海港、下午城市街区，晚上回星海广场一带住宿。",route:["星海广场酒店","东港","威尼斯水城","中山广场","酒店"],states:["游览完整日","市内交通","酒店过夜"],budget:[200,350],basis:"餐饮＋交通＋大连酒店第2晚（≤¥150）",unknown:"自选游船与展馆门票未计",photo:photos.dalian,steps:[
   {t:"10:00",n:"东港海岸",s:"港湾步行与城市天际线",tag:"海港",kind:"景点",cost:"步行免费",detail:"按天气决定步行时长。"},
   {t:"13:30",n:"威尼斯水城周边",s:"建筑与水岸慢走",tag:"街区",kind:"景点",cost:"街区免费",detail:"不把游船纳入基础预算。"},
   {t:"17:00",n:"中山广场",s:"看老建筑，晚饭后返回酒店",tag:"城市",kind:"景点",cost:"免费",detail:"城市交通按地铁与短途打车组合预留。"}
  ]},
- {d:"10/20",w:"周二",city:"大连",title:"滨海路与渔人码头",note:"第二个大连日保持慢节奏；今晚仍住星海广场，次日用较贵的快速铁路换回探亲时间。",route:["星海广场酒店","滨海路","渔人码头","酒店"],states:["游览完整日","海岸","酒店过夜"],budget:[360,650],basis:"餐饮＋交通＋大连酒店第3晚",unknown:"景区接驳与天气影响待核",photo:photos.dalian,steps:[
+ {d:"10/20",w:"周二",city:"大连",title:"滨海路与渔人码头",note:"第二个大连日保持慢节奏；今晚仍住星海广场，次日用较贵的快速铁路换回探亲时间。",route:["星海广场酒店","滨海路","渔人码头","酒店"],states:["游览完整日","海岸","酒店过夜"],budget:[200,350],basis:"餐饮＋交通＋大连酒店第3晚（≤¥150）",unknown:"景区接驳与天气影响待核",photo:photos.dalian,steps:[
   {t:"10:00",n:"滨海路择段慢走",s:"按体力选择一小段，不走全线",tag:"海岸",kind:"景点",cost:"免费",detail:"大连海岸距离长，必须控制范围。"},
   {t:"14:30",n:"渔人码头",s:"咖啡、海港与傍晚光线",tag:"放松",kind:"景点",cost:"按个人消费",detail:"不额外塞入远郊目的地。"},
   {t:"晚上",n:"整理行李，早休息",s:"明早前往大连北站",tag:"准备转场",kind:"住宿",cost:"酒店已计入当天预算",detail:"确认次日高铁中转站和两个车次是否在同站换乘。"}
  ]},
- {d:"10/21",w:"周三",city:"大连 → 南昌",title:"用一整天铁路换回探亲时间",note:"候选快速方案经武汉中转，约08:10从大连北出发、22:53到南昌西；它比普速贵，但能保留约两天探亲。",route:["星海广场酒店","大连北站","武汉换乘","南昌西站","南昌酒店"],states:["全天交通","高铁中转","酒店过夜"],budget:[1130,1450],basis:"二等座参考约¥1005＋餐饮＋接驳＋南昌酒店",unknown:"10/21具体车次、同站换乘和余票未核",photo:photos.dalianrail,steps:[
+ {d:"10/21",w:"周三",city:"大连 → 南昌",title:"一整天高铁到南昌",note:"全程唯一的高铁段：大连到南昌没有查到直达普速车。经武汉中转，约08:10从大连北出发、22:53到南昌西。",route:["星海广场酒店","大连北站","武汉换乘","南昌西站","南昌老城酒店"],states:["全天交通","高铁中转","酒店过夜"],budget:[1050,1320],basis:"二等座参考约¥1005＋餐饮＋接驳＋南昌酒店（@H）",unknown:"10/21具体车次、同站换乘和余票未核",photo:photos.dalianrail,steps:[
   {t:"06:40",n:"酒店 → 大连北站",s:"预留早餐与进站",tag:"早出发",kind:"交通",cost:"预留 ¥40–80",detail:"根据最终酒店位置重新计算。"},
-  {t:"08:10参考",n:"大连北 → 武汉",s:"公开样本为G2625，约19:19到",tag:"高铁",kind:"火车",cost:"二等座公开样本 ¥896",detail:"这是相近日公开样本，不是10月21日实时余票。"},
+  {t:"08:10参考",n:"大连北 → 武汉",s:"公开样本为G2625，约19:19到",tag:"高铁",kind:"火车",cost:"二等座公开样本 ¥896",detail:"这是相近日公开样本，不是10月21日实时余票。大连到南昌没有查到直达普速车，普速中转会多花约一天，所以这一段保留高铁。"},
   {t:"20:54参考",n:"武汉 → 南昌西",s:"公开样本约22:53到",tag:"中转",kind:"火车",cost:"二等座公开样本 ¥109",detail:"预留约1小时35分换乘；目标日时刻必须在12306重新组合。",link:"https://trains.ctrip.com/TrainBooking/dalian-nanchang",linkText:"公开中转样本"},
-  {t:"23:20",n:"入住南昌",s:"南昌西站周边一晚",tag:"住1晚",kind:"住宿",cost:"估算 ¥180–280",detail:"第二天需要去南昌站搭普速列车，酒店应兼顾晚到与早起。"}
+  {t:"23:30",n:"入住南昌老城",s:"南昌西站打车到滕王阁、万寿宫一带",tag:"住1晚",kind:"住宿",cost:"酒店 @H；夜间打车约 ¥40–60",detail:"住老城，第二天上午可以步行去滕王阁和万寿宫，下午再去南昌站坐普速去新干。原候选如家商旅（滕王阁万寿宫地铁站店）参考约¥180–280/晚，超出每晚¥150的预算，需要另选。",link:"https://www.bthhotels.com/hotel/Z79103",linkText:"原候选酒店官方页面（超预算）"}
  ]},
- {d:"10/22",w:"周四",city:"南昌 → 新干县",title:"上午去新干，下午先看爷爷奶奶",note:"今天到家后先陪爷爷奶奶；公开版只写新干县家中，不显示村庄或住宅。",route:["南昌酒店","南昌站","新干站","新干县家中"],states:["短途铁路","下午探亲","家中过夜"],budget:[120,230],basis:"K8725硬座＋市内/乡镇接驳＋餐饮",unknown:"车次时刻冲突与乡镇接驳价待核",photo:photos.xingan,steps:[
-  {t:"上午",n:"酒店 → 南昌站",s:"不要误去南昌西站",tag:"换站",kind:"交通",cost:"接驳按实时",detail:"前一晚住南昌西站附近时，需提前跨城到南昌站。"},
-  {t:"11:47参考",n:"K8725 南昌 → 新干",s:"参考13:50到；公开资料存在时刻冲突",tag:"需复核",kind:"火车",cost:"硬座约 ¥21.5",detail:"另有公开页面显示12:11发车，以12306为准。"},
-  {t:"下午",n:"新干站 → 家中",s:"先看爷爷奶奶",tag:"家庭位置隐藏",kind:"探亲",cost:"接驳预留 ¥50–100",detail:"页面不显示村名、门牌或精确地图点。"}
+ {d:"10/22",w:"周四",city:"南昌 → 新干县",title:"上午逛南昌老城，下午坐火车去新干",note:"上午滕王阁和万寿宫，午饭后从南昌站乘K8723普速列车，约16:31到新干，傍晚到家。",route:["南昌老城酒店","滕王阁","万寿宫","南昌站","新干站","新干县家中"],states:["半日游览","普速火车","家中过夜"],budget:[200,340],basis:"滕王阁门票＋餐饮＋K8723硬座＋两端接驳；不计酒店",unknown:"K8723目标日时刻、票价与新干站接驳待核",photo:photos.nanchang,steps:[
+  {t:"08:30",n:"退房，寄存行李",s:"行李放酒店前台，轻装游览",tag:"老城",kind:"住宿",cost:"—",detail:"下午回酒店取行李再去南昌站；如果酒店不能寄存，就先带去南昌站寄存。"},
+  {t:"09:00",n:"滕王阁",s:"南昌市东湖区仿古街58号 · 预留约2小时",tag:"南昌",kind:"景点",cost:"门票约 ¥50",detail:"上午人相对少。门票与开放时间以景区官方为准。"},
+  {t:"11:30",n:"万寿宫历史文化街区",s:"午饭与老城散步",tag:"午饭",kind:"景点",cost:"街区免费 · 餐饮约 ¥40–80",detail:"白天逛街区、吃午饭，不赶夜游。"},
+  {t:"13:40",n:"取行李，前往南昌站",s:"注意是南昌站，不是南昌西站",tag:"转场",kind:"交通",cost:"市内交通约 ¥20–40",detail:"老城到南昌站打车或地铁都可以；建议发车前至少40分钟到站。"},
+  {t:"14:50参考",n:"K8723 南昌 → 新干",s:"参考16:31到新干 · 约1小时41分",tag:"普速 · 需复核",kind:"火车",cost:"硬座参考约 ¥20–25",detail:"公开时刻：南昌14:50发、新干16:31到。同一下午的K441（南昌14:43发、新干约16:25到）可作备选。票价参考同区段K8725硬座约¥21.5，以12306为准。",link:"https://train.hao86.com/K8723/",linkText:"K8723公开时刻"},
+  {t:"16:31后",n:"（可选）县城顺路看堂妹",s:"到站后约在县城见一面",tag:"可选",kind:"探亲",cost:"按个人消费",detail:"堂妹就在新干县城、离新干站很近，不用单独占一天；时间对不上就直接回家，离开那天也可以顺路再约。"},
+  {t:"傍晚",n:"新干站 → 家中",s:"先看爷爷奶奶",tag:"家人接送优先",kind:"接驳",cost:"约 ¥50–100 预留",detail:"已隐藏村庄名称、门牌与精确地图点；家人接送或当地网约车请私下确认。"}
  ]},
- {d:"10/23",w:"周五",city:"新干县",title:"爷爷奶奶与堂妹的一整天",note:"完整探亲日：先陪爷爷奶奶，再根据堂妹时间去县城；不安排观光打卡。",route:["新干县家中","县城堂妹","新干县家中"],states:["探亲完整日","县内接驳","家中过夜"],budget:[80,220],basis:"县内交通＋餐饮；住宿不计",unknown:"礼物、聚餐与家庭支出未计",photo:photos.jiangxi,steps:[
+ {d:"10/23",w:"周五",city:"新干县",title:"陪爷爷奶奶的一整天",note:"完整探亲日：在家陪爷爷奶奶；不安排观光打卡。",route:["新干县家中"],states:["探亲完整日","家中过夜"],budget:[50,140],basis:"日常餐饮与零星交通；住宿不计",unknown:"礼物、聚餐与家庭支出未计",photo:photos.jiangxi,steps:[
   {t:"上午",n:"陪爷爷奶奶",s:"家中时间优先",tag:"探亲",kind:"探亲",cost:"按家庭安排",detail:"不公开家庭地点和照片。"},
-  {t:"下午",n:"去县城看堂妹",s:"具体时间先私下确认",tag:"县城",kind:"探亲",cost:"县内交通预留 ¥30–80",detail:"如果堂妹时间不合适，整天继续留在家中。"},
+  {t:"下午",n:"继续陪家人",s:"在家吃饭、聊天、休息",tag:"不赶路",kind:"探亲",cost:"按家庭安排",detail:"看堂妹不必单独占一天：她就在新干县城、离火车站很近，安排在到达或离开时顺路见一面即可。"},
   {t:"晚上",n:"回家中过夜",s:"至此约有10/22下午＋10/23全天＋10/24上午",tag:"约2天探亲",kind:"住宿",cost:"不计酒店",detail:"没有悄悄压缩成一天；10/24中午后才离开。"}
  ]},
- {d:"10/24",w:"周六",city:"新干县 → 南昌",title:"上午陪家人，下午去南昌",note:"探亲约两天后再进南昌；下午滕王阁，晚上万寿宫，住一晚。",route:["新干县家中","新干站","南昌站","滕王阁","万寿宫","南昌酒店"],states:["半日探亲","交通＋游览","酒店过夜"],budget:[385,605],basis:"车票＋门票＋餐饮＋接驳＋酒店",unknown:"周六门票、房价与K1666运行待核",photo:photos.nanchang,steps:[
-  {t:"上午",n:"继续陪家人",s:"中午前后再前往新干站",tag:"探亲",kind:"探亲",cost:"按家庭安排",detail:"保证探亲总量约两天。"},
-  {t:"午后",n:"新干 → 南昌",s:"K1666同向时刻仅作参考",tag:"铁路",kind:"火车",cost:"硬座约 ¥25.5",detail:"若早班不合适，需要在12306选择午后替代车次。"},
-  {t:"15:30后",n:"滕王阁 → 万寿宫",s:"实际到站晚时只保留万寿宫",tag:"弹性游览",kind:"景点",cost:"滕王阁门票约 ¥50",detail:"不为打卡牺牲探亲时间。"},
-  {t:"晚上",n:"入住南昌老城",s:"如家商旅滕王阁万寿宫地铁站店",tag:"住1晚",kind:"住宿",cost:"估算 ¥180–280",detail:"目标日期房价待酒店官方渠道确认。",link:"https://www.bthhotels.com/hotel/Z79103",linkText:"酒店官方页面"}
+ {d:"10/24",w:"周六",city:"新干县 → 广州",title:"陪家人到下午，坐夜车回广州",note:"白天继续陪家人；傍晚从新干站上K441卧铺，车上睡一晚，次日早上到广州白云站。",route:["新干县家中","新干站","K441夜车 → 广州白云"],states:["半日探亲","普速卧铺","火车过夜"],budget:[390,520],basis:"K441硬卧＋到站接驳＋餐饮；不计酒店",unknown:"K441目标日运行、新干站发车时刻与卧铺票价待核",photo:photos.xingan,steps:[
+  {t:"白天",n:"继续陪家人",s:"午饭后再准备出发",tag:"探亲",kind:"探亲",cost:"按家庭安排",detail:"夜车傍晚才开，最后一天白天仍然留给家人。"},
+  {t:"15:30",n:"家中 → 新干站",s:"预留接驳与进站时间",tag:"家人接送优先",kind:"接驳",cost:"约 ¥50–100 预留",detail:"建议发车前至少40分钟到站。到达那天没见到堂妹的话，可以早点出门，在县城顺路见一面再进站；工作日白天她在上学，要提前约好时间。家庭具体位置继续隐藏。"},
+  {t:"16:29参考",n:"K441 新干 → 广州白云",s:"经吉安、衡阳 · 参考次日07:00到 · 约14小时31分",tag:"硬卧优先",kind:"火车",cost:"硬卧约 ¥300–340（南昌起全程参考价）",detail:"公开时刻：新干16:25到、16:29开，次日07:00到广州白云。页面只列出南昌起全程卧铺价：硬卧上/中/下约¥303.5/311.5/340，新干起应略低；以12306为准。",link:"https://train.hao86.com/K441/",linkText:"K441公开时刻与票价"}
  ]},
- {d:"10/25",w:"周日",city:"南昌 → 广州",title:"回到广州白云",note:"按K1665同向时刻模板规划09:33–21:03；10月25日是否运行及余票仍需12306确认。",route:["南昌酒店","南昌站","K1665参考","广州白云站","广州住处"],states:["返程日","当晚到家"],budget:[220,450],basis:"硬座/硬卧＋餐饮＋两端接驳",unknown:"10/25车次运行、票价与余票尚未核实",photo:photos.baiyun,steps:[
-  {t:"08:20",n:"退房前往南昌站",s:"确认不是南昌西站",tag:"返程",kind:"交通",cost:"市内交通另计",detail:"按最终车票站点调整。"},
-  {t:"09:33参考",n:"K1665 南昌 → 广州白云",s:"同向公开模板约21:03到",tag:"运行待核",kind:"火车",cost:"硬座约 ¥112；硬卧约 ¥194–208",detail:"公开结果此前只覆盖到10月22日前后，不能据此断言10月25日开行。"},
-  {t:"21:03参考",n:"抵达广州白云站",s:"再返回广州住处",tag:"旅程结束",kind:"到达",cost:"市内接驳另计",detail:"广州白云站是火车站，不是白云机场。"}
+ {d:"10/25",w:"周日",city:"车上 → 广州",title:"早上到广州白云，回家",note:"K441卧铺次日早上约07:00到广州白云站，到家后休息。",route:["K441车上","广州白云站","广州住处"],states:["抵达日","当天到家"],budget:[30,80],basis:"早餐＋市内接驳",unknown:"实际到站时刻以列车运行为准",photo:photos.baiyun,steps:[
+  {t:"07:00参考",n:"抵达广州白云站",s:"再返回广州白云区住处",tag:"旅程结束",kind:"到达",cost:"市内交通另计",detail:"广州白云站是火车站，不是白云机场。卧铺早上到站，提前半小时起床收拾。"}
  ]}
 ]);
-var nanchangFullTemplate={d:"",w:"",city:"南昌",title:"南昌完整游玩日",note:"给南昌单独留一个完整日，不挤占新干探亲，也不改变固定交通时长。",route:["南昌酒店","八一广场","江西省博物馆 / 老城","南昌酒店"],states:["南昌完整日","弹性游览","酒店过夜"],budget:[350,620],basis:"餐饮＋市内交通＋门票预留＋南昌酒店",unknown:"展馆开放时间、预约与目标日房价待核",photo:photos.nanchang,steps:[
+var nanchangFullTemplate={d:"",w:"",city:"南昌",title:"南昌完整游玩日",note:"给南昌单独留一个完整日，再去新干探亲；不挤占探亲，也不改变固定交通时长。",route:["南昌酒店","八一广场","江西省博物馆 / 老城","南昌酒店"],states:["南昌完整日","弹性游览","酒店过夜"],budget:[270,490],basis:"餐饮＋市内交通＋门票预留＋南昌酒店（≤¥150）",unknown:"展馆开放时间、预约与目标日房价待核",photo:photos.nanchang,steps:[
  {t:"09:30",n:"八一广场与老城",s:"按体力安排城市步行",tag:"完整日",kind:"景点",cost:"步行免费",detail:"具体开放安排随实际日期顺延，不把参考日期当作已核验结果。"},
  {t:"14:00",n:"江西省博物馆或江边",s:"二选一，保留休息时间",tag:"弹性",kind:"景点",cost:"预约与门票待核",detail:"若博物馆闭馆或预约不足，改为赣江沿岸与老城慢走。"},
- {t:"晚上",n:"返回南昌酒店",s:"为次日返穗留出休息",tag:"住1晚",kind:"住宿",cost:"估算 ¥180–280",detail:"每增加一个南昌完整日，就增加一晚酒店和对应预算。"}
+ {t:"晚上",n:"返回南昌酒店",s:"次日上午继续游览，下午坐火车去新干",tag:"住1晚",kind:"住宿",cost:"预算 ≤¥150 / 晚",detail:"每增加一个南昌完整日，就增加一晚酒店和对应预算。"}
 ]};
+var legDays={
+ gzqdHsr:{d:"10/12",w:"周一",city:"广州 → 青岛",title:"坐高铁去青岛，当晚入住",note:"G566上午从广州南站出发，傍晚到青岛北站，当晚入住市南区。",route:["广州住处","广州南站","G566高铁","青岛北站","市南酒店"],states:["交通日","高铁","酒店过夜"],budget:[580,1380],basis:"G566二等座＋两端接驳＋餐饮＋青岛酒店第1晚（≤¥150）",unknown:"G566票价公开数据不一（¥376–1,034），目标日余票待12306确认；酒店需按每晚≤¥150重新选定",photo:photos.qdsea,steps:[
+  {t:"08:30",n:"前往广州南站",s:"注意是广州南站，不是广州白云站",tag:"出发",kind:"交通",cost:"市内交通约 ¥20–40",detail:"建议发车前至少40分钟到站。"},
+  {t:"09:45参考",n:"G566 广州南 → 青岛北",s:"参考18:36到 · 约8小时51分",tag:"高铁 · 需复核",kind:"火车",cost:"二等座公开数据 ¥376–1,034 不一",detail:"好查网列出G566二等座¥376、一等座¥565；携程上同线路反方向二等座约¥1,011–1,034。两个来源差距很大，以12306为准。",link:"https://train.hao86.com/G566/",linkText:"G566公开时刻与票价"},
+  {t:"18:36参考",n:"抵达青岛北站",s:"出站后前往市南区酒店",tag:"傍晚到达",kind:"火车",cost:"打车 / 地铁约 ¥20–60",detail:"傍晚到达，地铁和打车都方便。"},
+  {t:"19:40",n:"办理入住",s:"市南区海边一带 · 每晚≤¥150，酒店待选定",tag:"住4晚",kind:"住宿",cost:"预算 ≤¥150 / 晚",detail:"原候选如家精选（八大关第三海水浴场店，市南区太平角三路2号甲）参考约¥260–420/晚，超出每晚¥150的预算，需要另选；可放宽到地铁或公交方便到海边的经济型酒店。",link:"https://www.bthhotels.com/hotel/J53214",linkText:"原候选酒店官方页面（超预算）"}
+ ]},
+ dlncRailA:{d:"10/21",w:"周三",city:"大连 → 北京",title:"大连再逛半天，晚上坐卧铺去北京",note:"白天还能在大连逛半天；晚上20:35从大连站上K683/K682卧铺，次日早上到北京站。",route:["星海广场酒店","大连站","K682夜车 → 北京"],states:["半日游览","普速卧铺","火车过夜"],budget:[340,420],basis:"K682硬卧＋餐饮＋市内交通；不计酒店",unknown:"K682目标日运行、卧铺余票与票价待核",photo:photos.dalianrail,steps:[
+  {t:"上午",n:"退房，寄存行李",s:"行李放酒店前台或大连站寄存",tag:"轻装",kind:"住宿",cost:"—",detail:"夜车晚上才开，白天还能再逛一段。"},
+  {t:"白天",n:"大连自由活动",s:"补逛没去的海边或街区，不安排远郊",tag:"半日",kind:"景点",cost:"按个人消费",detail:"晚上要坐一夜车，下午早点吃晚饭、休息。"},
+  {t:"19:40",n:"前往大连站",s:"注意是大连站，不是大连北站",tag:"转场",kind:"交通",cost:"市内交通约 ¥20–40",detail:"建议发车前至少40分钟到站。"},
+  {t:"20:35参考",n:"K683/K682 大连 → 北京",s:"参考次日08:50到北京站 · 约12小时15分",tag:"硬卧优先",kind:"火车",cost:"硬卧约 ¥255",detail:"公开数据（中铁网9/11）：大连20:35发，次日08:50到北京站；硬卧¥255、软卧¥390。车次在大石桥前为K683、之后为K682。以12306为准。",link:"https://www.crecc.com/huoche/k682.html",linkText:"K682公开时刻与票价"}
+ ]},
+ dlncRailB:{d:"10/22",w:"周四",city:"北京 → 南昌",title:"北京换车，再坐一晚卧铺到南昌",note:"早上到北京站，换到北京西站；14:06坐T167卧铺，次日早上07:26到南昌站。",route:["K682车上","北京站","北京西站","T167夜车 → 南昌"],states:["换乘日","普速卧铺","火车过夜"],budget:[470,550],basis:"T167硬卧＋北京市内交通＋餐饮；不计酒店",unknown:"T167目标日运行、卧铺余票与票价待核",photo:photos.nanchangrail,steps:[
+  {t:"08:50参考",n:"抵达北京站",s:"吃早饭，再去北京西站",tag:"到站",kind:"火车",cost:"车票已在前一日计入",detail:"换乘时间约5小时，足够从容。"},
+  {t:"上午",n:"北京站 → 北京西站",s:"地铁或打车，行李可在北京西站寄存",tag:"换站",kind:"交通",cost:"地铁约 ¥5–10",detail:"注意是北京西站发车，不是北京站。"},
+  {t:"14:06参考",n:"T167 北京西 → 南昌",s:"参考次日07:26到南昌站 · 约17小时20分",tag:"硬卧优先",kind:"火车",cost:"硬卧约 ¥404.5–425.5",detail:"公开数据：北京西14:06发，次日07:26到南昌站；硬卧上/中/下约¥404.5/415.5/425.5，软卧约¥586.5–609.5。以12306为准。",link:"https://train.hao86.com/T167/",linkText:"T167公开时刻与票价"}
+ ]},
+ xggzHsr:{d:"10/24",w:"周六",city:"新干县 → 广州",title:"陪家人到下午，坐高铁当晚回广州",note:"白天继续陪家人；下午从新干东站坐G3065，当晚20:37到广州东站。",route:["新干县家中","新干东站","G3065高铁","广州东站","广州住处"],states:["半日探亲","高铁","当晚到家"],budget:[510,730],basis:"G3065二等座（预留）＋两端接驳＋餐饮；不计酒店",unknown:"G3065是否停新干东、目标日时刻与分段票价待核",photo:photos.xingan,steps:[
+  {t:"白天",n:"继续陪家人",s:"午饭后再准备出发",tag:"探亲",kind:"探亲",cost:"按家庭安排",detail:"高铁下午才开，最后一天白天仍然留给家人。"},
+  {t:"15:40",n:"家中 → 新干东站",s:"新干东是高铁站，和新干站不是同一个站",tag:"家人接送优先",kind:"接驳",cost:"约 ¥50–100 预留",detail:"建议发车前至少40分钟到站。家庭具体位置继续隐藏。"},
+  {t:"16:34参考",n:"G3065 新干东 → 广州东",s:"参考20:37到广州东 · 约4小时03分",tag:"高铁 · 需复核",kind:"火车",cost:"分段票价未查到，按 ¥400–494 预留",detail:"公开时刻（中铁网9/11数据）：新干东16:32到、16:34开，20:37到广州东；南昌西起全程二等座¥494，新干东起应更低。另有公开页面显示G3065不停新干东，必须在12306核实。",link:"https://www.crecc.com/huoche/g3065.html",linkText:"G3065公开时刻与票价"},
+  {t:"20:37参考",n:"抵达广州东站",s:"再返回广州住处",tag:"旅程结束",kind:"到达",cost:"市内交通约 ¥20–50",detail:"到的是广州东站，不是广州白云站。"}
+ ]}
+};
+legDays.gzqdHsr.steps[3].detail="原候选如家精选（八大关第三海水浴场店，市南区太平角三路2号甲）参考约¥260–420/晚，超出每晚¥150的预算，需要另选；可放宽到地铁或公交方便到海边的经济型酒店。";
+var legModes={
+ gzqd:{label:"广州→青岛",order:["rail","hsr"],opts:{
+  rail:{name:"普速卧铺",train:"Z168/Z169",time:"18:57发 · 次日22:45到青岛北",dur:"27小时48分",fare:"硬卧约 ¥434.5–464.5",effect:"车上睡一晚，第二天夜里到青岛",min:1668},
+  hsr:{name:"高铁",train:"G566",time:"09:45发 · 当天18:36到青岛北",dur:"8小时51分",fare:"二等座公开数据 ¥376–1,034 不一",effect:"当天到，当晚入住青岛",min:531}}},
+ dlnc:{label:"大连→南昌",order:["hsr","rail"],opts:{
+  hsr:{name:"高铁中转",train:"G2625＋武汉换乘",time:"08:10发 · 当天22:53到南昌西",dur:"14小时43分",fare:"二等座约 ¥1,005",effect:"一天到，南昌住一晚",min:883},
+  rail:{name:"普速卧铺（经北京）",train:"K682＋T167",time:"大连20:35发 · 第三天07:26到南昌",dur:"车上约29小时35分＋北京换乘约5小时",fare:"硬卧约 ¥660–680",effect:"大连多逛半天，车上睡两晚，省一晚南昌酒店",min:1775}}},
+ ncxg:{label:"南昌→新干",order:["rail","hsr"],opts:{
+  rail:{name:"普速",train:"K8723",time:"南昌站14:50发 · 16:31到新干站",dur:"1小时41分",fare:"硬座约 ¥20–25",effect:"从南昌站上车，到新干站",min:101},
+  hsr:{name:"高铁",train:"G3065",time:"南昌西15:54发 · 16:32到新干东",dur:"38分",fare:"分段票价未查到，预留约 ¥40–60",effect:"南昌多逛约1小时；到新干东站（和新干站不是同一个站）",min:38}}},
+ xggz:{label:"新干→广州",order:["rail","hsr"],opts:{
+  rail:{name:"普速卧铺",train:"K441",time:"新干站16:29发 · 次日07:00到广州白云",dur:"14小时31分",fare:"硬卧约 ¥300–340",effect:"车上睡一晚，第二天早上到家",min:871},
+  hsr:{name:"高铁",train:"G3065",time:"新干东16:34发 · 当天20:37到广州东",dur:"约4小时03分",fare:"分段票价未查到，按 ¥400–494 预留",effect:"当晚到家",min:243}}}
+};
+var tripModes={gzqd:"rail",dlnc:"hsr",ncxg:"rail",xggz:"rail"};
+function hm(m){return Math.floor(m/60)+"小时"+(m%60)+"分"}
+function trunkMinutes(){var t=Object.keys(legModes).reduce(function(a,k){return a+legModes[k].opts[tripModes[k]].min},0);return[t+420,t+540]}
+function ncxgDay(arriveByRail){
+ var d=cloneDay(dalianDays[10]),hsr=tripModes.ncxg==="hsr";
+ if(arriveByRail){d.steps[0]={t:"07:26参考",n:"T167 抵达南昌站",s:"在车站寄存行李，吃早饭",tag:"到站",kind:"火车",cost:"车票已在前一日计入",detail:"夜车到站时间以实际运行为准。"+(hsr?"下午要去南昌西站坐高铁，行李也可以带到南昌西站寄存。":"下午还从南昌站坐K8723，行李寄存在南昌站最方便。")};d.title="清晨到南昌，逛完老城坐车去新干";d.route[0]="南昌站"}
+ if(hsr){
+  d.steps.splice(3,4,
+   {t:"14:40",n:"取行李，前往南昌西站",s:"老城打车约30–40分钟",tag:"转场",kind:"交通",cost:"打车约 ¥40–60",detail:"注意是南昌西站，不是南昌站；建议发车前至少40分钟到站。"},
+   {t:"15:54参考",n:"G3065 南昌西 → 新干东",s:"参考16:32到新干东 · 约38分钟",tag:"高铁 · 需复核",kind:"火车",cost:"分段票价未查到，预留约 ¥40–60",detail:"公开时刻（中铁网9/11数据）：南昌西15:54发、新干东16:32到；同一下午的G2745（南昌西15:20发、新干东16:06到）可作备选。另有公开页面显示G3065不停新干东，必须在12306核实。新干东是高铁站，和新干站不是同一个站，接站地点要提前和家人说清楚。",link:"https://www.crecc.com/huoche/g3065.html",linkText:"G3065公开时刻"},
+   {t:"16:32后",n:"（可选）县城顺路看堂妹",s:"到站后约在县城见一面",tag:"可选",kind:"探亲",cost:"按个人消费",detail:"堂妹就在新干县城、离新干站很近；改坐高铁到的是新干东站，顺不顺路要按新干东到县城的实际路程再定。时间对不上就直接回家，离开那天也可以顺路再约。"},
+   {t:"傍晚",n:"新干东站 → 家中",s:"先看爷爷奶奶",tag:"家人接送优先",kind:"接驳",cost:"约 ¥50–100 预留",detail:"已隐藏村庄名称、门牌与精确地图点；家人接送或当地网约车请私下确认。"});
+  d.route=[d.route[0],"滕王阁","万寿宫","南昌西站","新干东站","新干县家中"];d.states=["半日游览","高铁","家中过夜"];
+  d.budget=[d.budget[0]+40,d.budget[1]+60];d.basis="滕王阁门票＋餐饮＋G3065二等座（预留）＋两端接驳；不计酒店";d.unknown="G3065是否停新干东、目标日时刻与分段票价待核";
+ }
+ d.note=(arriveByRail?"早上07:26到南昌站。":"")+"上午滕王阁和万寿宫，"+(hsr?"下午从南昌西站坐G3065高铁，约16:32到新干东，傍晚到家。":"午饭后从南昌站乘K8723普速列车，约16:31到新干，傍晚到家。");
+ return d;
+}
 var stayRules={
  qingdao:{label:"青岛",hint:"完整游玩日",min:1,max:3},
- dalian:{label:"大连",hint:"完整游玩日",min:1,max:2},
- xingan:{label:"新干探亲",hint:"完整日，另含首尾半日",min:1,max:2},
- nanchang:{label:"南昌",hint:"完整游玩日，另含到达半日",min:0,max:2}
+ dalian:{label:"大连",hint:"完整游玩日",min:0,max:2},
+ xingan:{label:"新干探亲",hint:"完整日，另含首尾半日",min:0,max:2},
+ nanchang:{label:"南昌",hint:"完整游玩日，另含次日上午",min:0,max:2}
 };
 var stayPrefs={qingdao:2,dalian:1,xingan:1,nanchang:0};
 function dateInfo(offset){var x=new Date(2026,9,12+offset),wd=["周日","周一","周二","周三","周四","周五","周六"];return{d:(x.getMonth()+1)+"/"+x.getDate(),w:wd[x.getDay()]}}
@@ -370,35 +626,57 @@ function retimeText(s,info){var cn=info.d.replace("/","月")+"日";return String
 function retimeDay(d,i){var info=dateInfo(i);d.d=info.d;d.w=info.w;["note","unknown","basis"].forEach(function(k){d[k]=retimeText(d[k],info)});d.steps.forEach(function(s){["s","detail","cost"].forEach(function(k){s[k]=retimeText(s[k],info)})});return d}
 function stayValue(k,n){if(k==="xingan")return n+"个完整日＋首尾半日 ≈ "+(n+1)+"天";if(k==="nanchang")return n+"个完整日＋到达半日";return n+"个完整日 · "+(n+1)+"晚"}
 function buildPlan(){
- var built=[],push=function(x){built.push(cloneDay(x))};
- push(dalianDays[0]);push(dalianDays[1]);
+ var built=[],push=function(x){built.push(cloneDay(x))},m=tripModes;
+ if(m.gzqd==="hsr")push(legDays.gzqdHsr);else{push(dalianDays[0]);push(dalianDays[1])}
+ var qdArr=built.length-1;
  [dalianDays[2],dalianDays[3],dalianDays[4]].slice(0,stayPrefs.qingdao).forEach(push);
  var ferryIndex=built.length;push(dalianDays[5]);var dalianArrival=built.length;push(dalianDays[6]);
  [dalianDays[7],dalianDays[8]].slice(0,stayPrefs.dalian).forEach(push);
- var longRail=built.length;push(dalianDays[9]);var xinganArrival=built.length;push(dalianDays[10]);
- for(var i=0;i<stayPrefs.xingan;i++){var family=cloneDay(dalianDays[11]);family.title=i?"继续陪家人的完整一天":"爷爷奶奶与堂妹的一整天";family.note="第 "+(i+1)+" 个完整探亲日；不安排观光打卡，家庭具体位置继续隐藏。";family.steps[2].s="完整探亲日结束后继续家中过夜";family.steps[2].tag="第 "+(i+1)+" 个完整日";family.steps[2].detail="增加或减少探亲日只会顺延后续日期，不会偷减其他城市或交通。";push(family)}
- var xinganDeparture=built.length;push(dalianDays[12]);var nanchangStart=xinganDeparture;
- for(i=0;i<stayPrefs.nanchang;i++){var nc=cloneDay(nanchangFullTemplate);nc.title=stayPrefs.nanchang>1?"南昌完整游玩日 · "+(i+1):nc.title;push(nc)}
- var returnIndex=built.length;push(dalianDays[13]);
+ var longRail=built.length;
+ if(m.dlnc==="hsr")push(dalianDays[9]);else{push(legDays.dlncRailA);push(legDays.dlncRailB)}
+ var ncStart=built.length;
+ for(var i=0;i<stayPrefs.nanchang;i++){var nc=cloneDay(nanchangFullTemplate);nc.title=stayPrefs.nanchang>1?"南昌完整游玩日 · "+(i+1):nc.title;if(!i&&m.dlnc==="rail"){nc.steps.unshift({t:"07:26参考",n:"T167 抵达南昌站",s:"先去酒店寄存行李，再开始游览",tag:"到站",kind:"火车",cost:"车票已在前一日计入",detail:"夜车到站时间以实际运行为准。"});nc.route[0]="南昌站"}push(nc)}
+ var xinganArrival=built.length;built.push(ncxgDay(m.dlnc==="rail"&&!stayPrefs.nanchang));
+ for(i=0;i<stayPrefs.xingan;i++){var family=cloneDay(dalianDays[11]);family.title=i?"继续陪家人的完整一天":"陪爷爷奶奶的一整天";family.note="第 "+(i+1)+" 个完整探亲日；不安排观光打卡，家庭具体位置继续隐藏。";family.steps[2].s="完整探亲日结束后继续家中过夜";family.steps[2].tag="第 "+(i+1)+" 个完整日";family.steps[2].detail="增加或减少探亲日只会顺延后续日期，不会偷减其他城市或交通。";push(family)}
+ var xinganDeparture=built.length;
+ if(m.xggz==="rail"){push(dalianDays[12]);push(dalianDays[13])}else push(legDays.xggzHsr);
+ var returnIndex=built.length-1;
  built.forEach(retimeDay);
- built[1].note="夜抵青岛，不安排景点；之后有 "+stayPrefs.qingdao+" 个完整游玩日。";built[1].steps[1].tag="住"+(stayPrefs.qingdao+1)+"晚";
- built[longRail].note="候选快速方案经武汉中转，公开样本约08:10出发、22:53到达；实际出行日必须重新核对车次、同站换乘与余票。";built[longRail].unknown="实际出行日车次、同站换乘和余票未核";
- built[xinganDeparture].note="已保留约 "+(stayPrefs.xingan+1)+" 天探亲（含首尾半日），再进南昌；增加停留只会顺延后续日期。";built[xinganDeparture].unknown="目标日门票、房价与K1666运行待核";built[xinganDeparture].steps[0].detail="当前分配约 "+(stayPrefs.xingan+1)+" 天探亲；调整后续日期时不压缩固定交通。";
- built[returnIndex].note="按K1665同向时刻模板规划约09:33–21:03；实际出行日是否运行及余票仍需12306确认。";built[returnIndex].unknown="实际出行日车次运行、票价与余票尚未核实";
- var total=built.length,end=built[returnIndex].d,qdEnd=built[ferryIndex].d,dalEnd=built[longRail].d,xaEnd=built[xinganDeparture].d;
+ var qdHotel=built[qdArr].steps.filter(function(x){return x.kind==="住宿"})[0];if(qdHotel)qdHotel.tag="住"+(stayPrefs.qingdao+1)+"晚";
+ if(m.gzqd==="rail")built[qdArr].note="夜抵青岛，不安排景点；之后有 "+stayPrefs.qingdao+" 个完整游玩日。";
+ var lastDl=built[longRail-1];
+ if(m.dlnc==="hsr"){built[longRail].note="大连到南昌没有查到直达普速车，这里选了高铁：经武汉中转，公开样本约08:10出发、22:53到南昌西；实际出行日必须重新核对车次、同站换乘与余票。";built[longRail].unknown="实际出行日车次、同站换乘和余票未核";built[longRail].steps[3].tag="住"+(stayPrefs.nanchang+1)+"晚"}
+ else{lastDl.note=lastDl.note.replace("次日用较贵的快速铁路换回探亲时间","次日白天还能再逛半天，晚上坐夜车去北京");lastDl.steps.forEach(function(x){if(x.s==="明早前往大连北站"){x.s="明天晚上才从大连站坐夜车";x.detail="次日白天还能再逛，不用早起赶车。"}})}
+ var xaDays=stayPrefs.xingan+1,arr=built[xinganArrival],weekend=arr.w==="周六"||arr.w==="周日";
+ arr.steps.forEach(function(x){if(x.n==="（可选）县城顺路看堂妹")x.s=arr.w+(weekend?"，堂妹不上学，到站后就能约":"是上学日，白天她在上课，约在放学后见一面")});
+ built[xinganDeparture].note="已保留约 "+xaDays+" 天探亲（含首尾半日）；"+(m.xggz==="rail"?"傍晚从新干站上K441卧铺，车上睡一晚，次日早上到广州白云站。":"下午从新干东站坐G3065高铁，当晚到广州东站。");
+ built[xinganDeparture].steps[0].detail="当前分配约 "+xaDays+" 天探亲；"+(m.xggz==="rail"?"夜车":"高铁")+"下午才开，最后一天白天仍然留给家人。";
+ var total=built.length,end=built[returnIndex].d,qdEnd=built[ferryIndex].d,xaEnd=built[xinganDeparture].d,ncNights=stayPrefs.nanchang+(m.dlnc==="hsr"?1:0),trunk=trunkMinutes();
  var segments=[
-  {kind:"transit",label:"去青岛火车",duration:"27小时48分 · 跨2个日历日",range:built[0].d+"晚—"+built[1].d+"晚",start:0,end:1},
-  {kind:"stay",label:"青岛",duration:(stayPrefs.qingdao+1)+"晚 · "+stayPrefs.qingdao+"个完整白天",range:built[1].d+"夜—"+qdEnd+"上午",start:1,end:ferryIndex},
-  {kind:"transit",label:"烟台夜船",duration:"铁路1–2小时＋航行6–7小时",range:built[ferryIndex].d+"—"+built[dalianArrival].d+" · 候船/接驳待核",start:ferryIndex,end:dalianArrival},
-  {kind:"stay",label:"大连",duration:(stayPrefs.dalian+1)+"晚 · "+stayPrefs.dalian+"个完整白天＋到达大半日",range:built[dalianArrival].d+"上午—"+dalEnd+"清晨",start:dalianArrival,end:longRail},
-  {kind:"transit",label:"大连→南昌",duration:"公开样本14小时43分 · 含中转",range:built[longRail].d+" · 两端接驳另计",start:longRail,end:longRail},
-  {kind:"stay",label:"南昌中转",duration:"1晚 · 次日上午换站",range:built[longRail].d+"夜—"+built[xinganArrival].d+"上午",start:longRail,end:xinganArrival},
-  {kind:"transit",label:"南昌→新干",duration:"约2小时03分 · 衔接待复核",range:built[xinganArrival].d+"中午",start:xinganArrival,end:xinganArrival},
-  {kind:"stay",label:"新干探亲",duration:(stayPrefs.xingan+1)+"晚 · 约"+(stayPrefs.xingan+1)+"天（含首尾半日）",range:built[xinganArrival].d+"下午—"+xaEnd+"中午",start:xinganArrival,end:xinganDeparture},
-  {kind:"stay",label:"南昌",duration:(stayPrefs.nanchang+1)+"晚 · "+stayPrefs.nanchang+"个完整白天＋到达半日",range:built[nanchangStart].d+"下午—"+built[returnIndex].d+"上午",start:nanchangStart,end:returnIndex},
-  {kind:"transit",label:"返穗火车",duration:"约11小时30分 · 当日到",range:built[returnIndex].d,start:returnIndex,end:returnIndex}
+  m.gzqd==="rail"?{kind:"transit",leg:"gzqd",label:"去青岛火车",via:"Z168卧铺",duration:"普速Z168 · 27小时48分 · 车上过夜",range:built[0].d+"晚—"+built[1].d+"晚",start:0,end:1}:{kind:"transit",leg:"gzqd",label:"去青岛高铁",via:"G566高铁",duration:"高铁G566 · 8小时51分 · 当天到",range:built[0].d,start:0,end:0},
+  {kind:"stay",label:"青岛",duration:(stayPrefs.qingdao+1)+"晚 · "+stayPrefs.qingdao+"个完整白天",range:built[qdArr].d+"夜—"+qdEnd+"上午",start:qdArr,end:ferryIndex},
+  {kind:"transit",label:"烟台夜船",via:"铁路＋夜船",duration:"铁路1–2小时＋航行6–7小时",range:built[ferryIndex].d+"—"+built[dalianArrival].d+" · 候船/接驳待核",start:ferryIndex,end:dalianArrival},
+  {kind:"stay",label:"大连",duration:(stayPrefs.dalian+1)+"晚 · "+stayPrefs.dalian+"个完整白天＋到达大半日"+(m.dlnc==="rail"?"＋离开日白天":""),range:built[dalianArrival].d+"上午—"+built[longRail].d+(m.dlnc==="rail"?"晚上":"清晨"),start:dalianArrival,end:longRail},
+  m.dlnc==="hsr"?{kind:"transit",leg:"dlnc",label:"大连→南昌",via:"高铁中转",duration:"高铁 · 公开样本14小时43分 · 含中转",range:built[longRail].d+" · 22:53到南昌西",start:longRail,end:longRail}:{kind:"transit",leg:"dlnc",label:"大连→北京→南昌",via:"K682＋T167卧铺",duration:"普速卧铺K682＋T167 · 车上两晚",range:built[longRail].d+"晚—"+built[ncStart].d+"早上",start:longRail,end:ncStart},
+  {kind:"stay",label:"南昌",duration:ncNights+"晚 · "+(m.dlnc==="hsr"?stayPrefs.nanchang+"个完整日＋次日上午":"07:26到 · "+stayPrefs.nanchang+"个完整日＋上午"),range:(m.dlnc==="hsr"?built[longRail].d+"夜":built[ncStart].d+"早上")+"—"+built[xinganArrival].d+"下午",start:m.dlnc==="hsr"?longRail:ncStart,end:xinganArrival},
+  {kind:"transit",leg:"ncxg",label:"南昌→新干",via:m.ncxg==="rail"?"K8723":"G3065高铁",duration:m.ncxg==="rail"?"普速K8723 · 约1小时41分":"高铁G3065 · 约38分 · 到新干东",range:built[xinganArrival].d+"下午",start:xinganArrival,end:xinganArrival},
+  {kind:"stay",label:"新干探亲",duration:xaDays+"晚 · "+stayPrefs.xingan+"个完整日＋首尾半日",range:built[xinganArrival].d+"傍晚—"+xaEnd+"下午",start:xinganArrival,end:xinganDeparture},
+  m.xggz==="rail"?{kind:"transit",leg:"xggz",label:"返穗卧铺",via:"K441卧铺",duration:"普速K441 · 约14小时31分 · 车上过夜",range:xaEnd+"傍晚—"+end+"早上",start:xinganDeparture,end:returnIndex}:{kind:"transit",leg:"xggz",label:"返穗高铁",via:"G3065高铁",duration:"高铁G3065 · 约4小时03分 · 当晚到",range:xaEnd+"傍晚",start:xinganDeparture,end:returnIndex}
  ];
- return{key:"dynamic",name:total+"天可调大连线",title:"广州—青岛—大连—江西 "+total+"日行程",status:total>14?"已超14天上限 · 请减少停留":total+"天 · 候选未订票",lede:"10月12日至"+end+"。青岛"+(stayPrefs.qingdao+1)+"晚、"+stayPrefs.qingdao+"个完整日；大连"+(stayPrefs.dalian+1)+"晚、"+stayPrefs.dalian+"个完整日；新干约"+(stayPrefs.xingan+1)+"天探亲；南昌"+stayPrefs.nanchang+"个完整日＋到达半日。",route:["广州白云","青岛","烟台北港","旅顺 / 大连","南昌","新干县","南昌","广州白云"],metrics:[total+"个日历日","已知干线约64小时43分–66小时43分 · 约2.7天","停留可调 · 固定交通不压缩"],segments:segments,days:built,overLimit:total>14};
+ var at=function(day,hm){var q=hm.split(":");return day*24+(+q[0])+q[1]/60};
+ var tGo=m.gzqd==="rail"?at(0,"18:57"):at(0,"09:45"),tQd=m.gzqd==="rail"?at(1,"22:45"):at(0,"18:36"),tFerry=at(ferryIndex,"09:30"),tDl=at(dalianArrival,"09:00");
+ var tDlGo=m.dlnc==="hsr"?at(longRail,"08:10"):at(longRail,"20:35"),tNc=m.dlnc==="hsr"?at(longRail,"22:53"):at(longRail+2,"07:26");
+ var tNcGo=m.ncxg==="rail"?at(xinganArrival,"14:50"):at(xinganArrival,"15:54"),tXg=m.ncxg==="rail"?at(xinganArrival,"16:31"):at(xinganArrival,"16:32");
+ var tXgGo=m.xggz==="rail"?at(xinganDeparture,"16:29"):at(xinganDeparture,"16:34"),tHome=m.xggz==="rail"?at(xinganDeparture+1,"07:00"):at(xinganDeparture,"20:37");
+ var hrs=[tGo,tQd-tGo,tFerry-tQd,tDl-tFerry,tDlGo-tDl,tNc-tDlGo,tNcGo-tNc,tXg-tNcGo,tXgGo-tXg,tHome-tXgGo,total*24-tHome];
+ var tenth=hrs.map(function(h){return h/2.4}),fl=tenth.map(Math.floor),left=total*10-fl.reduce(function(a,b){return a+b},0);
+ tenth.map(function(v,i){return[v-fl[i],i]}).sort(function(a,b){return b[0]-a[0]}).slice(0,left).forEach(function(x){fl[x[1]]++});
+ var dd=fl.map(function(v){return v/10});
+ segments.forEach(function(x,i){x.days=dd[i+1]});
+ var sumOf=function(kind){return Math.round(segments.reduce(function(a,x){return a+(x.kind===kind?x.days*10:0)},0))/10};
+ var ledger={before:dd[0],after:dd[10],stay:sumOf("stay"),transit:sumOf("transit"),go:built[0].d+" "+(m.gzqd==="rail"?"18:57":"09:45"),home:built[returnIndex].d+" "+(m.xggz==="rail"?"07:00":"20:37")};
+ var hsrCount=Object.keys(tripModes).filter(function(k){return tripModes[k]==="hsr"}).length;
+ return{key:"dynamic",name:total+"天可调大连线",title:"广州—青岛—大连—江西 "+total+"日行程",status:total>14?"已超14天上限 · 请减少停留":total+"天 · 候选未订票",lede:"10月12日至"+end+"。青岛"+(stayPrefs.qingdao+1)+"晚；大连"+(stayPrefs.dalian+1)+"晚；南昌"+ncNights+"晚；新干约"+xaDays+"天探亲；"+hsrCount+"段高铁。",route:m.dlnc==="rail"?["广州白云","青岛","烟台北港","旅顺 / 大连","北京（换乘）","南昌","新干县","广州"]:["广州白云","青岛","烟台北港","旅顺 / 大连","南昌","新干县","广州白云"],metrics:[total+"个日历日","已知干线约"+hm(trunk[0])+"–"+hm(trunk[1])+" · 约"+((trunk[0]+trunk[1])/2880).toFixed(1)+"天","停留可调 · 固定交通不压缩"],segments:segments,days:built,trunk:trunk,ledger:ledger,overLimit:total>14};
 }
 var evidence={
  train:[
@@ -412,77 +690,281 @@ var evidence={
   ["南昌如家商旅官方页面","https://www.bthhotels.com/hotel/Z79103"]
  ]
 };
-var selected=0,lastFocus=null,startX=0;
+var selected=0,lastFocus=null,editing=false,swipe=null,drag=null,expanded=-1;
+var defaultModes=JSON.parse(JSON.stringify(tripModes));
+var defaultStays=JSON.parse(JSON.stringify(stayPrefs));
+try{var savedModes=JSON.parse(localStorage.getItem("china-trip-v3-modes")||"null");if(savedModes)Object.keys(legModes).forEach(function(k){if(legModes[k].opts[savedModes[k]])tripModes[k]=savedModes[k]})}catch(e){}
 try{var saved=JSON.parse(localStorage.getItem("china-trip-v3-stays")||"null");if(saved)Object.keys(stayRules).forEach(function(k){if(Number.isInteger(saved[k]))stayPrefs[k]=Math.max(stayRules[k].min,Math.min(stayRules[k].max,saved[k]))});selected=Number(localStorage.getItem("china-trip-v3-day")||0)}catch(e){}
-var plan=buildPlan(),days=plan.days;selected=Math.max(0,Math.min(days.length-1,selected));
-var rail=document.getElementById("dateRail"),phaseRail=document.getElementById("phaseRail"),steps=document.getElementById("steps"),card=document.getElementById("dayCard"),visual=document.getElementById("dayVisual");
-var overlay=document.getElementById("overlay"),content=document.getElementById("sheetContent");
+var plan=buildPlan(),days=plan.days;
+defSnap=defaultSnap();
+var todayIndex=(function(){var n=new Date();return Math.round((new Date(n.getFullYear(),n.getMonth(),n.getDate())-new Date(2026,9,12))/864e5)})();
+if(todayIndex>=0&&todayIndex<days.length)selected=todayIndex;
+selected=Math.max(0,Math.min(days.length-1,selected||0));
+function $(id){return document.getElementById(id)}
+var rail=$("dateRail"),phaseRail=$("phaseRail"),steps=$("steps"),card=$("dayCard"),visual=$("dayVisual"),overview=$("overview"),railWrap=$("railWrap");
+var overlay=$("overlay"),sheet=$("sheet"),content=$("sheetContent");
+var reduceMotion=matchMedia("(prefers-reduced-motion: reduce)");
+var icons={
+ train:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="1.8" width="9" height="10" rx="2.2"/><path d="M3.5 7.5h9M6 14.2l1-2.4M10 14.2l-1-2.4"/><circle cx="6" cy="9.7" r=".4" fill="currentColor"/><circle cx="10" cy="9.7" r=".4" fill="currentColor"/></svg>',
+ ferry:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.2 9.5h11.6l-1.8 3H4z"/><path d="M5 9.5V6h6v3.5M8 6V3.2"/><path d="M1.5 14.6c1.1 0 1.1-.7 2.2-.7s1.1.7 2.2.7 1.1-.7 2.1-.7 1.1.7 2.2.7 1.1-.7 2.2-.7 1.1.7 2.1.7"/></svg>',
+ zoom:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"/><path d="M10.5 10.5l3.6 3.6M7 5v4M5 7h4"/></svg>'
+};
+var stayKeyOf={"青岛":"qingdao","大连":"dalian","新干探亲":"xingan","南昌":"nanchang"};
+var cityColors=[["青岛","var(--c-qd)"],["大连","var(--c-dl)"],["旅顺","var(--c-dl)"],["海上","var(--c-dl)"],["烟台","var(--c-dl)"],["新干","var(--c-xg)"],["南昌","var(--c-nc)"],["广州","var(--c-gz)"]];
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function money(n){return Number(n).toLocaleString("zh-CN")}
 function dayBudget(d){return "¥"+money(d.budget[0])+"–"+money(d.budget[1])}
 function totalBudget(ds){return ds.reduce(function(a,d){a[0]+=d.budget[0];a[1]+=d.budget[1];return a},[0,0])}
-function routeHtml(route){return route.map(function(x,i){return (i?'<span class="route-arrow">→</span>':"")+'<span class="route-node">'+esc(x)+'</span>'}).join("")}
-function centerInRail(container,item){if(!item)return;container.scrollTo({left:item.offsetLeft-(container.clientWidth-item.clientWidth)/2,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"})}
+function routeHtml(route){var last=route.length-1;return route.map(function(x,i){return (i?'<span class="route-arrow" aria-hidden="true">→</span>':"")+'<span class="route-node'+(i===0||i===last?' is-end':'')+'">'+esc(x)+'</span>'}).join("")}
+function colorOf(name){for(var i=0;i<cityColors.length;i++)if(name.indexOf(cityColors[i][0])>=0)return cityColors[i][1];return "var(--sea)"}
+function isMoving(d){return d.city.indexOf("→")>=0}
+function destOf(d){var p=d.city.split("→");return p[p.length-1].trim()}
+function chipCity(d){return (isMoving(d)?"→":"")+destOf(d).replace(/县$/,"")}
+function cnDate(d){return d.d.replace("/","月")+"日 "+d.w}
+function nightOf(d){
+ var s=d.states.filter(function(x){return /过夜|到家/.test(x)})[0]||"—",last=d.route[d.route.length-1];
+ return{b:s,sub:/^(酒店|新干县家中)$/.test(last)?destOf(d):last};
+}
+function timeHtml(t){var m=/^(\d{1,2}:\d{2})(.+)$/.exec(t);return m?esc(m[1])+'<small>'+esc(m[2])+'</small>':esc(t)}
+function kindColor(k){return /火车|轮渡|交通|接驳|到达/.test(k)?"var(--red)":k==="住宿"?"var(--ink)":k==="探亲"?"var(--c-xg)":k==="景点"?"var(--sea)":"var(--gold)"}
+function centerInRail(container,item){if(!item||container.scrollWidth<=container.clientWidth)return;container.scrollTo({left:item.offsetLeft-(container.clientWidth-item.clientWidth)/2,behavior:reduceMotion.matches?"auto":"smooth"})}
 function activePhaseIndex(){var exact=plan.segments.findIndex(function(x){return x.start===selected});if(exact>=0)return exact;return Math.max(0,plan.segments.findIndex(function(x){return selected>=x.start&&selected<=x.end}))}
-function render(){
+function transitHours(){
+ var m=plan.metrics[1].match(/(\d+)小时(\d+)分–(\d+)小时(\d+)分/);
+ return m?"约"+Math.round(+m[1]+m[2]/60)+"–"+Math.round(+m[3]+m[4]/60)+"小时":plan.metrics[1].split(" · ")[0];
+}
+function segIdx(x){var r=[];for(var k=x.start;k<=x.end;k++)r.push(k);return r}
+function snap(p){var ds=p.days,last=ds[ds.length-1],has=function(re){return ds.filter(function(d){return d.states.some(function(x){return re.test(x)})}).length};return{n:ds.length,end:last.d+" "+last.w,b:totalBudget(ds),t:p.trunk[0],board:has(/火车过夜|轮渡过夜/),hotel:has(/酒店过夜/)}}
+function withState(st,md,fn){var ks=stayPrefs,km=tripModes;stayPrefs=st;tripModes=md;try{return fn()}finally{stayPrefs=ks;tripModes=km}}
+function copy(o){return JSON.parse(JSON.stringify(o))}
+function simulate(leg,mode){var md=copy(tripModes);md[leg]=mode;return withState(copy(stayPrefs),md,function(){return snap(buildPlan())})}
+function defaultSnap(){return withState(copy(defaultStays),copy(defaultModes),function(){return snap(buildPlan())})}
+function durText(m){var a=Math.abs(m),h=Math.floor(a/60),r=a%60;return (h?h+"小时":"")+(r||!h?r+"分":"")}
+function cmp(a,b){
+ var dn=b.n-a.n,dt=b.t-a.t,dm=Math.round((b.b[0]+b.b[1]-a.b[0]-a.b[1])/2);
+ return{dn:dn,dt:dt,dm:dm,same:!dn&&!dt&&Math.abs(dm)<10,
+  days:dn?(dn>0?"多"+dn+"天":"少"+(-dn)+"天"):"天数不变",
+  time:dt?(dt>0?"多":"少")+durText(dt):"不变",timeCls:dt>0?"up":dt<0?"down":"",
+  money:Math.abs(dm)<10?"基本不变":dm>0?"约多花 ¥"+money(dm):"约省 ¥"+money(-dm),moneyCls:dm>=10?"up":dm<=-10?"down":""};
+}
+var lastChange=null,barClosed=false,defSnap;
+function noteChange(label){lastChange={label:label,before:snap(plan)};barClosed=false}
+function renderBar(cur){
+ var bar=$("changeBar"),show=!barClosed&&!!lastChange;
+ bar.hidden=!show;document.documentElement.classList.toggle("has-bar",show);
+ if(!show)return;
+ var before=lastChange?lastChange.before:defSnap,c=cmp(before,cur),d=cmp(defSnap,cur),title;
+ if(lastChange)title="刚才："+lastChange.label;
+ else title=d.same?"当前是默认方案 · 加减天数或切换交通后，这里显示变化":"与默认方案相比";
+ var extra=[];
+ if(before.board!==cur.board)extra.push("车上过夜 "+before.board+"→"+cur.board+" 晚");
+ if(before.hotel!==cur.hotel)extra.push("酒店 "+before.hotel+"→"+cur.hotel+" 晚");
+ var foot=lastChange?(d.same?"已和默认方案一致":"比默认方案："+d.days+" · 坐车船"+d.time+" · 预算"+d.money):"";
+ bar.innerHTML='<div class="cb-head"><span class="cb-title">'+esc(title)+'</span><button class="cb-close" id="closeBar" aria-label="关闭变化提示">×</button></div>'+
+  '<div class="cb-grid">'+
+  '<div class="cb-cell"><small>总天数</small><b>'+(c.dn?before.n+'→'+cur.n+'天':cur.n+'天 不变')+'</b><span>'+esc(c.days)+' · '+esc(cur.end.split(' ')[0])+'结束</span></div>'+
+  '<div class="cb-cell"><small>坐车船时间</small><b class="'+c.timeCls+'">'+esc(c.time)+'</b><span>干线共约'+Math.round(cur.t/60)+'–'+Math.round((cur.t+120)/60)+'小时</span></div>'+
+  '<div class="cb-cell"><small>预算</small><b class="'+c.moneyCls+'">'+esc(c.money)+'</b><span>¥'+money(cur.b[0])+'–'+money(cur.b[1])+'</span></div>'+
+  '</div>'+((extra.length||foot)?'<div class="cb-foot">'+esc(extra.concat(foot?[foot]:[]).join(" · "))+'</div>':'');
+ var f=document.activeElement;
+ if(f&&overview.contains(f)){var fr=f.getBoundingClientRect(),top=bar.getBoundingClientRect().top;if(fr.bottom>top-8)window.scrollBy({top:fr.bottom-top+16,behavior:reduceMotion.matches?"auto":"smooth"})}
+}
+function modeChooser(leg){
+ var L=legModes[leg],cur=tripModes[leg];
+ return '<div class="mode-cmp" role="group" aria-label="'+esc(L.label)+'交通方式">'+L.order.map(function(k){
+  var o=L.opts[k],on=k===cur,eff;
+  if(on)eff='当前选择 · '+esc(o.effect);
+  else{var sim=simulate(leg,k),c=cmp(snap(plan),sim);eff='改选后：坐车船<b class="'+c.timeCls+'">'+esc(c.time)+'</b> · 预算<b class="'+c.moneyCls+'">'+esc(c.money)+'</b> · '+esc(c.days+'（'+sim.end+'结束）· '+o.effect)}
+  return '<button class="mode-opt" data-mode="'+leg+':'+k+'" aria-pressed="'+on+'"><span class="mo-head"><b>'+esc(o.name)+'</b><span>'+esc(o.train)+'</span></span><span class="mo-line">'+esc(o.time)+'</span><span class="mo-line">用时 '+esc(o.dur)+' · '+esc(o.fare)+'</span><span class="mo-eff">'+eff+'</span></button>';
+ }).join("")+'</div>';
+}
+function modeToggle(leg){var L=legModes[leg];return '<span class="modes" role="group" aria-label="'+esc(L.label)+'交通方式">'+L.order.map(function(k){return '<button data-mode="'+leg+':'+k+'" aria-pressed="'+(tripModes[leg]===k)+'">'+(k==="hsr"?"高铁":"普速")+'</button>'}).join("")+'</span>'}
+function panelHtml(x,i){
+ var idx=segIdx(x),info="";
+ if(x.kind==="transit"){
+  var legs=[];idx.forEach(function(k){days[k].steps.forEach(function(s){if(/火车|轮渡|到达/.test(s.kind))legs.push(s)})});
+  info=(x.leg?modeChooser(x.leg):'')+'<div class="sp-legs">'+legs.map(function(s){return '<div class="sp-leg"><span class="sp-t">'+timeHtml(s.t)+'</span><span><b>'+esc(s.n)+'</b><small>'+esc(s.s)+'</small><em>'+esc(s.cost)+'</em></span></div>'}).join("")+'</div>';
+ }else{
+  var sum=totalBudget(idx.map(function(k){return days[k]})),hotel=null,home=x.label.indexOf("新干")>=0;
+  idx.forEach(function(k){days[k].steps.forEach(function(s){if(!hotel&&s.kind==="住宿"&&/150/.test(s.cost))hotel=s})});
+  info='<div class="sp-facts"><div class="sp-fact-money"><small>这几天预算合计</small><b>¥'+money(sum[0])+'–'+money(sum[1])+'</b><small>含进出当天的交通</small></div><div><small>住宿</small>'+(home?'<b>住家中</b><small>不计酒店</small>':hotel?'<b>每晚 ≤¥150</b><small>'+esc(hotel.s.split(" · ")[0])+' · 酒店待选定</small>':'<b>—</b>')+'</div></div>';
+ }
+ var list='<ol class="sp-days">'+idx.map(function(k){var d=days[k];return '<li><button data-goto="'+k+'"><span class="sp-date">'+esc(d.d+" "+d.w)+'</span><span class="sp-title">'+esc(d.title)+'</span><span class="sp-bud">'+dayBudget(d)+'</span><span class="sp-go" aria-hidden="true">›</span></button></li>'}).join("")+'</ol>';
+ var unk=[];idx.forEach(function(k){if(unk.indexOf(days[k].unknown)<0)unk.push(days[k].unknown)});
+ return '<div class="seg-panel '+x.kind+'" id="segPanel'+i+'" role="region" aria-label="'+esc(x.label)+'详情">'+info+'<span class="sp-label">'+(x.kind==="stay"?esc(x.duration.split(" · ").slice(1).join(" · "))+' · ':esc(x.duration)+' · ')+'逐日 · 点按查看当天安排</span>'+list+'<p class="sp-unknown">待核：'+esc(unk.join("；"))+'</p></div>';
+}
+function segHtml(x,i,activePhase){
+ var cur=i===activePhase?' is-current':'',open=i===expanded,parts=x.duration.split(" · ");
+ var btnAttr='data-phase="'+i+'" aria-current="'+(cur?'step':'false')+'" aria-expanded="'+open+'" aria-controls="segPanel'+i+'"',chev='<span class="seg-chev" aria-hidden="true">›</span>',panel=open?panelHtml(x,i):"";
+ if(x.kind==="transit"){
+  var icon=/船/.test(x.label)?icons.ferry:icons.train;
+  return '<div class="seg transit'+cur+(open?' open':'')+'"><button class="seg-main" '+btnAttr+'><span class="seg-mark" aria-hidden="true">'+icon+'</span><span class="seg-text"><b>'+esc(x.label)+'</b><span>'+(x.days<0.05?'路上不到0.1天':'路上约'+x.days.toFixed(1)+'天')+' · '+esc(x.via)+'</span></span><span></span>'+chev+'</button>'+(x.leg?modeToggle(x.leg):'')+'</div>'+panel;
+ }
+ var key=stayKeyOf[x.label],c=colorOf(x.label),nights=parts.shift(),sub=parts.join(" · ");
+ var stepper="";
+ if(key){var r=stayRules[key],n=stayPrefs[key];stepper='<span class="stepper"><button data-adjust="'+key+'" data-delta="-1" aria-label="减少'+esc(r.label)+'一天" '+(n<=r.min?'disabled':'')+'>−</button><output aria-live="polite">'+esc(nights)+'</output><button data-adjust="'+key+'" data-delta="1" aria-label="增加'+esc(r.label)+'一天" '+(n>=r.max?'disabled':'')+'>＋</button></span>'}
+ return '<div class="seg stay'+(key?' adjustable':'')+cur+(open?' open':'')+'" style="--c:'+c+'"><button class="seg-main" '+btnAttr+'><span class="seg-mark" aria-hidden="true"></span><span class="seg-text"><b>'+esc(x.label)+'</b><span>约'+x.days.toFixed(1)+'天 · '+esc(x.range)+'</span></span><span class="seg-nights">'+esc(nights)+'</span>'+chev+'</button>'+stepper+'</div>'+panel;
+}
+function render(opts){
+ opts=opts||{};
  plan=buildPlan();days=plan.days;selected=Math.max(0,Math.min(days.length-1,selected));
- document.getElementById("planStatus").textContent=plan.status;
- document.getElementById("heroTitle").textContent=plan.title;
- document.getElementById("heroLede").textContent=plan.lede;
+ var n=days.length,gap=14-n,total=totalBudget(days),onBoard=days.filter(function(d){return d.states.some(function(s){return /火车过夜|轮渡过夜/.test(s)})}).length;
+ $("heroDates").textContent=cnDate(days[0])+" — "+cnDate(days[n-1]);
+ $("heroTitle").innerHTML='<span>广州—青岛—大连—江西</span><span class="h1-days">'+n+'日行程</span>';
+ var status=$("planStatus");status.textContent=plan.status;status.className="plan-label"+(plan.overLimit?" over":"");
  document.title=plan.title;
  document.querySelector('meta[name="description"]').setAttribute("content",plan.lede);
- document.getElementById("allocationSummary").innerHTML=plan.metrics.map(function(x,i){var p=x.split(" · ");return '<span class="metric"><b>'+esc(p.shift())+'</b><span>'+esc(p.join(" · ")||(i===0?"行程覆盖":"计时口径"))+'</span></span>'}).join("");
- document.getElementById("stayControls").innerHTML=Object.keys(stayRules).map(function(k){var r=stayRules[k],n=stayPrefs[k];return '<section class="stay-control"><span class="stay-name"><b>'+esc(r.label)+'</b><small>'+esc(r.hint)+'</small></span><span class="counter"><button data-adjust="'+k+'" data-delta="-1" aria-label="减少'+esc(r.label)+'一天" '+(n<=r.min?'disabled':'')+'>−</button><strong>'+esc(stayValue(k,n))+'</strong><button data-adjust="'+k+'" data-delta="1" aria-label="增加'+esc(r.label)+'一天" '+(n>=r.max?'disabled':'')+'>＋</button></span></section>'}).join("");
- var limit=document.getElementById("limitNote"),gap=14-days.length;limit.className="limit-note"+(plan.overLimit?" over":"");limit.textContent=plan.overLimit?"当前 "+days.length+" 天，超过14天上限 "+(-gap)+" 天。请减少任一城市完整日；固定交通不会被压缩。":"当前 "+days.length+" 天，距14天上限还可增加 "+gap+" 天。调整只增减停留，后续日期与预算会一起顺延。";
+ $("statDays").textContent=n+"天";
+ $("statDaysBox").className="stat"+(plan.overLimit?" over":"");
+ $("statDaysSub").textContent=plan.overLimit?"超出14天上限":gap?"还可加"+gap+"天":"已到上限";
+ $("statBudget").textContent="¥"+money(total[0])+"–"+money(total[1]);
+ $("statTransit").textContent="约"+plan.ledger.transit.toFixed(1)+"天";
+ $("statTransit").title=plan.metrics[1];
+ var cur=snap(plan),dd=cmp(defSnap,cur);
+ $("dDays").textContent=dd.dn?"比默认"+dd.days:"";
+ $("dBudget").textContent=dd.moneyCls?"比默认"+dd.money:"";$("dBudget").className=dd.moneyCls;
+ $("dTransit").textContent=dd.dt?"坐车船比默认"+dd.time:"";$("dTransit").className=dd.timeCls;
+ $("statTransitSub").innerHTML="坐车船"+esc(transitHours().replace(/^约/,""))+"<br>"+onBoard+"晚在车船上";
+ var tb=$("todayBtn"),t=days[todayIndex];tb.hidden=!t;if(t)tb.textContent="查看今天 · "+t.d+" "+chipCity(t)+" ↓";
  var activePhase=activePhaseIndex();
- phaseRail.innerHTML=plan.segments.map(function(x,i){return '<button class="phase '+x.kind+'" data-phase="'+i+'" aria-current="'+(i===activePhase?'step':'false')+'"><b>'+esc(x.label)+'</b><span>'+esc(x.duration)+'</span><small>'+esc(x.range)+'</small></button>'}).join("");
- rail.innerHTML=days.map(function(x,i){return '<button class="date" role="tab" aria-selected="'+(i===selected)+'" data-day="'+i+'"><b>'+esc(x.d)+'</b><span>'+esc(x.w)+'</span></button>'}).join("");
+ var lg=plan.ledger;
+ phaseRail.innerHTML='<div class="seg-end"><span class="seg-mark" aria-hidden="true"></span><span><b>广州出发</b><span>'+esc(lg.go)+' · 出发前约'+lg.before.toFixed(1)+'天</span></span></div>'+plan.segments.map(function(x,i){return segHtml(x,i,activePhase)}).join("")+'<div class="seg-end"><span class="seg-mark" aria-hidden="true"></span><span><b>回到广州</b><span>'+esc(lg.home)+' · 到家后约'+lg.after.toFixed(1)+'天</span></span></div>';
+ var pieces=[{c:"o",d:lg.before,t:"出发前"}].concat(plan.segments.map(function(x){return x.kind==="transit"?{c:"t",d:x.days,t:x.label}:{c:"s",d:x.days,t:x.label,col:colorOf(x.label)}}),[{c:"o",d:lg.after,t:"到家后"}]);
+ $("timeLedger").innerHTML='<div class="lg-head"><span>时间怎么分</span><span>共 '+days.length+' 天</span></div><div class="lg-bar" role="img" aria-label="'+esc(days.length+"天：停留"+lg.stay+"天，路上"+lg.transit+"天，出发前和到家后"+Math.round((lg.before+lg.after)*10)/10+"天")+'">'+pieces.map(function(x){var w=x.d/days.length*100,px=x.d/days.length*330,short=x.t.replace("探亲","");return '<i class="'+x.c+'" style="flex:'+x.d+' 0 0'+(x.col?';background:'+x.col:'')+'" title="'+esc(x.t+" 约"+x.d.toFixed(1)+"天")+'">'+(px>=52&&x.c==="s"?esc(short)+" "+x.d.toFixed(1):px>=24?x.d.toFixed(1):"")+'</i>'}).join("")+'</div><p class="lg-sum"><b>'+days.length+'天</b> ＝ 停留 <b>'+lg.stay.toFixed(1)+'</b> ＋ 路上 <b class="lg-t">'+lg.transit.toFixed(1)+'</b> ＋ 出发前/到家后 <b>'+(Math.round((lg.before+lg.after)*10)/10).toFixed(1)+'</b> 天</p>';
+ overview.classList.toggle("editing",editing);
+ var toggle=$("adjustToggle");toggle.setAttribute("aria-expanded",String(editing));toggle.textContent=editing?"完成调整":"调整天数与交通";var tt=$("adjustTop");tt.textContent=editing?"完成":"调整";tt.setAttribute("aria-pressed",String(editing));
+ $("resetStays").hidden=!editing||(JSON.stringify(stayPrefs)===JSON.stringify(defaultStays)&&JSON.stringify(tripModes)===JSON.stringify(defaultModes));
+ var limit=$("limitNote");limit.hidden=!editing&&!plan.overLimit;limit.className="limit-note"+(plan.overLimit?" over":"");limit.textContent=plan.overLimit?"当前 "+n+" 天，超过14天上限 "+(-gap)+" 天。请减少任一城市完整日；固定交通不会被压缩。":"当前 "+n+" 天，距14天上限还可增加 "+gap+" 天。改停留天数或交通方式后，后续日期与预算会一起顺延。";
+ var railHadFocus=rail.contains(document.activeElement);
+ rail.innerHTML=days.map(function(x,i){var today=i===todayIndex;return '<button class="date'+(isMoving(x)?' moving':'')+(today?' today':'')+'" style="--c:'+colorOf(destOf(x))+'" role="tab" aria-selected="'+(i===selected)+'" tabindex="'+(i===selected?0:-1)+'" data-day="'+i+'" aria-label="第'+(i+1)+'天 '+esc(cnDate(x)+" "+x.city)+(today?' 今天':'')+'"><b>'+esc(x.d.split("/")[1])+'</b><span>'+esc(x.w)+'</span><i>'+esc(chipCity(x))+'</i></button>'}).join("");
  var d=days[selected];
- document.getElementById("dayKicker").textContent=d.d+" · "+d.w+" · "+d.city;
- document.getElementById("dayTitle").textContent=d.title;document.getElementById("dayNote").textContent=d.note;document.getElementById("dayCount").textContent=String(selected+1).padStart(2,"0");
- visual.classList.remove("photo-fail");
- visual.innerHTML='<button class="photo-btn" aria-label="放大查看：'+esc(d.photo.alt)+'"><img class="day-photo" loading="eager" decoding="async" referrerpolicy="no-referrer" src="'+d.photo.url+'" alt="'+esc(d.photo.alt)+'" onerror="var f=this.closest(\'.day-visual\');if(f)f.classList.add(\'photo-fail\')"></button><a class="photo-credit" href="'+d.photo.source+'" target="_blank" rel="noopener">'+esc(d.photo.credit)+' ↗</a>';
- document.getElementById("routeChain").innerHTML=routeHtml(d.route);
- document.getElementById("stateLine").innerHTML=d.states.map(function(x){return '<span class="state-chip">'+esc(x)+'</span>'}).join("");
- document.getElementById("dayBudget").textContent=dayBudget(d);
- document.getElementById("budgetBasis").textContent=d.basis;
- document.getElementById("budgetUnknown").textContent="待核： "+d.unknown;
- steps.innerHTML=d.steps.map(function(s,i){return '<button class="step" data-step="'+i+'"><span class="step-time">'+esc(s.t)+'</span><span class="step-dot"></span><span class="step-main"><b>'+esc(s.n)+'</b><span>'+esc(s.s)+'</span><em>'+esc(s.tag)+' · 点开详情</em></span></button>'}).join("");
- document.getElementById("prevDay").disabled=selected===0;document.getElementById("nextDay").disabled=selected===days.length-1;
- centerInRail(rail,rail.querySelector('[aria-selected="true"]'));
- centerInRail(phaseRail,phaseRail.querySelector('[aria-current="step"]'));
- try{localStorage.setItem("china-trip-v3-stays",JSON.stringify(stayPrefs));localStorage.setItem("china-trip-v3-day",selected)}catch(e){}
+ $("dayKicker").textContent=d.d+" "+d.w+" · 第 "+(selected+1)+" / "+n+" 天 · "+d.city;
+ $("dayTitle").textContent=d.title;$("dayNote").textContent=d.note;
+ if(visual.dataset.src!==d.photo.url){
+  visual.dataset.src=d.photo.url;visual.setAttribute("data-alt",d.photo.alt);
+  visual.classList.remove("photo-fail");
+  visual.innerHTML='<button class="photo-btn" aria-label="放大查看：'+esc(d.photo.alt)+'"><img class="day-photo" loading="eager" decoding="async" referrerpolicy="no-referrer" src="'+d.photo.url+'" alt="'+esc(d.photo.alt)+'" onload="this.classList.add(\'ready\')" onerror="var f=this.closest(\'.day-visual\');if(f)f.classList.add(\'photo-fail\')"></button><span class="zoom-hint" aria-hidden="true">'+icons.zoom+'</span><a class="photo-credit" href="'+d.photo.source+'" target="_blank" rel="noopener">'+esc(d.photo.credit)+' ↗</a>';
+ }
+ $("routeChain").innerHTML=routeHtml(d.route);
+ var night=nightOf(d);
+ $("stateLine").innerHTML=d.states.filter(function(x){return x!==night.b}).map(function(x){return '<span class="state-chip'+(/交通|铁路|轮渡|换乘|返程|中转|转场/.test(x)?' moving':'')+'">'+esc(x)+'</span>'}).join("");
+ $("dayNight").textContent=night.b;$("dayNightSub").textContent=night.sub;
+ $("dayBudget").textContent=dayBudget(d);
+ $("budgetBasis").textContent=d.basis;
+ $("budgetUnknown").textContent="待核： "+d.unknown;
+ steps.innerHTML=d.steps.map(function(s,i){return '<button class="step" data-step="'+i+'" style="--dot:'+kindColor(s.kind)+'"><span class="step-time">'+timeHtml(s.t)+'</span><span class="step-dot" aria-hidden="true"></span><span class="step-main"><b>'+esc(s.n)+'</b><span>'+esc(s.s)+'</span><em>'+esc(s.kind)+' · '+esc(s.tag)+'</em></span><span class="step-go" aria-hidden="true">›</span></button>'}).join("");
+ var prev=$("prevDay"),next=$("nextDay"),p=days[selected-1],q=days[selected+1];
+ prev.disabled=!p;next.disabled=!q;
+ prev.innerHTML='<small>← 前一天</small>'+(p?esc(p.d+" "+p.w+" · "+chipCity(p)):"已是第一天");
+ next.innerHTML='<small>后一天 →</small>'+(q?esc(q.d+" "+q.w+" · "+chipCity(q)):"已是最后一天");
+ if(opts.dir&&!reduceMotion.matches){card.style.setProperty("--dx",(opts.dir*18)+"px");card.classList.remove("swap");void card.offsetWidth;card.classList.add("swap")}
+ var chip=rail.querySelector('[aria-selected="true"]');
+ centerInRail(rail,chip);
+ if(railHadFocus&&chip)chip.focus({preventScroll:true});
+ if(opts.refocus){var again=phaseRail.querySelector('[data-adjust="'+opts.refocus[0]+'"][data-delta="'+opts.refocus[1]+'"]');if(again&&!again.disabled)again.focus({preventScroll:true});else{var other=phaseRail.querySelector('[data-adjust="'+opts.refocus[0]+'"]:not([disabled])');if(other)other.focus({preventScroll:true})}}
+ try{localStorage.setItem("china-trip-v3-modes",JSON.stringify(tripModes));localStorage.setItem("china-trip-v3-stays",JSON.stringify(stayPrefs));localStorage.setItem("china-trip-v3-day",selected)}catch(e){}
+ renderBar(cur);updateJump();
+ setTimeout(function(){[selected-1,selected+1].forEach(function(i){var x=days[i];if(!x)return;var im=new Image();im.referrerPolicy="no-referrer";im.src=x.photo.url})},400);
 }
-function setDay(i){selected=Math.max(0,Math.min(days.length-1,i));render()}
-document.getElementById("stayControls").addEventListener("click",function(e){var b=e.target.closest("[data-adjust]");if(!b)return;var k=b.dataset.adjust,r=stayRules[k],next=stayPrefs[k]+Number(b.dataset.delta);if(next<r.min||next>r.max)return;stayPrefs[k]=next;selected=0;render()});
-rail.addEventListener("click",function(e){var b=e.target.closest("[data-day]");if(b)setDay(+b.dataset.day)});
-phaseRail.addEventListener("click",function(e){var b=e.target.closest("[data-phase]");if(!b)return;setDay(plan.segments[+b.dataset.phase].start)});
-rail.addEventListener("keydown",function(e){if(e.key==="ArrowRight"){e.preventDefault();setDay(selected+1)}if(e.key==="ArrowLeft"){e.preventDefault();setDay(selected-1)}});
+function updateJump(){
+ var pill=$("jumpPill"),r=railWrap.getBoundingClientRect(),inDays=r.top<innerHeight*.5,ovTop=overview.getBoundingClientRect().top;
+ if(matchMedia("(min-width:1000px)").matches||(ovTop>40&&!inDays)){pill.hidden=true;return}
+ var bar=$("changeBar");pill.style.bottom=bar.hidden?"":(innerHeight-bar.getBoundingClientRect().top+8)+"px";
+ pill.hidden=false;pill.textContent=inDays?"↑ 总览":"↓ 每日安排";pill.dataset.to=inDays?"overview":"days";
+}
+addEventListener("scroll",function(){requestAnimationFrame(updateJump)},{passive:true});addEventListener("resize",updateJump);
+$("jumpPill").onclick=function(){if(this.dataset.to==="overview")overview.scrollIntoView({block:"start",behavior:reduceMotion.matches?"auto":"smooth"});else revealCard(true)};
+function revealCard(force){
+ var offset=railWrap.getBoundingClientRect().height+10,top=card.getBoundingClientRect().top;
+ if(top<offset||(force&&top>innerHeight*.45))window.scrollTo({top:window.scrollY+top-offset,behavior:reduceMotion.matches?"auto":"smooth"});
+}
+function setDay(i,reveal){var n=Math.max(0,Math.min(days.length-1,i));if(n===selected&&!reveal)return;var dir=n>selected?1:n<selected?-1:0;selected=n;render({dir:dir});if(reveal)revealCard(reveal==="force")}
+overview.addEventListener("click",function(e){
+ var mo=e.target.closest("[data-mode]");
+ if(mo){var pm=mo.dataset.mode.split(":");if(tripModes[pm[0]]===pm[1])return;var lo=legModes[pm[0]].opts[pm[1]];noteChange(legModes[pm[0]].label+" 改为"+lo.name+"（"+lo.train+"）");tripModes[pm[0]]=pm[1];render();var again=phaseRail.querySelector('[data-mode="'+mo.dataset.mode+'"]');if(again)again.focus({preventScroll:true});return}
+ var a=e.target.closest("[data-adjust]");
+ if(a){var k=a.dataset.adjust,r=stayRules[k],next=stayPrefs[k]+Number(a.dataset.delta);if(next<r.min||next>r.max)return;noteChange(r.label+(Number(a.dataset.delta)>0?" 加1天":" 减1天"));stayPrefs[k]=next;render({refocus:[k,a.dataset.delta]});return}
+ var g=e.target.closest("[data-goto]");
+ if(g){setDay(+g.dataset.goto,"force");return}
+ var b=e.target.closest("[data-phase]");
+ if(!b)return;
+ var i=+b.dataset.phase;expanded=expanded===i?-1:i;render();
+ var head=phaseRail.querySelector('[data-phase="'+i+'"]');if(head)head.focus({preventScroll:true});
+ var pnl=$("segPanel"+i);
+ if(pnl){var r=pnl.getBoundingClientRect(),over=r.bottom-innerHeight+16;if(over>0)window.scrollBy({top:Math.min(over,r.top-140),behavior:reduceMotion.matches?"auto":"smooth"})}
+});
+$("adjustToggle").onclick=function(){editing=!editing;lastChange=null;barClosed=false;render()};
+$("adjustTop").onclick=function(){$("adjustToggle").click();if(editing)$("timeLedger").scrollIntoView({block:"start",behavior:reduceMotion.matches?"auto":"smooth"})};
+$("changeBar").addEventListener("click",function(e){if(e.target.closest("#closeBar")){barClosed=true;renderBar(snap(plan));updateJump()}});
+$("resetStays").onclick=function(){noteChange("恢复默认方案");stayPrefs=JSON.parse(JSON.stringify(defaultStays));tripModes=JSON.parse(JSON.stringify(defaultModes));render();$("adjustToggle").focus()};
+rail.addEventListener("click",function(e){var b=e.target.closest("[data-day]");if(b)setDay(+b.dataset.day,"soft")});
+rail.addEventListener("keydown",function(e){var k={ArrowRight:1,ArrowLeft:-1}[e.key];if(k){e.preventDefault();setDay(selected+k)}if(e.key==="Home"){e.preventDefault();setDay(0)}if(e.key==="End"){e.preventDefault();setDay(days.length-1)}});
 steps.addEventListener("click",function(e){var b=e.target.closest("[data-step]");if(b)openStep(days[selected].steps[+b.dataset.step],b)});
-visual.addEventListener("click",function(e){if(!e.target.closest(".photo-btn"))return;var d=days[selected],p=d.photo;openSheet("实景照片 · "+d.d,'<h2 id="sheetTitle">'+esc(d.title)+'</h2><img class="sheet-photo" src="'+p.url+'" alt="'+esc(p.alt)+'"><p class="sheet-copy">'+esc(p.alt)+'</p><a class="evidence" target="_blank" rel="noopener" href="'+p.source+'">查看照片来源与许可 ↗</a>',e.target.closest(".photo-btn"))});
-document.getElementById("prevDay").onclick=function(){setDay(selected-1)};document.getElementById("nextDay").onclick=function(){setDay(selected+1)};
-card.addEventListener("pointerdown",function(e){startX=e.clientX});card.addEventListener("pointerup",function(e){var dx=e.clientX-startX;if(Math.abs(dx)>65)setDay(selected+(dx<0?1:-1))});
-function openSheet(label,html,focus){lastFocus=focus||document.activeElement;document.getElementById("sheetLabel").textContent=label;content.innerHTML=html;overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");document.body.style.overflow="hidden";document.getElementById("closeSheet").focus()}
-function closeSheet(){overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true");document.body.style.overflow="";if(lastFocus&&lastFocus.focus)lastFocus.focus()}
-document.getElementById("closeSheet").onclick=closeSheet;overlay.addEventListener("click",function(e){if(e.target===overlay)closeSheet()});document.addEventListener("keydown",function(e){if(e.key==="Escape"&&overlay.classList.contains("open"))closeSheet()});
+visual.addEventListener("click",function(e){
+ var btn=e.target.closest(".photo-btn");if(!btn)return;var d=days[selected],p=d.photo;
+ openSheet("实景照片 · "+d.d+" "+d.w,'<h2 id="sheetTitle">'+esc(d.title)+'</h2><figure class="zoom" id="zoomBox"><img class="sheet-photo" referrerpolicy="no-referrer" src="'+p.url+'" alt="'+esc(p.alt)+'" onerror="this.parentNode.classList.add(\'photo-fail\')"></figure><p class="zoom-tip">点按照片放大，可左右拖动查看细节；也可双指缩放。</p><p class="sheet-copy">'+esc(p.alt)+' · '+esc(p.credit)+'</p><a class="evidence" target="_blank" rel="noopener" href="'+p.source+'">查看照片来源与许可 ↗</a>',btn);
+});
+content.addEventListener("click",function(e){
+ var z=e.target.closest(".zoom");
+ if(z){var on=z.classList.toggle("zoomed");if(on){var im=z.querySelector("img");z.scrollLeft=(im.offsetWidth-z.clientWidth)/2}return}
+ var g=e.target.closest("[data-goto]");
+ if(g){closeSheet(true);setDay(+g.dataset.goto,"force")}
+});
+$("prevDay").onclick=function(){setDay(selected-1,"soft")};$("nextDay").onclick=function(){setDay(selected+1,"soft")};
+card.addEventListener("touchstart",function(e){var t=e.touches[0];swipe=e.touches.length===1?{x:t.clientX,y:t.clientY,dx:0,t:Date.now(),axis:null}:null},{passive:true});
+card.addEventListener("touchmove",function(e){
+ if(!swipe)return;var t=e.touches[0],dx=t.clientX-swipe.x,dy=t.clientY-swipe.y;
+ if(!swipe.axis&&(Math.abs(dx)>8||Math.abs(dy)>8))swipe.axis=Math.abs(dx)>Math.abs(dy)*1.2?"x":"y";
+ if(swipe.axis!=="x")return;
+ if(e.cancelable)e.preventDefault();
+ swipe.dx=dx;var edge=(dx>0&&!selected)||(dx<0&&selected===days.length-1);
+ card.style.transition="none";card.style.transform="translateX("+(dx*(edge?.12:.3))+"px)";
+},{passive:false});
+function swipeEnd(){if(!swipe)return;var s=swipe;swipe=null;card.style.transition="transform .2s ease-out";card.style.transform="";if(s.axis==="x"&&Math.abs(s.dx)>60&&Date.now()-s.t<900)setDay(selected+(s.dx<0?1:-1),"soft")}
+card.addEventListener("touchend",swipeEnd);card.addEventListener("touchcancel",swipeEnd);
+function focusables(){return Array.prototype.filter.call(sheet.querySelectorAll('button,a[href],[tabindex]:not([tabindex="-1"])'),function(x){return x.offsetParent!==null})}
+function openSheet(label,html,focus){
+ lastFocus=focus||document.activeElement;$("sheetLabel").textContent=label;content.innerHTML=html;sheet.scrollTop=0;sheet.style.transform="";
+ overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");document.documentElement.classList.add("locked");
+ $("closeSheet").focus({preventScroll:true});
+}
+function closeSheet(skipFocus){
+ overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true");document.documentElement.classList.remove("locked");sheet.style.transform="";
+ if(!skipFocus&&lastFocus&&lastFocus.focus)lastFocus.focus({preventScroll:true});
+}
+$("closeSheet").onclick=function(){closeSheet()};
+overlay.addEventListener("click",function(e){if(e.target===overlay)closeSheet()});
+document.addEventListener("keydown",function(e){
+ if(!overlay.classList.contains("open"))return;
+ if(e.key==="Escape")closeSheet();
+ if(e.key==="Tab"){var f=focusables();if(!f.length)return;var first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}
+});
+function dragStart(e){if(e.target.closest(".close")||matchMedia("(min-width:1000px)").matches)return;drag={y:e.clientY,dy:0,id:e.pointerId};sheet.style.transition="none";try{sheet.setPointerCapture(e.pointerId)}catch(err){}}
+$("sheetGrip").addEventListener("pointerdown",dragStart);$("sheetTop").addEventListener("pointerdown",dragStart);
+sheet.addEventListener("pointermove",function(e){if(!drag||e.pointerId!==drag.id)return;drag.dy=Math.max(0,e.clientY-drag.y);sheet.style.transform="translateY("+drag.dy+"px)"});
+function dragEnd(){if(!drag)return;var dy=drag.dy;drag=null;sheet.style.transition="";if(dy>90)closeSheet();else sheet.style.transform=""}
+sheet.addEventListener("pointerup",dragEnd);sheet.addEventListener("pointercancel",dragEnd);
 function openStep(s,focus){
+ var d=days[selected],night=nightOf(d);
  var link=s.link?'<a class="evidence" target="_blank" rel="noopener" href="'+s.link+'">'+esc(s.linkText||"查看来源")+' ↗</a>':"";
- var sources=(s.kind==="火车"||s.kind==="住宿"||s.kind==="轮渡")?'<h3>核验提醒</h3><p class="sheet-copy">公开时刻、票价、船班与房价都会变化；本站不连接实时库存。购票或付款前请查看12306、运营方或酒店官方渠道。</p>':"";
- openSheet("第 "+(selected+1)+" 天 · "+s.kind,'<h2 id="sheetTitle">'+esc(s.n)+'</h2><p class="sheet-copy">'+esc(s.detail)+'</p><div class="facts"><div class="fact"><small>时间</small><b>'+esc(s.t)+'</b></div><div class="fact"><small>这一步</small><b>'+esc(s.cost)+'</b></div><div class="fact"><small>当天总预算</small><b>'+dayBudget(days[selected])+'</b></div><div class="fact"><small>过夜 / 状态</small><b>'+esc(days[selected].states.join(" · "))+'</b></div></div>'+link+sources,focus)
+ var sources=(s.kind==="火车"||s.kind==="住宿"||s.kind==="轮渡")?'<div class="callout warn"><strong>核验提醒</strong>公开时刻、票价、船班与房价都会变化；本站不连接实时库存。购票或付款前请查看12306、运营方或酒店官方渠道。</div>':"";
+ openSheet(d.d+" "+d.w+" · 第 "+(selected+1)+" 天 · "+s.kind,'<h2 id="sheetTitle">'+esc(s.n)+'</h2><p class="sheet-copy">'+esc(s.s)+'</p><div class="facts"><div class="fact"><small>时间</small><b>'+esc(s.t)+'</b></div><div class="fact"><small>这一步费用</small><b>'+esc(s.cost)+'</b></div><div class="fact"><small>当天总预算</small><b>'+dayBudget(d)+'</b></div><div class="fact"><small>今晚</small><b>'+esc(night.b+" · "+night.sub)+'</b></div></div><p class="sheet-copy">'+esc(s.detail)+'</p>'+link+sources,focus);
 }
 function budgetDrawer(){
- var total=totalBudget(days),rows=days.map(function(d){return '<div class="budget-row"><b>'+esc(d.d+" "+d.city)+'</b><span>'+dayBudget(d)+'</span></div>'}).join("");
+ var total=totalBudget(days),max=Math.max.apply(null,days.map(function(d){return d.budget[1]}));
+ var rows=days.map(function(d,i){return '<button class="budget-row'+(i===selected?' cur':'')+'" data-goto="'+i+'"><b>'+esc(d.d+" "+d.w)+'<small>'+esc(d.city)+'</small></b><span>'+dayBudget(d)+'</span><i style="--lo:'+(d.budget[0]/max*100).toFixed(1)+'%;--hi:'+(d.budget[1]/max*100).toFixed(1)+'%"></i></button>'}).join("");
  var unknown=days.map(function(d){return '<li><b>'+esc(d.d)+'</b> '+esc(d.unknown)+'</li>'}).join("");
- return '<h2 id="sheetTitle">'+esc(plan.name)+'总预算</h2><p class="sheet-copy">每天独立计费后自动相加。跨夜车票/船票只在出发日计一次，酒店只在实际入住夜计一次。</p><div class="budget-total">¥'+money(total[0])+'–'+money(total[1])+'</div>'+rows+'<div class="callout"><strong>加总口径</strong>包含页面所列交通、经济型住宿、普通餐饮与基础景点；未知项未按0元塞进总额，而是在下方单列。</div><h3>尚未核实，不纳入或只做预留</h3><ul class="list">'+unknown+'</ul>';
+ return '<h2 id="sheetTitle">'+esc(plan.name)+'总预算</h2><div class="budget-total">¥'+money(total[0])+'–'+money(total[1])+'</div><p class="budget-sub">'+days.length+' 天 · 平均每天约 ¥'+money(Math.round(total[0]/days.length))+'–'+money(Math.round(total[1]/days.length))+' · 点按某天可跳转</p><div class="budget-rows">'+rows+'</div><div class="callout"><strong>加总口径</strong>每天独立计费后自动相加。跨夜车票/船票只在出发日计一次，酒店只在实际入住夜计一次。包含页面所列交通、经济型住宿、普通餐饮与基础景点；未知项未按0元塞进总额，而是在下方单列。</div><h3>尚未核实，不纳入或只做预留</h3><ul class="list">'+unknown+'</ul>';
 }
-document.getElementById("budgetBtn").onclick=function(){openSheet("逐日预算核对",budgetDrawer(),this)};
+$("budgetBtn").onclick=function(){openSheet("逐日预算核对",budgetDrawer(),this)};
 function mapDrawer(){
- var map='<svg class="map" viewBox="0 0 520 340" role="img" aria-label="烟台夜船大连线路线示意"><path class="line" d="M75 285 C145 130 205 85 290 80 L355 62 L405 35 C350 125 295 215 240 245 L198 285 L240 245 C180 305 120 310 75 285"/><circle class="point" cx="75" cy="285" r="8"/><text x="35" y="318">广州白云</text><circle class="point" cx="290" cy="80" r="8"/><text x="252" y="66">青岛</text><circle class="point" cx="355" cy="62" r="8"/><text x="330" y="92">烟台</text><circle class="point" cx="405" cy="35" r="8"/><text x="420" y="40">大连</text><circle class="point" cx="240" cy="245" r="8"/><text x="252" y="248">南昌</text><circle class="point" cx="198" cy="285" r="8"/><text x="155" y="318">新干县</text></svg>';
- var note="青岛后经烟台北站乘夜船到旅顺，大连停留后用快速铁路去南昌，再去新干探亲，回南昌后返广州。停留调整只顺延日期，不删除大连或压缩交通。";
- return '<h2 id="sheetTitle">'+esc(plan.name)+'路线</h2><p class="sheet-copy">路线为方向示意，家庭精确位置不显示。</p>'+map+'<div class="callout"><strong>固定顺序</strong>'+esc(note)+'</div><div class="route-chain">'+routeHtml(plan.route)+'</div>';
+ var map='<svg class="map" viewBox="0 0 520 340" role="img" aria-label="烟台夜船大连线路线示意"><path class="line" d="M75 285 C145 130 205 85 290 80 L355 62 L405 35 C350 125 295 215 240 245 L198 285 C160 300 110 300 75 285"/><circle class="point" cx="75" cy="285" r="8"/><text x="35" y="318">广州白云</text><circle class="point" cx="290" cy="80" r="8"/><text x="252" y="66">青岛</text><circle class="point" cx="355" cy="62" r="8"/><text x="330" y="92">烟台</text><circle class="point" cx="405" cy="35" r="8"/><text x="420" y="40">大连</text><circle class="point" cx="240" cy="245" r="8"/><text x="252" y="248">南昌</text><circle class="point" cx="198" cy="285" r="8"/><text x="155" y="318">新干县</text></svg>';
+ var note="青岛后经烟台北站乘夜船到旅顺；大连停留后坐高铁到南昌住一晚，第二天上午逛老城，下午坐普速去新干探亲，最后从新干坐K441卧铺回广州。停留调整只顺延日期，不删除大连或压缩交通。";
+ return '<h2 id="sheetTitle">'+esc(plan.name)+'路线</h2><p class="sheet-copy">路线为方向示意，家庭精确位置不显示。</p>'+map+'<div class="route-chain">'+routeHtml(plan.route)+'</div><div class="callout"><strong>固定顺序</strong>'+esc(note)+'</div>';
 }
-document.getElementById("mapBtn").onclick=function(){openSheet("完整路线图",mapDrawer(),this)};
-render();
+$("todayBtn").onclick=function(){setDay(todayIndex,"force")};
+$("mapBtn").onclick=function(){openSheet("完整路线图",mapDrawer(),this)};
+render();updateJump();
 })();
 </script>
 </body>

@@ -52,7 +52,8 @@ class SiteContractTests(unittest.TestCase):
         self.assertIn('id="limitNote"', self.html)
         self.assertIn('data-phase=', self.html)
         for token in (
-            "已知干线约64小时43分–66小时43分",
+            "function trunkMinutes()",
+            "已知干线约",
             "青岛",
             "大连",
             "新干探亲",
@@ -71,9 +72,30 @@ class SiteContractTests(unittest.TestCase):
             'd:"10/25",w:"周日"',
             "烟台北站 → 旅顺西站",
             "星海广场与海湾散步",
-            "爷爷奶奶与堂妹的一整天",
+            "陪爷爷奶奶的一整天",
+            "（可选）县城顺路看堂妹",
         ):
             self.assertIn(token, self.html)
+
+    def test_jiangxi_leg_runs_nanchang_then_xingan_then_overnight_home(self):
+        for token in (
+            "K8723 南昌 → 新干",
+            "K441 新干 → 广州白云",
+            'label:"返穗卧铺"',
+            '["广州白云","青岛","烟台北港","旅顺 / 大连","南昌","新干县","广州白云"]',
+        ):
+            self.assertIn(token, self.html)
+        self.assertNotIn('label:"南昌中转"', self.html)
+
+    def test_hotels_are_budgeted_at_most_150_per_night(self):
+        self.assertIn("每晚¥150的预算", self.html)
+        for stale in ("约 ¥260–420 / 晚", "估算 ¥260–450 / 晚", "估算 ¥180–280"):
+            self.assertNotIn(stale, self.html)
+
+    def test_overview_segments_expand_in_place(self):
+        self.assertIn("function panelHtml(", self.html)
+        self.assertIn('aria-expanded="', self.html)
+        self.assertIn("data-goto=", self.html)
 
     def test_first_layer_has_direction_state_budget_and_unknowns(self):
         for element_id in (
@@ -129,6 +151,18 @@ class SiteContractTests(unittest.TestCase):
         for token in ("傅堎村", "三湖镇", "Nate", "Junshuo Plastics", "广州骏烁"):
             self.assertNotIn(token, self.html)
         self.assertIn("不公开村庄、门牌或家庭具体位置", self.html)
+
+
+    def test_transport_modes_switch_per_leg_with_rail_defaults(self):
+        self.assertIn('var tripModes={gzqd:"rail",dlnc:"hsr",ncxg:"rail",xggz:"rail"}', self.html)
+        self.assertIn('localStorage.getItem("china-trip-v3-modes")', self.html)
+        for token in ("G566 广州南 → 青岛北", "K683/K682 大连 → 北京", "T167 北京西 → 南昌", "G3065 南昌西 → 新干东", "G3065 新干东 → 广州东", "function simulate(", "data-mode="):
+            self.assertIn(token, self.html)
+
+
+    def test_time_ledger_adds_up_to_calendar_days(self):
+        for token in ("时间怎么分", "出发前/到家后", "var hrs=[tGo,", "total*24-tHome", "广州出发", "回到广州"):
+            self.assertIn(token, self.html)
 
 
 if __name__ == "__main__":

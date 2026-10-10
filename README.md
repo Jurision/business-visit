@@ -1,7 +1,9 @@
 # China Journey Planner
 
 A dependency-free personal journey page for a 2026 Guangzhou → Qingdao →
-Yantai night ferry → Dalian → Xingan → Nanchang → Guangzhou trip.
+Yantai night ferry → Dalian → Nanchang → Xingan → Guangzhou trip. Nanchang is a
+one-night stop with a morning in the old town; the trip returns from Xingan on
+the K441 overnight sleeper. Hotels are budgeted at no more than ¥150 per night.
 
 Live at: https://trip.arielzhu.space/travel/
 
