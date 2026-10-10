@@ -177,5 +177,10 @@ class SiteContractTests(unittest.TestCase):
         self.assertNotIn('<span class="summary-label">状态</span>', self.html)
 
 
+    def test_packing_list_with_weather_and_sources(self):
+        for token in ('id="packBtn"', "function packDrawer(", 'localStorage.getItem("china-trip-v3-pack")', "不用带行李箱", "身份证", "防风外套", "中央气象台 10/10 20:00 发布", "nmc.cn/publish/forecast/ASD/qingdao.html"):
+            self.assertIn(token, self.html)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -286,6 +286,24 @@ h1 span{display:block}
 .list{padding-left:18px;margin:0}
 .list li{margin:6px 0;color:var(--muted);font-size:13.5px;line-height:1.55}
 .list b{color:var(--ink)}
+.pack-tip{background:var(--gold-soft);color:#6d4a15;border-radius:14px;padding:11px 13px;margin:4px 0 12px;font-size:13.5px;line-height:1.6}
+.pack-tip b{display:block;margin-bottom:2px}
+.pack-progress{display:flex;align-items:center;gap:10px;margin:2px 0 6px;font-size:13px;font-weight:700;color:var(--muted)}
+.pack-progress i{flex:1;height:6px;border-radius:3px;background:var(--paper);overflow:hidden;position:relative}
+.pack-progress i:after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--w);background:var(--sea);border-radius:3px}
+.pack-reset{border:0;background:var(--paper);border-radius:10px;min-height:36px;padding:0 12px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
+.pack-list{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.pack-list li+li{border-top:1px solid var(--line)}
+.pack-list label{display:flex;align-items:center;gap:11px;min-height:46px;padding:8px 12px;font-size:14.5px;line-height:1.45;cursor:pointer}
+.pack-list input{flex:none;width:20px;height:20px;margin:0;accent-color:var(--sea)}
+.pack-list small{display:block;font-size:12px;color:var(--faint)}
+.pack-list input:checked+span{color:var(--faint);text-decoration:line-through}
+.wx{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.wx-row{display:grid;grid-template-columns:76px 74px minmax(0,1fr);gap:8px;padding:8px 12px;font-size:13px;line-height:1.5}
+.wx-row+.wx-row{border-top:1px solid var(--line)}
+.wx-row b{font-variant-numeric:tabular-nums}
+.wx-row span{color:var(--muted)}
+.wx-note{font-size:12px;color:var(--faint);margin:6px 0 0;line-height:1.55}
 .evidence{display:flex;align-items:center;min-height:44px;color:var(--sea);font-weight:650;text-underline-offset:3px}
 .budget-total{font-size:32px;line-height:1.15;font-weight:750;color:var(--red);margin:4px 0 2px;font-variant-numeric:tabular-nums}
 .budget-sub{color:var(--muted);font-size:13px;margin:0 0 14px}
@@ -357,7 +375,7 @@ html.has-bar .shell{padding-bottom:150px}
     </header>
 
     <section class="overview" id="overview" aria-labelledby="allocationTitle">
-      <div class="ov-head"><h2 id="allocationTitle">行程总览</h2><span class="ov-tools"><button class="pill-btn alt" id="adjustTop" aria-controls="phaseRail">调整</button><button class="pill-btn" id="mapBtn">路线图</button></span></div>
+      <div class="ov-head"><h2 id="allocationTitle">行程总览</h2><span class="ov-tools"><button class="pill-btn alt" id="adjustTop" aria-controls="phaseRail">调整</button><button class="pill-btn" id="packBtn">清单</button><button class="pill-btn" id="mapBtn">路线图</button></span></div>
       <div class="allocation-summary" id="allocationSummary">
         <div class="stat" id="statDaysBox"><small>总天数</small><b id="statDays">12天</b><span id="statDaysSub">上限14天</span><em id="dDays"></em></div>
         <button class="stat stat-btn" id="budgetBtn" aria-label="查看逐日预算"><small>预算估算</small><b id="statBudget">—</b><span>交通·住宿·餐饮·门票</span><em id="dBudget"></em></button>
@@ -991,6 +1009,41 @@ function mapDrawer(){
  return '<h2 id="sheetTitle">'+esc(plan.name)+'路线</h2><p class="sheet-copy">路线为方向示意，家庭精确位置不显示。</p>'+map+'<div class="route-chain">'+routeHtml(plan.route)+'</div><div class="callout"><strong>固定顺序</strong>'+esc(note)+'</div>';
 }
 $("todayBtn").onclick=function(){setDay(todayIndex,"force")};
+var packing=[
+ {g:"证件与电子",items:[["身份证","火车、船票都要实名"],["手机"],["充电器和数据线"],["充电宝"]]},
+ {g:"衣服（路上洗着穿）",items:[["速干短袖 ×3"],["长袖 ×1"],["防风外套或薄抓绒 ×1","青岛、大连早晚和夜船上用"],["长裤 ×1"],["短裤 ×1"],["内衣袜子 ×3–4 套"]]},
+ {g:"鞋",items:[["好走的运动鞋","青岛、大连步行多"],["拖鞋","卧铺、船上、酒店"]]},
+ {g:"卧铺与夜船",items:[["眼罩、耳塞"],["牙刷牙膏、杯子"],["湿巾、纸巾"],["车上吃的和水","Z168 约 28 小时，餐车贵"],["晕船药","容易晕船再带"]]},
+ {g:"其他",items:[["折叠伞","青岛 10/13 预报有雨"],["防晒","江西白天 30℃ 以上"],["常用药、创可贴"]]}
+];
+var weather=[
+ ["10/12","广州出发","晴，22–32℃"],
+ ["10/13","青岛","白天小雨，14–23℃，北风 3–4 级"],
+ ["10/14–16","青岛","晴到多云，约 18–22℃，海边有风"],
+ ["10/16 夜","渤海夜船","大连预报东风 4–5 级，海上更大"],
+ ["10/17–19","大连","超出预报范围；近几天约 12–23℃，常有 4–6 级风"],
+ ["10/19–22","南昌、新干","超出预报范围；新干近几天晴，16–32℃"],
+ ["10/23","回广州","近几天 22–32℃"]
+];
+var packed={};
+try{packed=JSON.parse(localStorage.getItem("china-trip-v3-pack")||"{}")||{}}catch(e){}
+function packCount(){var n=0,done=0;packing.forEach(function(g,gi){g.items.forEach(function(x,ii){n++;if(packed[gi+"-"+ii])done++})});return[done,n]}
+function packDrawer(){
+ var c=packCount();
+ return '<h2 id="sheetTitle">打包清单</h2>'+
+  '<div class="pack-tip"><b>不用带行李箱，背一个 30L 左右的包就够</b>卧铺、夜船、港口接驳和海边步行都不方便拖箱子。衣服按 3–4 天的量带，新干家里和酒店都可以洗。</div>'+
+  '<div class="pack-progress"><span id="packCount">已准备 '+c[0]+' / '+c[1]+'</span><i style="--w:'+(c[0]/c[1]*100).toFixed(0)+'%"></i><button class="pack-reset" id="packReset">全部取消</button></div>'+
+  packing.map(function(g,gi){return '<h3>'+esc(g.g)+'</h3><ul class="pack-list">'+g.items.map(function(x,ii){var id=gi+"-"+ii;return '<li><label><input type="checkbox" data-pack="'+id+'"'+(packed[id]?' checked':'')+'><span>'+esc(x[0])+(x[1]?'<small>'+esc(x[1])+'</small>':'')+'</span></label></li>'}).join("")+'</ul>'}).join("")+
+  '<h3>天气（按默认日期）</h3><div class="wx">'+weather.map(function(w){return '<div class="wx-row"><b>'+esc(w[0])+'</b><b>'+esc(w[1])+'</b><span>'+esc(w[2])+'</span></div>'}).join("")+'</div>'+
+  '<p class="wx-note">中央气象台 10/10 20:00 发布的预报只到 10/16，之后的日期参考近几天实况；出发后请再看最新预报。温差大：北方海边早晚十几度、风大，江西和广州白天三十多度。</p>'+
+  '<div class="callout warn"><strong>两个提醒</strong>想给爷爷奶奶带礼物或特产，小背包可能装不下：可以到江西再买，或在青岛、大连买完直接寄快递。夜船遇大风可能停航，10/16 当天在 12306 或运营方确认船班。</div>'+
+  '<a class="evidence" target="_blank" rel="noopener" href="https://www.nmc.cn/publish/forecast/ASD/qingdao.html">中央气象台 · 青岛预报 ↗</a><a class="evidence" target="_blank" rel="noopener" href="https://www.nmc.cn/publish/forecast/ALN/dalian.html">中央气象台 · 大连预报 ↗</a><a class="evidence" target="_blank" rel="noopener" href="http://www.nmc.cn/publish/forecast/AJX/xingan.html">中央气象台 · 新干预报 ↗</a>';
+}
+function savePack(){try{localStorage.setItem("china-trip-v3-pack",JSON.stringify(packed))}catch(e){}var c=packCount(),el=$("packCount");if(el){el.textContent="已准备 "+c[0]+" / "+c[1];el.nextElementSibling.style.setProperty("--w",(c[0]/c[1]*100).toFixed(0)+"%")}$("packBtn").textContent=c[0]?"清单 "+c[0]+"/"+c[1]:"清单"}
+content.addEventListener("change",function(e){var b=e.target.closest("[data-pack]");if(!b)return;if(b.checked)packed[b.dataset.pack]=1;else delete packed[b.dataset.pack];savePack()});
+content.addEventListener("click",function(e){if(!e.target.closest("#packReset"))return;packed={};content.querySelectorAll("[data-pack]").forEach(function(x){x.checked=false});savePack()});
+$("packBtn").onclick=function(){openSheet("出发前准备",packDrawer(),this)};
+savePack();
 $("mapBtn").onclick=function(){openSheet("完整路线图",mapDrawer(),this)};
 render();updateJump();
 })();
