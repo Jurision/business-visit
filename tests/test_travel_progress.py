@@ -8,7 +8,7 @@ import unittest
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 HTML = (ROOT / "travel/index.html").read_text(encoding="utf-8")
 JS = re.search(r"<script>(.*?)</script>", HTML, re.S).group(1)
-HELPERS = JS.split("/* progress helpers start */")[1].split("/* progress helpers end */")[0]
+HELPERS = "var tripStart=Date.UTC(2026,9,13),confirmedFlights={};\n" + JS.split("/* progress helpers start */")[1].split("/* progress helpers end */")[0]
 
 
 def node(source):
@@ -33,7 +33,7 @@ console.log(JSON.stringify([
         self.assertEqual(result, [{"d:qd-arrive:1": True}, {}, 200, 40, 0])
 
     def test_progress_is_separate_from_packing_and_no_cloud_requests(self):
-        self.assertIn('"china-trip-v3-progress"', JS)
+        self.assertIn('"china-trip-v4-progress"', JS)
         self.assertIn('"china-trip-v3-pack"', JS)
         self.assertNotIn("fetch(", JS)
         self.assertNotIn("/travel/api/", JS)
@@ -59,7 +59,7 @@ saveProgress();console.log(progressStorageOk);
         result = node(HELPERS + """
 var ds=[{steps:[{id:'a',t:'09:30'},{id:'b',t:'13:30'}]},
         {steps:[{id:'c',t:'09:30'}]},{steps:[{id:'d',t:'09:30'}]}];
-var now=Date.parse('2026-10-12T00:00:00+08:00');
+var now=Date.parse('2026-10-13T00:00:00+08:00');
 console.log(JSON.stringify([
  nextPending(ds,{},-1,now),nextPending(ds,{},3,now),nextPending(ds,{},0,now),
  nextPending(ds,{a:true},0,now),nextPending(ds,{a:true,b:true},0,now),
@@ -73,13 +73,13 @@ console.log(JSON.stringify([
     def test_countdown_uses_china_dates_and_does_not_guess_fuzzy_times(self):
         result = node(HELPERS + """
 console.log(JSON.stringify([
- countdownText({t:'22:45'},1,Date.parse('2026-10-13T21:00:00+08:00')),
- countdownText({t:'13:40参考'},4,Date.parse('2026-10-16T12:30:00+08:00')),
- countdownText({t:'约05:00'},5,Date.parse('2026-10-16T23:00:00+08:00')),
- countdownText({t:'09:30'},3,Date.parse('2026-10-14T20:00:00+08:00')),
- countdownText({t:'13:40'},4,Date.parse('2026-10-16T13:50:00+08:00')),
+ countdownText({t:'22:45'},1,Date.parse('2026-10-14T21:00:00+08:00')),
+ countdownText({t:'13:40参考'},4,Date.parse('2026-10-17T12:30:00+08:00')),
+ countdownText({t:'约05:00'},5,Date.parse('2026-10-17T23:00:00+08:00')),
+ countdownText({t:'09:30'},3,Date.parse('2026-10-15T20:00:00+08:00')),
+ countdownText({t:'13:40'},4,Date.parse('2026-10-17T13:50:00+08:00')),
  countdownText({t:'上午'},5,Date.now()),stepInstant({t:'25:00'},5),
- countdownText({t:'13:40'},4,Date.parse('2026-10-16T12:40:00+08:00'))
+ countdownText({t:'13:40'},4,Date.parse('2026-10-17T12:40:00+08:00'))
 ]));""")
         self.assertEqual(result, ['还有 1 小时 45 分', '还有 1 小时 10 分',
                                   '还有 6 小时', '还有 13 小时 30 分',
@@ -124,18 +124,18 @@ console.log(JSON.stringify([
         result = node(HELPERS + """
 var ds=[{steps:[{id:'past',t:'全天'}]},
  {steps:[{id:'checkout',t:'12:20'},{id:'train',t:'13:40参考'},{id:'ship',t:'22:00参考'}]},
- {steps:[{id:'arrival',t:'约05:00'}]}],done={},now=Date.parse('2026-10-13T12:30:00+08:00');
+ {steps:[{id:'arrival',t:'约05:00'}]}],done={},now=Date.parse('2026-10-14T12:30:00+08:00');
 console.log(JSON.stringify([
  nextPending(ds,done,1,now).step.id,
  overdueSteps(ds,done,1,now).map(x=>x.step.id),done,
- nextPending(ds,done,1,Date.parse('2026-10-13T23:00:00+08:00')).step.id,
- nextPending(ds,done,1,Date.parse('2026-10-13T13:40:00+08:00')).step.id
+ nextPending(ds,done,1,Date.parse('2026-10-14T23:00:00+08:00')).step.id,
+ nextPending(ds,done,1,Date.parse('2026-10-14T13:40:00+08:00')).step.id
 ]));""")
         self.assertEqual(result, ['train', ['past', 'checkout'], {}, 'arrival', 'train'])
 
     def test_fuzzy_times_are_not_assigned_invented_deadlines(self):
         result = node(HELPERS + """
-var ds=[{steps:[{id:'fuzzy',t:'上午'},{id:'train',t:'13:40'}]}],now=Date.parse('2026-10-12T12:30:00+08:00');
+var ds=[{steps:[{id:'fuzzy',t:'上午'},{id:'train',t:'13:40'}]}],now=Date.parse('2026-10-13T12:30:00+08:00');
 console.log(JSON.stringify([
  nextPending(ds,{},0,now).step.id,overdueSteps(ds,{},0,now),
  nextPending(ds,{},0,now+2*3600000).step.id,

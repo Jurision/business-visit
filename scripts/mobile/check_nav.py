@@ -18,7 +18,7 @@ with sync_playwright() as p:
     b=p.chromium.launch(channel="chrome")
     pg=b.new_context(viewport={"width":428,"height":926},device_scale_factor=3,is_mobile=True,has_touch=True,user_agent=UA).new_page()
     pg.goto(URL,wait_until="domcontentloaded"); pg.evaluate("localStorage.clear()"); pg.reload(wait_until="load"); time.sleep(1)
-    rec("页面顶部不显示跳转按钮", pg.locator("#jumpPill").is_hidden())
+    rec("10/13新路线首屏为11天，页面顶部不显示跳转按钮", pg.locator("#jumpPill").is_hidden() and "11日行程" in pg.inner_text("#heroTitle") and "10月13日" in pg.inner_text("#heroDates"))
     pg.screenshot(path=O+"/p-fold.png")
     pg.evaluate("window.scrollTo({top:document.getElementById('timeLedger').getBoundingClientRect().top+scrollY-20,behavior:'instant'})"); time.sleep(.4)
     pg.wait_for_function("()=>{const e=document.getElementById('jumpPill'),r=e.getBoundingClientRect();return !e.hidden&&r.width>0&&r.height>0}")

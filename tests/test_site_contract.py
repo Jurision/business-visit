@@ -20,7 +20,7 @@ class SiteContractTests(unittest.TestCase):
 
     def test_share_metadata_is_personal_travel_not_nate(self):
         for token in (
-            'property="og:title" content="广州—青岛—大连—江西 12日行程"',
+            'property="og:title" content="广州—青岛—威海—大连—江西 11日行程"',
             'property="og:url" content="https://trip.arielzhu.space/travel/"',
             'property="og:image" content="https://trip.arielzhu.space/travel/img/personal-trip-watercolor.png"',
         ):
@@ -36,9 +36,9 @@ class SiteContractTests(unittest.TestCase):
         self.assertIn('content="0;url=/travel/"', legacy)
         self.assertIn('location.replace("/travel/"', legacy)
 
-    def test_default_is_single_twelve_day_dalian_route(self):
-        self.assertIn("广州—青岛—大连—江西 12日行程", self.html)
-        self.assertIn("var stayPrefs={qingdao:2,dalian:1,xingan:1,nanchang:0}", self.html)
+    def test_default_is_single_eleven_day_dalian_route(self):
+        self.assertIn("广州—青岛—威海—大连—江西 11日行程", self.html)
+        self.assertIn("var stayPrefs={qingdao:1,dalian:0,xingan:1,nanchang:1}", self.html)
         self.assertIn("return{key:\"dynamic\"", self.html)
         self.assertNotIn('data-plan=', self.html)
         self.assertNotIn('data-preset=', self.html)
@@ -65,7 +65,7 @@ class SiteContractTests(unittest.TestCase):
         self.assertNotIn("一路向海", self.html)
         self.assertIn("function buildPlan()", self.html)
         self.assertIn("function dateInfo(offset)", self.html)
-        self.assertIn("var total=built.length", self.html)
+        self.assertIn("total=built.length", self.html)
         for token in (
             'd:"10/17",w:"周六"',
             'd:"10/25",w:"周日"',
@@ -80,14 +80,14 @@ class SiteContractTests(unittest.TestCase):
         for token in (
             "K8723 南昌 → 新干",
             "K441 新干 → 广州白云",
-            'label:"返穗卧铺"',
-            '["广州白云","青岛","烟台北港","旅顺 / 大连","南昌","新干县","广州白云"]',
+            '"返穗卧铺"',
+            'wh?"威海":"烟台北港"',
         ):
             self.assertIn(token, self.html)
         self.assertNotIn('label:"南昌中转"', self.html)
 
-    def test_hotels_are_budgeted_at_most_150_per_night(self):
-        self.assertIn("每晚¥150的预算", self.html)
+    def test_hotels_are_budgeted_at_most_200_per_night(self):
+        self.assertIn("每晚¥200的预算", self.html)
         for stale in ("约 ¥260–420 / 晚", "估算 ¥260–450 / 晚", "估算 ¥180–280"):
             self.assertNotIn(stale, self.html)
 
@@ -145,7 +145,7 @@ class SiteContractTests(unittest.TestCase):
             self.assertIn('id="%s"' % element_id, self.html)
         self.assertIn("pointerdown", self.html)
         self.assertIn("@media(prefers-reduced-motion:reduce)", self.html)
-        self.assertIn('localStorage.getItem("china-trip-v3-stays")', self.html)
+        self.assertIn('localStorage.getItem("china-trip-v4-stays")', self.html)
 
     def test_public_page_omits_private_family_location_and_old_customer(self):
         for token in ("傅堎村", "三湖镇", "Nate", "Junshuo Plastics", "广州骏烁"):
@@ -154,25 +154,25 @@ class SiteContractTests(unittest.TestCase):
 
 
     def test_transport_modes_switch_per_leg_with_rail_defaults(self):
-        self.assertIn('var tripModes={gzqd:"rail",dlnc:"hsr",ncxg:"rail",xggz:"rail"}', self.html)
-        self.assertIn('localStorage.getItem("china-trip-v3-modes")', self.html)
+        self.assertIn('var tripModes={gzqd:"air",dlnc:"air",ncxg:"rail",xggz:"rail"}', self.html)
+        self.assertIn('localStorage.getItem("china-trip-v4-modes")', self.html)
         for token in ("G566 广州南 → 青岛北", "K683/K682 大连 → 北京", "T167 北京西 → 南昌", "G3065 南昌西 → 新干东", "G3065 新干东 → 广州东", "function simulate(", "data-mode="):
             self.assertIn(token, self.html)
 
 
     def test_time_ledger_adds_up_to_calendar_days(self):
-        for token in ("时间怎么分", "出发前/到家后", "var hrs=[tGo,", "total*24-tHome", "广州出发", "回到广州"):
+        for token in ("时间怎么分", "出发前/到家后", "var hrs=[tGo]", "total*24-tHome", "广州出发", "回到广州"):
             self.assertIn(token, self.html)
 
 
     def test_transit_shows_departure_and_arrival_like_a_ticket(self):
-        for token in ("function ticketHtml(", 'from:"广州白云站",arr:"22:45",to:"青岛北站"', 'from:"新干站",arr:"07:00",to:"广州白云站"', "k.depDate=days[x.start].d", "k.arrDate=days[arr].d", "今天的车船"):
+        for token in ("function ticketHtml(", 'from:"广州白云站",arr:"22:45",to:"青岛北站"', 'from:"新干站",arr:"07:00",to:"广州白云站"', "k.depDate=days[x.start].d", "k.arrDate=days[arr].d", "今天的交通"):
             self.assertIn(token, self.html)
         self.assertNotIn('<span class="summary-label">状态</span>', self.html)
 
 
     def test_packing_list_with_weather_and_sources(self):
-        for token in ('id="packBtn"', "function packDrawer(", 'localStorage.getItem("china-trip-v3-pack")', "不用带行李箱", "身份证", "防风外套", "中央气象台 10/10 20:00 发布", "nmc.cn/publish/forecast/ASD/qingdao.html"):
+        for token in ('id="packBtn"', "function packDrawer(", 'localStorage.getItem("china-trip-v3-pack")', "轻装可以", "身份证", "防风外套", "2026-10-11 08:00", "weather.com.cn/weather/101120201.shtml"):
             self.assertIn(token, self.html)
 
 
