@@ -96,8 +96,12 @@ return new Set(ids).size===ids.length&&ids.every(id=>/^[a-z0-9:_-]{1,48}$/.test(
     tap(pg, "#adjustToggle")
     check("已订票锁住切换且多入口状态一致", pg.locator('#phaseRail [data-mode="gzqd:hsr"]').is_disabled()
           and pg.locator('#phaseRail [data-book="leg:gzqd:rail"]').first.get_attribute("aria-pressed") == "true")
+    lock_text = '已订票，改方式前先退票并取消已订标记'
+    check('调整模式已订退票提示只出现一次', pg.inner_text('#phaseRail').count(lock_text) == 1)
     tap(pg, '#phaseRail [data-phase="0"]')
     check("展开详情也不能改已订方式", pg.locator('#segPanel0 [data-mode="gzqd:hsr"]').is_disabled())
+    check('调整加详情已订退票提示仍只出现一次', pg.inner_text('#phaseRail').count(lock_text) == 1
+          and pg.inner_text('#segPanel0 [data-mode="gzqd:hsr"] .mo-eff') == '切换已锁定')
     check('调整加交通详情同一预订按钮只出现一次', pg.locator('#phaseRail [data-book="leg:gzqd:rail"]:visible').count() == 1)
     shot(pg, '09-adjust-transit-detail')
     tap(pg, '#phaseRail [data-phase="0"]')
@@ -204,9 +208,11 @@ state.booked['leg:gzqd:rail']=true;localStorage.setItem('china-trip-v3-progress'
         check(label + ' 页面身份及正常加载', '/travel/' in pg.url and '日行程' in pg.title()
               and pg.locator('#dayTitle').inner_text() != '')
         if label == '14-next-tomorrow':
-            for _ in range(pg.locator('#steps [data-done]').count()):
-                tap(pg, '#nextComplete')
-            check('完成按钮逐步推进并同步日期勾号', pg.inner_text('#dateRail [data-day="2"] .day-done') == '✓'
+            tap(pg, '#nextOverdue')
+            for i in range(3):
+                tap(pg, f'#sheetContent [data-done="d:qd-coast:{i}"]')
+            pg.keyboard.press('Escape')
+            check('补勾当天完成同步日期勾号', pg.inner_text('#dateRail [data-day="2"] .day-done') == '✓'
                   and pg.locator('#overlay.open').count() == 0)
         check(label + ' 下一步及倒计时', title in pg.inner_text('#nextTitle')
               and pg.inner_text('#nextCountdown') == countdown
@@ -220,6 +226,10 @@ return [...document.querySelectorAll('#dateRail [data-day]')].every(e=>{
 const count=e.querySelector('.day-done');return +e.dataset.day<=current?!!count:!count||count.textContent==='✓'})} """))
         if label != '14-next-tomorrow':
             text = pg.inner_text('#nextTicket')
+            check(label + ' 交通只显示车票和倒计时，不重复文字', all(
+                pg.locator('#' + id).is_hidden() for id in ['nextTime', 'nextTitle', 'nextPlace'])
+                and pg.locator('#nextTicket .tk-ref').count() == 2
+                and pg.locator('#nextTicket .tk-ref').first.evaluate("e=>getComputedStyle(e).fontSize==='9px'&&getComputedStyle(e).color!==getComputedStyle(e.parentElement).color"))
             check(label + ' 车票显示出发到达时刻及站名', '→' not in text and pg.locator('#nextTicket .tk').count() == 1
                   and (('10/12' in text and '18:57' in text and '22:45' in text and '青岛北站' in text) if 'z168' in label else
                        ('13:40' in text and '14:54' in text and '烟台站' in text) if 'c6571' in label else
@@ -278,8 +288,11 @@ const rows=[...e.querySelectorAll('.step-row')];return !e.querySelector('.step-d
     ctx.add_init_script("localStorage.setItem('china-trip-v3-progress',JSON.stringify({done:Object.fromEntries([0,1,2,3].map(i=>['d:ferry-depart:'+i,true])),booked:{}}))")
     pg = ctx.new_page()
     pg.goto(URL, wait_until='domcontentloaded')
-    check('夜船过时未勾仍提醒已到时间，不自动跳过', pg.inner_text('#nextCountdown') == '已到时间'
-          and '烟台北站' in pg.inner_text('#nextTitle') and '22:00' in pg.inner_text('#nextTicket'))
+    check('夜船过时未勾转到明天抵达，仍保留未完成记录', pg.inner_text('#nextCountdown') == '还有 6 小时'
+          and '明天' in pg.inner_text('#nextWhen') and '旅顺西站' in pg.inner_text('#nextTicket')
+          and pg.evaluate("!JSON.parse(localStorage.getItem('china-trip-v3-progress')).done['d:ferry-depart:4']"))
+    tap(pg, '#nextOverdue')
+    check('漏勾夜船可从补勾抽屉找到', pg.locator('#sheetContent [data-done="d:ferry-depart:4"]').count() == 1)
     ctx.close()
 
     ctx = browser.new_context(viewport={'width': 428, 'height': 926}, device_scale_factor=3,
@@ -304,10 +317,67 @@ const rows=[...e.querySelectorAll('.step-row')];return !e.querySelector('.step-d
     clock(ctx, '2026-10-23T20:00:00+08:00')
     pg = ctx.new_page()
     pg.goto(URL, wait_until='domcontentloaded')
-    for _ in range(pg.locator('#steps [data-done]').count()):
-        tap(pg, '#nextComplete')
+    for id in pg.locator('#steps [data-done]').evaluate_all('es=>es.map(e=>e.dataset.done)'):
+        tap(pg, f'#steps [data-done="{id}"]')
     check('最后一天完成安全收尾，不越界到明天', '今天的安排已全部完成' in pg.inner_text('#nextTitle')
           and pg.locator('#nextComplete').is_disabled() and pg.inner_text('#nextCountdown') == '')
+    ctx.close()
+
+    prior_done = {f'd:{day}:{i}': True for day, count in [
+        ('qd-depart-rail', 2), ('qd-arrive', 2), ('qd-coast', 3), ('qd-oldtown', 3)] for i in range(count)}
+    ctx = browser.new_context(viewport={'width': 428, 'height': 926}, device_scale_factor=3,
+                              is_mobile=True, has_touch=True)
+    clock(ctx, '2026-10-16T12:30:00+08:00')
+    ctx.add_init_script("if(!localStorage.getItem('china-trip-v3-progress'))localStorage.setItem('china-trip-v3-progress',%s)" %
+                        json.dumps(json.dumps({'done': prior_done, 'booked': {}})))
+    pg = ctx.new_page()
+    pg.goto(URL, wait_until='domcontentloaded')
+    check('12:30漏勾12:20退房也直接提醒13:40车次', 'C6571' in pg.inner_text('#nextTicket')
+          and pg.inner_text('#nextCountdown') == '还有 1 小时 10 分' and pg.inner_text('#nextOverdue') == '还有 1 项没勾 ›'
+          and pg.locator('#steps [data-done="d:ferry-depart:0"]').get_attribute('aria-pressed') == 'false')
+    pg.evaluate('scrollTo({top:0,behavior:"instant"})')
+    shot(pg, '20-future-step-missed-checkout')
+    tap(pg, '#nextOverdue')
+    check('补勾抽屉只列出漏勾退房，44px目标', pg.locator('#sheetContent [data-done]').count() == 1
+          and pg.locator('#sheetContent [data-done]').first.bounding_box()['height'] >= 44
+          and '12:20' in pg.inner_text('#sheetContent'))
+    shot(pg, '21-catch-up-drawer')
+    tap(pg, '#sheetContent [data-done="d:ferry-depart:0"]')
+    check('补勾不改变未来车次，提醒清零且抽屉不关闭', pg.locator('#nextOverdue').is_hidden()
+          and 'C6571' in pg.inner_text('#nextTicket') and '都补记好了' in pg.inner_text('#sheetContent')
+          and pg.locator('#overlay.open').count() == 1)
+    pg.keyboard.press('Escape')
+    check('提醒消失后关闭抽屉焦点回到可见完成按钮', pg.evaluate("document.activeElement.id==='nextComplete'"))
+    pg.reload(wait_until='domcontentloaded')
+    check('补勾刷新保留且未自动勾未来车次', pg.locator('#nextOverdue').is_hidden()
+          and pg.locator('#steps [data-done="d:ferry-depart:0"]').get_attribute('aria-pressed') == 'true'
+          and pg.locator('#steps [data-done="d:ferry-depart:1"]').get_attribute('aria-pressed') == 'false')
+    ctx.close()
+
+    ctx = browser.new_context(viewport={'width': 428, 'height': 926}, device_scale_factor=3,
+                              is_mobile=True, has_touch=True)
+    clock(ctx, '2026-10-16T12:19:00+08:00', manual_ticks=True)
+    ctx.add_init_script("localStorage.setItem('china-trip-v3-progress',%s)" %
+                        json.dumps(json.dumps({'done': prior_done, 'booked': {}})))
+    pg = ctx.new_page()
+    pg.goto(URL, wait_until='domcontentloaded')
+    check('12:19先提醒一分钟后退房', '退房' in pg.inner_text('#nextTitle')
+          and pg.inner_text('#nextCountdown') == '还有 1 分' and pg.locator('#nextOverdue').is_hidden())
+    pg.evaluate('window.__testTime+=120000;window.__testMinuteTick()')
+    check('时间越过退房自动换车票并保留漏勾提醒', 'C6571' in pg.inner_text('#nextTicket')
+          and pg.inner_text('#nextCountdown') == '还有 1 小时 19 分' and '还有 1 项没勾' in pg.inner_text('#nextOverdue')
+          and pg.locator('#steps [data-done="d:ferry-depart:0"]').get_attribute('aria-pressed') == 'false')
+    ctx.close()
+
+    ctx = browser.new_context(viewport={'width': 1440, 'height': 900})
+    clock(ctx, '2026-10-16T12:30:00+08:00')
+    ctx.add_init_script("localStorage.setItem('china-trip-v3-progress',%s)" %
+                        json.dumps(json.dumps({'done': prior_done, 'booked': {}})))
+    pg = ctx.new_page()
+    pg.goto(URL, wait_until='domcontentloaded')
+    check('1440宽下一步车票简洁且无溢出', pg.locator('#nextTitle').is_hidden()
+          and pg.locator('#nextTicket .tk').count() == 1 and pg.evaluate('document.documentElement.scrollWidth<=innerWidth'))
+    shot(pg, '22-desktop-next-ticket')
     ctx.close()
 
     ctx = browser.new_context(viewport={'width': 428, 'height': 926}, device_scale_factor=3,

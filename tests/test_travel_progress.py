@@ -59,10 +59,11 @@ saveProgress();console.log(progressStorageOk);
         result = node(HELPERS + """
 var ds=[{steps:[{id:'a',t:'09:30'},{id:'b',t:'13:30'}]},
         {steps:[{id:'c',t:'09:30'}]},{steps:[{id:'d',t:'09:30'}]}];
+var now=Date.parse('2026-10-12T00:00:00+08:00');
 console.log(JSON.stringify([
- nextPending(ds,{},-1),nextPending(ds,{},3),nextPending(ds,{},0),
- nextPending(ds,{a:true},0),nextPending(ds,{a:true,b:true},0),
- nextPending(ds,{a:true,b:true,c:true},0),nextPending(ds,{d:true},2)
+ nextPending(ds,{},-1,now),nextPending(ds,{},3,now),nextPending(ds,{},0,now),
+ nextPending(ds,{a:true},0,now),nextPending(ds,{a:true,b:true},0,now),
+ nextPending(ds,{a:true,b:true,c:true},0,now),nextPending(ds,{d:true},2,now)
 ]));""")
         self.assertEqual(result[:2], [None, None])
         self.assertEqual([x['step']['id'] for x in result[2:5]], ['a', 'b', 'c'])
@@ -104,7 +105,7 @@ console.log(JSON.stringify([
                       '"china-trip-v3-route-open"', 'all||i<=todayIndex',
                       'html.keyboard-input #closeSheet:focus',
                       'html:not(.keyboard-input) #closeSheet:focus',
-                      'document.addEventListener("pointerdown"', 'renderNextStep(true)'):
+                      'document.addEventListener("pointerdown"', 'else renderNextStep()'):
             self.assertIn(token, HTML)
         step_render = JS.split('steps.innerHTML=')[1].split('var prev=')[0]
         self.assertNotIn('step-dot', step_render)
@@ -118,6 +119,37 @@ console.log(JSON.stringify([
         self.assertIn('new ResizeObserver(updateBarSpace)', JS)
         self.assertIn('padding-bottom:max(150px,var(--bar-clearance,150px))', HTML)
         self.assertIn('/火车过夜/.test(s)', JS.split('function chipCity(')[1].split('function cnDate')[0])
+
+    def test_past_steps_do_not_block_future_and_are_never_auto_completed(self):
+        result = node(HELPERS + """
+var ds=[{steps:[{id:'past',t:'全天'}]},
+ {steps:[{id:'checkout',t:'12:20'},{id:'train',t:'13:40参考'},{id:'ship',t:'22:00参考'}]},
+ {steps:[{id:'arrival',t:'约05:00'}]}],done={},now=Date.parse('2026-10-13T12:30:00+08:00');
+console.log(JSON.stringify([
+ nextPending(ds,done,1,now).step.id,
+ overdueSteps(ds,done,1,now).map(x=>x.step.id),done,
+ nextPending(ds,done,1,Date.parse('2026-10-13T23:00:00+08:00')).step.id,
+ nextPending(ds,done,1,Date.parse('2026-10-13T13:40:00+08:00')).step.id
+]));""")
+        self.assertEqual(result, ['train', ['past', 'checkout'], {}, 'arrival', 'train'])
+
+    def test_fuzzy_times_are_not_assigned_invented_deadlines(self):
+        result = node(HELPERS + """
+var ds=[{steps:[{id:'fuzzy',t:'上午'},{id:'train',t:'13:40'}]}],now=Date.parse('2026-10-12T12:30:00+08:00');
+console.log(JSON.stringify([
+ nextPending(ds,{},0,now).step.id,overdueSteps(ds,{},0,now),
+ nextPending(ds,{},0,now+2*3600000).step.id,
+ overdueSteps(ds,{},0,now+2*3600000).map(x=>x.step.id)
+]));""")
+        self.assertEqual(result, ['train', [], 'fuzzy', ['train']])
+
+    def test_ticket_card_and_overdue_ui_use_existing_local_progress(self):
+        for token in ('id="nextOverdue"', 'function overdueDrawer()',
+                      'ticketHtml(k,true)', 'reference===true',
+                      '$("nextTime").innerHTML=s?timeHtml(s.t)',
+                      'modeLocked(leg)?\'切换已锁定\'', '$("nextOverdue").onclick'):
+            self.assertIn(token, HTML)
+        self.assertNotIn('已过时步骤已自动完成', HTML)
 
 
 if __name__ == "__main__":
