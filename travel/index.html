@@ -60,6 +60,8 @@ h1 span{display:block}
 .stat span{font-size:11px;line-height:1.4;color:var(--faint);margin-top:1px}
 .stat-btn{cursor:pointer;background:var(--red-soft)}
 .stat-btn b{color:var(--red)}
+#statBudget.precise{font-size:17px;white-space:normal;overflow:visible;text-overflow:clip}
+#statBudget .budget-bound{display:inline;font:inherit;color:inherit;white-space:nowrap}
 .stat-btn small:after{content:" ›";font-weight:800}
 .stat.over b{color:#9a3a26}
 
@@ -214,6 +216,7 @@ h1 span{display:block}
 .state-chip.moving{background:var(--red-soft);color:var(--red)}
 .day-budget{padding:10px 14px 11px}
 .day-budget b{display:block;color:var(--red);font-size:21px;line-height:1.3;font-weight:750;font-variant-numeric:tabular-nums}
+.day-budget b.precise{font-size:16px;white-space:nowrap}
 .day-budget small{display:block;color:var(--muted);font-size:12px;line-height:1.5;margin-top:2px}
 .unknown{display:block;border-top:1px solid #ecdfc3;background:var(--gold-soft);color:var(--gold);padding:9px 14px 9px 36px;position:relative;font-size:12.5px;font-weight:650;line-height:1.5}
 .unknown:before{content:"!";position:absolute;left:13px;top:10px;width:16px;height:16px;border-radius:50%;background:var(--gold);color:var(--gold-soft);font-size:11px;font-weight:800;line-height:16px;text-align:center}
@@ -438,7 +441,7 @@ html.keyboard-input #closeSheet:focus{outline:3px solid rgba(46,127,131,.45);out
         <div class="stat"><small>路上</small><b id="statTransit">—</b><span id="statTransitSub"></span><em id="dTransit"></em></div>
       </div>
       <div class="ledger" id="timeLedger"></div>
-      <div class="route-tools"><button id="weihaiToggle" class="adjust-toggle" aria-pressed="true">去威海 · 已开启</button><button id="compareToggle" class="reset-btn" hidden>仅比较其他交通</button></div><p class="limit-note" id="compareNote" hidden></p><p class="flight-task">九元联订提醒：按你的订单要求，11/10前通过飞猪订酒店并完成入住离店，否则扣回¥40；可用青岛或威海酒店完成，具体规则以订单为准。</p>
+      <div class="route-tools"><button id="weihaiToggle" class="adjust-toggle" aria-pressed="true">去威海 · 已开启</button><button id="compareToggle" class="reset-btn" hidden>仅比较其他交通</button></div><p class="limit-note" id="compareNote" hidden></p><p class="flight-task">九元联订任务：已通过飞猪订青岛酒店，入住离店后即完成。须在11/10前完成，具体以订单规则与平台确认结果为准。</p>
       <button class="route-expand" id="routeExpand" aria-expanded="false" aria-controls="stayControls overviewActions" hidden>展开全部路线</button>
       <div id="stayControls" aria-label="各段停留与交通，可调整停留时间">
         <nav class="phase-rail" id="phaseRail" aria-label="按阶段选择行程"></nav>
@@ -484,7 +487,7 @@ html.keyboard-input #closeSheet:focus{outline:3px solid rgba(46,127,131,.45);out
     <footer class="foot">
       <p><b>预订状态：</b><span id="bookingFoot">这是行程草案，不代表已出票或订房。</span>班次、票价、船班与房价均为参考，出发前请在 12306、运营方与酒店官方渠道再次核对。</p>
       <p><b>隐私边界：</b>公开版只展示“新干县家中”，不公开村庄、门牌或家庭具体位置。</p>
-      <p>最后更新：2026年10月11日 · 不替代实时预订结果。</p>
+      <p>最后更新：2026年10月12日 · 不替代实时预订结果。</p>
     </footer>
   </div>
 </main>
@@ -721,14 +724,21 @@ var confirmedFlights={
  "leg:gzqd:air":{date:"10/13",dep:"07:25",arr:"10:30",train:"AQ1019",paid:532},
  "leg:dlnc:air":{date:"10/18",dep:"13:35",arr:"15:45",train:"MU6908",paid:747}
 };
+var confirmedHotels={"hotel:qd:2026-10-13":{
+ date:"10/13",out:"10/14",paid:133.49,name:"青岛一然海景民宿（青岛火车站栈桥店）",
+ address:"市南区北京路38号鲁邦新天地1单元0704",room:"海景精致投影一居室 · 大床、有窗",
+ detail:"10/13 15:00后入住—10/14 12:00前离店，1晚；飞猪在线实付¥133.49，订单已确认（由你提供）。寄存行李、钥匙领取方式、Wi-Fi和书桌、取消政策待与房东或订单确认。10/14这一晚尚未订，可能续订同一家。"
+}};
 var flightHotelDetail="酒店尚未预订；每晚含税预算≤¥200。1人、大床或单人房，书桌、稳定Wi-Fi、有窗与禁烟优先；寄存、实际房价与取消政策均待核。";
 var flightDays={
- qd:{city:"广州 → 青岛",title:"早班飞机到青岛，下午看海",note:"已订九元航空AQ1019：07:25白云机场T2出发，10:30到胶东机场，实付¥532。机场到市南区预留1小时以上，方式待核。",route:["广州住处","白云国际机场T2","AQ1019","青岛胶东机场","市南酒店","海边"],states:["飞机","抵达日","酒店过夜"],budget:[772,952],basis:"AQ1019实付¥532＋接驳餐饮预留¥120–220＋青岛酒店预留¥120–200",unknown:"值机截止、航站楼、行李额和机场到市南接驳待核；酒店待选定",steps:[
+ qd:{city:"广州 → 青岛",title:"早班飞机到青岛，下午逛栈桥老城",note:"AQ1019 07:25白云机场T2出发、10:30到胶东机场，实付¥532。12:00前后到市区为预留，地铁用时待核；先去一然海景民宿寄存行李，下午逛栈桥老城，15:00后入住。10/13这晚已确认，飞猪实付¥133.49。",route:["广州住处","白云国际机场T2","AQ1019","胶东机场","地铁8号线 → 青岛北换3号线","青岛站步行","一然民宿寄存","栈桥 / 老城","15:00后入住"],states:["飞机","抵达日","酒店过夜"],budget:[772,952],basis:"AQ1019实付¥532＋接驳餐饮预留¥120–220＋青岛酒店预留¥120–200",unknown:"机场地铁接驳用时、寄存行李和钥匙领取待核；值机截止、行李额及订单取消政策待核",steps:[
  {t:"05:30",n:"出门去白云国际机场T2",s:"机场接驳预留；不是广州白云火车站",tag:"早起",kind:"交通",cost:"接驳预留",detail:"约05:30出门是暂定安排，须按住处到T2实际时长、值机截止与是否托运行李反推；若来不及提前2小时到机场，请更早出门。"},
  {t:"07:25",n:"AQ1019 广州 → 青岛",s:"白云国际机场T2 → 青岛胶东机场 · 10:30到",tag:"已订 · 九元航空",kind:"飞机",cost:"实付 ¥532",detail:"航班日期2026-10-13，价格来自你的已订订单；航站楼、起降时间和行李额以订单及航司通知为准。不是Z168。",link:"https://www.9air.com/",linkText:"九元航空官网"},
- {t:"10:30",n:"抵达青岛胶东国际机场",s:"取行李后到市南区，预留1小时以上",tag:"机场接驳待核",kind:"飞机",cost:"机票已计入出发步骤",detail:"地铁/机场巴士/网约车的组合、时长、费用待核，不能把落地时间当成抵达市南区时间。"},
- {t:"13:00",n:"酒店放行李、午餐",s:"市南区 · 青岛酒店待选定",tag:"住青岛",kind:"住宿",cost:"预留 ¥120–200 / 晚",detail:flightHotelDetail+"提前入住以酒店确认为准。"},
- {t:"15:30",n:"第三海水浴场、太平角",s:"下午沿海散步，按天气和体力缩短",tag:"海边慢游",kind:"景点",cost:"步行免费",detail:"早班机后不赶景点。遇雨可改室内休息。"}
+ {t:"10:30",n:"抵达青岛胶东国际机场",s:"地铁8号线到青岛北站，换3号线到青岛站，出站步行去民宿",tag:"地铁用时待核",kind:"飞机",cost:"机票已计入出发步骤；地铁票价待核",detail:"机场到民宿按你提供的地铁路线：8号线→青岛北换3号线→青岛站→步行。出站口、步行路线、费用与总用时待核；取行李另留缓冲，不保证12:00抵达。"},
+ {id:"d:qd-arrive-air:city",t:"约12:00",n:"12:00前后到市区",s:"青岛站出站步行到北京路38号，实际用时待核",tag:"时间预留",kind:"交通",cost:"地铁与步行接驳预留",detail:"这是到市区的预留时间，不是已核验的到达时刻；机场候车、换乘和步行可能让到达推迟。"},
+ {id:"d:qd-arrive-air:bags",t:"到市区后",n:"先去民宿寄存行李",s:"一然海景民宿 · 北京路38号鲁邦新天地1单元0704",tag:"寄存、钥匙待确认",kind:"住宿",cost:"房费在15:00后入住步骤计入；寄存费用待核",detail:"先和房东确认能否提前寄存、寄存地点、联系方式与怎么拿钥匙。入住从15:00后开始；未得到确认不要假定可以提前进房。"},
+ {id:"d:qd-arrive-air:oldtown",t:"下午",n:"栈桥、老城一带慢走",s:"寄存行李后轻装游览，按天气和体力调整",tag:"不赶路",kind:"景点",cost:"公共区域步行免费",detail:"午餐和老城散步后再入住；若寄存不方便，先与房东商量行李安排。"},
+ {id:"d:qd-arrive-air:checkin",t:"15:00后",n:"入住一然海景民宿",s:"海景精致投影一居室 · 大床、有窗 · 10/13已订1晚",tag:"已确认 · 飞猪",kind:"住宿",cost:"在线实付 ¥133.49 / 1晚",detail:confirmedHotels["hotel:qd:2026-10-13"].detail+" 地址："+confirmedHotels["hotel:qd:2026-10-13"].address}
  ]},
  nc:{city:"大连 → 南昌",title:"午后飞南昌，傍晚逛万寿宫",note:"已订东方航空MU6908：13:35周水子机场出发，15:45到昌北机场，实付¥747。约11:30前到机场；进城到老城预留约1小时，接驳待核。",route:["大连酒店","周水子机场","MU6908","南昌昌北机场","南昌老城酒店","万寿宫"],states:["飞机","抵达日","酒店过夜"],budget:[947,1097],basis:"MU6908实付¥747＋接驳餐饮预留¥80–150＋南昌酒店预留¥120–200",unknown:"机场接驳、值机截止与酒店待核；酒店待选定",steps:[
  {t:"09:00",n:"早餐、酒店周边短走",s:"不去远郊，按酒店位置决定是否出门",tag:"留白",kind:"自由活动",cost:"餐饮预留",detail:"上午以顺利赶航班为先；交通不确定就直接退房出发。"},
@@ -776,7 +786,7 @@ function retimeText(s,info){var cn=info.d.replace("/","月")+"日";return String
 function retimeDay(d,i){var info=dateInfo(i);d.d=info.d;d.w=info.w;if(/^wh-/.test(d.source)){d.unknown=d.unknown.replace(/10\/(15|16)/g,info.d);d.steps.forEach(function(s){s.detail=s.detail.replace(/10\/(15|16)/g,info.d)})}["note","unknown","basis"].forEach(function(k){d[k]=retimeText(d[k],info)});d.steps.forEach(function(s){["s","detail","cost"].forEach(function(k){s[k]=retimeText(s[k],info)})});return d}
 function stayValue(k,n){if(k==="xingan")return n+"个完整日＋首尾半日 ≈ "+(n+1)+"天";if(k==="nanchang")return n+"个完整日＋到达半日";return n+"个完整日 · "+(n+1)+"晚"}
 function buildPlan(){
- var built=[],push=function(x,source){var day=cloneDay(x);day.source=source;day.steps.forEach(function(s,i){s.id="d:"+source+":"+i});built.push(day)},m=tripModes,wh=routePrefs.weihai;
+ var built=[],push=function(x,source){var day=cloneDay(x);day.source=source;day.steps.forEach(function(s,i){if(!s.id)s.id="d:"+source+":"+i});built.push(day)},m=tripModes,wh=routePrefs.weihai;
  if(m.gzqd==="air")push(flightDays.qd,"qd-arrive-air");else if(m.gzqd==="hsr")push(legDays.gzqdHsr,"qd-arrive-hsr");else{push(dalianDays[0],"qd-depart-rail");push(dalianDays[1],"qd-arrive")}
  var qdArr=built.length-1;
  for(var q=0;q<stayPrefs.qingdao+(wh?0:1);q++){var qd=cloneDay(dalianDays[2+q%3]);qd.budget=[180,330];qd.basis="餐饮、市内交通预留¥60–130＋酒店预留¥120–200";push(qd,["qd-coast","qd-oldtown","qd-free"][q]||"qd-extra-"+q)}
@@ -803,6 +813,16 @@ function buildPlan(){
  var arr=built[xinganArrival],weekend=arr.w==="周六"||arr.w==="周日";arr.steps.forEach(function(x){if(x.n==="（可选）县城顺路看堂妹")x.s=arr.w+(weekend?"，可提前约在县城见一面":"是上学日，白天在上课，放学后再约")});
  // Hotel ceilings are estimates, never implied bookings or actual room prices.
  built.forEach(function(d){d.steps.forEach(function(s){if(s.kind==="住宿"&&/酒店|入住/.test(s.s+" "+s.n)&&!/退房|整理/.test(s.n)){s.detail=flightHotelDetail+(/寄存|放行李/.test(s.n)?"早入住待核。":"");s.link=undefined;s.linkText=undefined}})});
+ // A confirmed room applies to this night only, never to the whole Qingdao stay.
+ built.forEach(function(d){if(!/^qd-/.test(d.source)||d.d!=="10/13"||d.states.indexOf("酒店过夜")<0)return;
+  var h=confirmedHotels["hotel:qd:2026-10-13"];d.hotelOrderId="hotel:qd:2026-10-13";
+  d.budget=d.budget.map(function(n,i){return Math.round((n-(i?200:120)+h.paid)*100)/100});
+  d.basis=d.basis.replace(/青岛酒店预留¥120–200|青岛酒店第1晚（≤¥200）/,"一然民宿实付¥133.49（仅10/13 1晚）");
+  if(d.source!=="qd-arrive-air")d.unknown+="；已订一然民宿仅10/13一晚，入住15:00后、次日12:00前离店；晚到与钥匙领取待房东确认";
+  d.steps.forEach(function(s){if(s.kind==="住宿"&&/入住/.test(s.n)){s.s=h.name+" · "+h.room;s.cost="在线实付 ¥133.49 / 1晚";s.detail=h.detail+" 地址："+h.address;s.tag="已确认 · 飞猪"}});
+ });
+ var qdCheckout=built.find(function(d){return /^qd-/.test(d.source)&&d.d==="10/14"&&d.states.indexOf("酒店过夜")>=0});
+ if(qdCheckout){qdCheckout.note+=" 一然民宿已订订单只到10/14：12:00前离店，寄存行李与是否续住待确认；今晚仍待订。";qdCheckout.unknown="10/14房价与续订、退房寄存和钥匙归还方式待核；自选付费项目另计";qdCheckout.steps.push({id:"d:qd-hotel:checkout",hotelBookId:"hotel:qd:2026-10-13",t:"12:00前",n:"一然民宿离店或确认续住",s:"10/13订单到今天12:00前；今晚仍待订",tag:"寄存、续住待确认",kind:"住宿",cost:"今晚房费预留¥120–200，续住实际价待核",detail:"不能把已订1晚当成连住2晚。未续订请在12:00前退房；当天寄存、取行李时间及钥匙归还方式问房东。"});qdCheckout.steps.sort(function(a,b){return parseFloat(a.t.replace(":","."))-parseFloat(b.t.replace(":","."))})}
  var ncNights=stayPrefs.nanchang+(m.dlnc==="rail"?0:1),qdNights=stayPrefs.qingdao+1+(wh?0:1),total=built.length,end=built[returnIndex].d;
  var segments=[],bounds=[],at=function(day,hm){var q=hm.replace(/^约/,"").split(":");return day*24+(+q[0])+q[1]/60};
  var add=function(x,a,b){segments.push(x);bounds.push([a,b])};
@@ -848,6 +868,9 @@ var evidence={
 var selected=0,lastFocus=null,editing=false,swipe=null,drag=null,expanded=-1;
 var progressState={done:{},booked:{"leg:gzqd:air":true,"leg:dlnc:air":true}},progressStorageOk=true;
 try{var savedProgress=JSON.parse(localStorage.getItem("china-trip-v4-progress")||"null");if(savedProgress){progressState.done=cleanProgressMap(savedProgress.done,200);progressState.booked=cleanProgressMap(savedProgress.booked,40)}}catch(e){}
+// Apply the newly reported order once; later manual cancellation must survive refresh.
+if(!savedProgress||savedProgress.hotelSeedVersion!==1){delete progressState.booked["hotel:qd"];progressState.booked["hotel:qd:2026-10-13"]=true}
+progressState.hotelSeedVersion=1;
 var defaultModes=JSON.parse(JSON.stringify(tripModes));
 var defaultStays=JSON.parse(JSON.stringify(stayPrefs));
 try{var savedModes=JSON.parse(localStorage.getItem("china-trip-v4-modes")||"null");if(savedModes)Object.keys(legModes).forEach(function(k){if(legModes[k].opts[savedModes[k]])tripModes[k]=savedModes[k]})}catch(e){}
@@ -871,9 +894,9 @@ var icons={
 var stayKeyOf={"青岛":"qingdao","威海":"weihai","大连":"dalian","新干探亲":"xingan","南昌":"nanchang"};
 var cityColors=[["威海","var(--c-wh)"],["青岛","var(--c-qd)"],["大连","var(--c-dl)"],["旅顺","var(--c-dl)"],["海上","var(--c-dl)"],["烟台","var(--c-dl)"],["新干","var(--c-xg)"],["南昌","var(--c-nc)"],["广州","var(--c-gz)"]];
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
-function money(n){return Number(n).toLocaleString("zh-CN")}
+function money(n){return Number(n).toLocaleString("zh-CN",{maximumFractionDigits:2})}
 function dayBudget(d){return "¥"+money(d.budget[0])+"–"+money(d.budget[1])}
-function totalBudget(ds){return ds.reduce(function(a,d){a[0]+=d.budget[0];a[1]+=d.budget[1];return a},[0,0])}
+function totalBudget(ds){return ds.reduce(function(a,d){a[0]=Math.round((a[0]+d.budget[0])*100)/100;a[1]=Math.round((a[1]+d.budget[1])*100)/100;return a},[0,0])}
 function routeHtml(route){var last=route.length-1;return route.map(function(x,i){return (i?'<span class="route-arrow" aria-hidden="true">→</span>':"")+'<span class="route-node'+(i===0||i===last?' is-end':'')+'">'+esc(x)+'</span>'}).join("")}
 function colorOf(name){for(var i=0;i<cityColors.length;i++)if(name.indexOf(cityColors[i][0])>=0)return cityColors[i][1];return "var(--sea)"}
 function isMoving(d){return d.city.indexOf("→")>=0}
@@ -882,6 +905,8 @@ function chipCity(d){return d.states.some(function(s){return /火车过夜/.test
 function cnDate(d){return d.d.replace("/","月")+"日 "+d.w}
 function nightOf(d){
  var s=d.states.filter(function(x){return /过夜|到家/.test(x)})[0]||"—",last=d.route[d.route.length-1];
+ if(d.hotelOrderId){var h=confirmedHotels[d.hotelOrderId],booked=bookingFlag({id:d.hotelOrderId});return{b:"民宿过夜 · "+(booked?"已订":"已取消标记"),sub:h.name+" · "+h.room+" · 实付¥"+money(h.paid)+" / 1晚"}}
+ if(/^qd-/.test(d.source)&&/酒店过夜/.test(s)){var room=hotelForDay(d),yes=room&&bookingFlag(room);return{b:"酒店过夜 · "+(yes?"已订（手动标记）":"待订"),sub:d.d+"这一晚待选定（可能续订一然民宿，房价待核）"}}
  return{b:s,sub:/酒店过夜/.test(s)?destOf(d)+"酒店待选定":/^(酒店|新干县家中)$/.test(last)?destOf(d):last};
 }
 function timeHtml(t){var m=/^(\d{1,2}:\d{2})(.+)$/.exec(t);return m?esc(m[1])+'<small>'+esc(m[2])+'</small>':esc(t)}
@@ -946,7 +971,13 @@ function bookingItems(p,modes){
    raw.forEach(function(k,i){var id=x.leg?"leg:"+x.leg+":"+modes[x.leg]:k.id||(i?"leg:ferry":"leg:c6571"),end=p.days[Math.min(p.days.length-1,x.start+k.plus)];
     items.push({id:id,depDate:p.days[x.start].d,label:k.train,detail:p.days[x.start].d+" "+k.dep+" "+k.from+" → "+end.d+" "+k.arr+" "+k.to,signature:[p.days[x.start].d,k.dep,k.from,end.d,k.arr,k.to].join("|"),seg:x});
    });
-  }else{var key=stayKeyOf[x.label];if(hotels[key]&&!/^0晚/.test(x.duration))items.push({id:"hotel:"+hotels[key],label:x.label+"酒店",detail:x.range+" · "+x.duration.split(" · ")[0]+" · 酒店待选定",signature:x.range+"|"+x.duration.split(" · ")[0],seg:x})}
+  }else{var key=stayKeyOf[x.label];if(hotels[key]&&!/^0晚/.test(x.duration)){
+   if(key==="qingdao"){
+    for(var night=x.start;night<x.end;night++){var date=p.days[night].d,id="hotel:qd:2026-"+date.replace("/","-"),h=confirmedHotels[id];
+     items.push({id:id,date:date,nightIndex:night,label:date+" 青岛"+(h?"一然海景民宿":"酒店"),detail:h?h.name+" · "+h.address+" · "+h.room+" · "+h.detail:date+"—"+p.days[night+1].d+" · 1晚 · 酒店待选定（可能续订一然民宿，房价待核）",signature:date+"|"+p.days[night+1].d+"|1晚",seg:x});
+    }
+   }else items.push({id:"hotel:"+hotels[key],label:x.label+"酒店",detail:x.range+" · "+x.duration.split(" · ")[0]+" · 酒店待选定",signature:x.range+"|"+x.duration.split(" · ")[0],seg:x})
+  }}
  });return items;
 }
 function bookingFlag(item){var f=confirmedFlights[item.id];return !!progressState.booked[item.id]&&(!f||item.depDate===f.date)}
@@ -954,7 +985,7 @@ function bookButton(id,label){var item=bookingItems(plan).find(function(x){retur
 function segmentBooking(x){return bookingItems(plan).filter(function(item){return item.seg===x})}
 function bookingActions(x){var list=segmentBooking(x);return list.length?'<div class="booking-actions">'+list.map(function(item){return bookButton(item.id,item.label)}).join("")+'</div>':""}
 function hotelId(key){return{qingdao:"hotel:qd",weihai:"hotel:wh",dalian:"hotel:dl",nanchang:"hotel:nc"}[key]}
-function hotelBadge(key){var id=hotelId(key);if(!id||!bookingItems(plan).some(function(x){return x.id===id}))return "";var booked=!!progressState.booked[id],label=booked?"酒店已订":"酒店待订";return '<small class="hotel-badge'+(booked?' booked':'')+'" title="'+label+'" aria-label="'+label+'">'+(booked?'✓':'○')+'</small>'}
+function hotelBadge(key){var id=hotelId(key),items=bookingItems(plan).filter(function(x){return key==="qingdao"?x.id.indexOf("hotel:qd:")===0:x.id===id});if(!items.length)return "";var n=items.filter(bookingFlag).length,all=n===items.length,label=n?"酒店已订"+n+"/"+items.length+"晚":"酒店待订";return '<small class="hotel-badge'+(n?' booked':'')+'" title="'+label+'" aria-label="'+label+'">'+(all?'✓':n?n+'/'+items.length:'○')+'</small>'}
 function modeLocked(leg){return !!progressState.booked["leg:"+leg+":"+tripModes[leg]]}
 function stayLocked(key){return !!progressState.booked[hotelId(key)]}
 // Compare booked dates as well as local controls: upstream edits must not silently move a booking.
@@ -968,7 +999,7 @@ function changeReason(kind,key,value){
   if(kind==="mode")tripModes[key]=value;else if(kind==="stay")stayPrefs[key]=value;else if(kind==="weihai")routePrefs={weihai:value};else{tripModes=Object.assign({},defaultModes);stayPrefs=Object.assign({},defaultStays);routePrefs={weihai:true}}
   after=bookingItems(buildPlan(),tripModes);
  }finally{tripModes=oldModes;stayPrefs=oldStays;routePrefs=oldRoute}
- var conflict=before.find(function(x){if(comparisonMode&&confirmedFlights[x.id])return false;var item=after.find(function(y){return y.id===x.id});return !item||item.signature!==x.signature});
+ var conflict=before.find(function(x){if(comparisonMode&&(confirmedFlights[x.id]||confirmedHotels[x.id]))return false;var item=after.find(function(y){return y.id===x.id});return !item||item.signature!==x.signature});
  return conflict?"会改变已订的"+conflict.label+"日期或行程，请先调整订单并取消已订标记。":"";
 }
 function doneCount(d){return d.steps.filter(function(s){return progressState.done[s.id]}).length}
@@ -1041,10 +1072,11 @@ function renderTripProgress(){
 function bookingDrawer(){
  var items=bookingItems(plan),pending=items.filter(function(x){return !bookingFlag(x)}),booked=items.filter(function(x){return bookingFlag(x)});
  var group=function(title,list){return '<h3>'+title+' · '+list.length+'</h3>'+(list.length?list.map(function(x){return '<div class="booking-block"><b>'+esc(x.label)+'</b><small>'+esc(x.detail)+'</small>'+bookButton(x.id,x.label)+'</div>'}).join(""):'<p class="sheet-copy">暂无</p>')};
- return '<h2 id="sheetTitle">预订进度</h2><p class="sheet-copy">仅本机保存。已订是你手动记录，不代表已出票或订房；酒店信息仍待选定。</p>'+group("待订",pending)+group("已订",booked)+'<div class="callout warn"><strong>修改已订行程</strong>请先在购票或订房平台调整、退订，再取消这里的“已订”。取消勾选不会替你退票或退房。</div>';
+ return '<h2 id="sheetTitle">预订进度</h2><p class="sheet-copy">仅本机保存。已订是你手动记录，不连接购票或订房平台；青岛10/13一晚已按你提供的确认订单录入，其余酒店待选定。</p>'+group("待订",pending)+group("已订",booked)+'<div class="callout warn"><strong>修改已订行程</strong>请先在购票或订房平台调整、退订，再取消这里的“已订”。取消勾选不会替你退票或退房。</div>';
 }
-function hotelForDay(d){var name=destOf(d),hotel=d.states.some(function(s){return /酒店/.test(s)});if(!hotel)return null;return bookingItems(plan).find(function(x){return x.id.indexOf("hotel:")===0&&name.indexOf(x.seg.label)>=0})}
+function hotelForDay(d){var name=destOf(d),hotel=d.states.some(function(s){return /酒店/.test(s)});if(!hotel)return null;return bookingItems(plan).find(function(x){return x.id.indexOf("hotel:")===0&&name.indexOf(x.seg.label)>=0&&(x.date===undefined||x.date===d.d)})}
 function stepBookings(s){
+ if(s.hotelBookId)return bookingItems(plan).filter(function(x){return x.id===s.hotelBookId});
  if(s.kind==="住宿"){var h=hotelForDay(days[selected]);return h?[h]:[]}
  if(!/火车|飞机|轮渡|到达/.test(s.kind))return [];
  return bookingItems(plan).filter(function(x){if(x.id.indexOf("leg:")!==0||selected<x.seg.start||selected>x.seg.end)return false;if(x.id==="leg:shengsheng")return /生生2|大连港/.test(s.n);if(x.id==="leg:qdwh")return /C6587|威海站/.test(s.n);if(x.id==="leg:ferry")return /轮渡|夜船|旅顺/.test(s.n);if(x.id==="leg:c6571")return /C6571|烟台站/.test(s.n);return x.label.split(/[ ·＋→]/).some(function(train){return /[A-Z]\d+/.test(train)&&s.n.indexOf(train)>=0})});
@@ -1083,7 +1115,8 @@ function panelHtml(x,i){
  }else{
   var sum=totalBudget(idx.map(function(k){return days[k]})),hotel=null,home=x.label.indexOf("新干")>=0;
   idx.forEach(function(k){days[k].steps.forEach(function(s){if(!hotel&&s.kind==="住宿"&&/200/.test(s.cost))hotel=s})});
-  info='<div class="sp-facts"><div class="sp-fact-money"><small>这几天预算合计</small><b>¥'+money(sum[0])+'–'+money(sum[1])+'</b><small>含进出当天的交通</small></div><div><small>住宿</small>'+(home?'<b>住家中</b><small>不计酒店</small>':hotel?'<b>每晚 ≤¥200</b><small>'+esc(hotel.s.split(" · ")[0])+' · 酒店待选定</small>':'<b>—</b>')+'</div></div>';
+  var qdRooms=x.label==="青岛"?segmentBooking(x).map(function(item){var h=confirmedHotels[item.id];return '<small>'+esc(item.date+' · '+(bookingFlag(item)?'已订':'待订')+' · '+(h?h.name+' · '+h.room+' · 实付¥'+money(h.paid):'酒店待选定，可能续订一然民宿，房价待核'))+'</small>'}).join(''):'';
+  info='<div class="sp-facts"><div class="sp-fact-money"><small>这几天预算合计</small><b>¥'+money(sum[0])+'–'+money(sum[1])+'</b><small>含进出当天的交通</small></div><div><small>住宿</small>'+(home?'<b>住家中</b><small>不计酒店</small>':qdRooms?'<b>按晚预订 · 预算≤¥200</b>'+qdRooms:hotel?'<b>每晚 ≤¥200</b><small>'+esc(hotel.s.split(" · ")[0])+' · 酒店待选定</small>':'<b>—</b>')+'</div></div>';
  }
  info=bookingActions(x)+(x.leg&&modeLocked(x.leg)?'<p class="lock-note">已订票，改方式前先退票并取消已订标记。</p>':'')+info;
  var list='<ol class="sp-days">'+idx.map(function(k){var d=days[k];return '<li><button data-goto="'+k+'"><span class="sp-date">'+esc(d.d+" "+d.w)+'</span><span class="sp-title">'+esc(d.title)+'</span><span class="sp-bud">'+dayBudget(d)+'</span><span class="sp-go" aria-hidden="true">›</span></button></li>'}).join("")+'</ol>';
@@ -1117,7 +1150,8 @@ function render(opts){
  $("statDays").textContent=n+"天";
  $("statDaysBox").className="stat"+(plan.overLimit?" over":"");
  $("statDaysSub").textContent=plan.overLimit?"超出14天上限":gap?"还可加"+gap+"天":"已到上限";
- $("statBudget").textContent="¥"+money(total[0])+"–"+money(total[1]);
+ var cents=total.some(function(n){return !Number.isInteger(n)});$("statBudget").classList.toggle("precise",cents);
+ $("statBudget").innerHTML=cents?'<span class="budget-bound">¥'+money(total[0])+'–</span><wbr><span class="budget-bound">'+money(total[1])+'</span>':"¥"+money(total[0])+"–"+money(total[1]);
  $("statTransit").textContent="约"+plan.ledger.transit.toFixed(1)+"天";
  $("statTransit").title=plan.metrics[1];
  var cur=snap(plan),dd=cmp(defSnap,cur);
@@ -1151,6 +1185,7 @@ function render(opts){
  $("dayNight").textContent=night.b;$("dayNightSub").textContent=night.sub;
  var hotelToday=hotelForDay(d);$("dayHotelStatus").innerHTML=hotelToday?bookButton(hotelToday.id,hotelToday.label):"";$("dayHotelStatus").hidden=!editing||!hotelToday;
  $("dayBudget").textContent=dayBudget(d);
+ $("dayBudget").classList.toggle("precise",d.budget.some(function(n){return !Number.isInteger(n)}));
  $("budgetBasis").textContent=d.basis;
  $("budgetUnknown").textContent="待核： "+d.unknown;
  steps.innerHTML=d.steps.map(function(s,i){return '<div class="step-row'+(progressState.done[s.id]?' done':'')+'"><span class="step-time">'+timeHtml(s.t)+'</span>'+completionButton(s)+'<button class="step" data-step="'+i+'"><span class="step-main"><b>'+esc(s.n)+'</b><span>'+esc(s.s)+'</span><em>'+(progressState.done[s.id]?'已完成 · ':'')+esc(s.tag)+'</em></span><span class="step-go" aria-hidden="true">›</span></button></div>'}).join("");

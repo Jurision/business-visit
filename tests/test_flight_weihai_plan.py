@@ -33,11 +33,36 @@ budgets:days.filter(d=>/-air$/.test(d.source)).map(d=>[d.budget,d.basis]),count:
 }));''')
         self.assertEqual(result['dates'], ['10/' + str(d) for d in range(13, 24)])
         self.assertEqual(result['nights'], ['2晚', '1晚', '1晚', '2晚', '2晚'])
-        self.assertEqual(result['booked'], [['leg:gzqd:air', '10/13'], ['leg:dlnc:air', '10/18']])
+        self.assertEqual(result['booked'], [['leg:gzqd:air', '10/13'], ['hotel:qd:2026-10-13', None], ['leg:dlnc:air', '10/18']])
         self.assertEqual(result['paid'], 1279)
-        self.assertEqual(result['budgets'][0][0], [772, 952])
+        self.assertEqual(result['budgets'][0][0], [785.49, 885.49])
         self.assertEqual(result['budgets'][1][0], [947, 1097])
-        self.assertEqual(result['count'], 10)
+        self.assertEqual(result['count'], 11)
+
+    def test_confirmed_hotel_is_one_night_and_pending_nights_keep_estimates(self):
+        result = run('''console.log(JSON.stringify({
+rooms:bookingItems(plan).filter(x=>x.id.startsWith('hotel:qd:')).map(x=>[x.date,bookingFlag(x),x.detail]),
+budgets:days.slice(0,2).map(d=>d.budget),basis:days[0].basis,
+steps:days[0].steps.map(s=>[s.id,s.t,s.n,s.s,s.detail]),checkout:days[1].steps.find(s=>s.id==='d:qd-hotel:checkout')
+}));''')
+        self.assertEqual([row[:2] for row in result['rooms']], [['10/13', True], ['10/14', False]])
+        self.assertIn('133.49', result['rooms'][0][2])
+        self.assertIn('0704', result['rooms'][0][2])
+        self.assertEqual(result['budgets'], [[785.49, 885.49], [180, 330]])
+        self.assertIn('实付¥133.49', result['basis'])
+        self.assertEqual([s[1] for s in result['steps']], ['05:30', '07:25', '10:30', '约12:00', '到市区后', '下午', '15:00后'])
+        self.assertIn('3号线', result['steps'][2][3])
+        self.assertIn('寄存', result['steps'][4][2])
+        self.assertIn('待确认', result['checkout']['tag'])
+        self.assertEqual(result['checkout']['t'], '12:00前')
+
+    def test_hotel_dates_do_not_lock_unbooked_extra_nights(self):
+        result = run('''progressState.booked={"hotel:qd:2026-10-13":true};
+var out=[changeReason('stay','qingdao',2),changeReason('weihai',null,false),!!changeReason('mode','gzqd','rail')];
+routePrefs.weihai=false;plan=buildPlan();days=plan.days;
+out.push(bookingItems(plan).filter(x=>x.id.startsWith('hotel:qd:')).map(x=>[x.date,bookingFlag(x)]));
+console.log(JSON.stringify(out));''')
+        self.assertEqual(result, ['', '', True, [['10/13', True], ['10/14', False], ['10/15', False]]])
 
     def test_no_weihai_preserves_flights_and_two_yantai_tickets(self):
         result = run('''routePrefs.weihai=false;plan=buildPlan();days=plan.days;
