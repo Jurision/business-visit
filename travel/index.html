@@ -185,7 +185,8 @@ h1 span{display:block}
 .date[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
 .date[aria-selected="true"] span{color:#c8d8d8}
 .date[aria-selected="true"] i{color:#fff}
-.date.today:after{content:"今天";position:absolute;top:-7px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-size:9.5px;font-weight:700;border-radius:6px;padding:0 5px;line-height:15px}
+.date.today span{color:var(--red);font-weight:800}
+.date.today[aria-selected="true"] span{color:#ffb7a5}
 
 /* 每日卡片 */
 .stage{margin-top:12px}
@@ -983,7 +984,7 @@ function render(opts){
  var resetReason=changeReason("reset");$("resetStays").disabled=!!resetReason;$("resetStays").title=resetReason;
  var limit=$("limitNote");limit.hidden=!editing&&!plan.overLimit;limit.className="limit-note"+(plan.overLimit?" over":"");limit.textContent=plan.overLimit?"当前 "+n+" 天，超过14天上限 "+(-gap)+" 天。请减少任一城市完整日；固定交通不会被压缩。":"当前 "+n+" 天，距14天上限还可增加 "+gap+" 天。改停留天数或交通方式后，后续日期与预算会一起顺延。";
  var railHadFocus=rail.contains(document.activeElement);
- rail.innerHTML=days.map(function(x,i){var today=i===todayIndex,count=doneCount(x),all=count===x.steps.length;return '<button class="date'+(isMoving(x)?' moving':'')+(today?' today':'')+(i<todayIndex?' past':'')+'" style="--c:'+colorOf(destOf(x))+'" role="tab" aria-selected="'+(i===selected)+'" tabindex="'+(i===selected?0:-1)+'" data-day="'+i+'" aria-label="第'+(i+1)+'天 '+esc(cnDate(x)+" "+x.city)+(today?' 今天':'')+'，已完成'+count+'/'+x.steps.length+'"><b>'+esc(x.d.split("/")[1])+'</b><span>'+esc(x.w)+'</span><i>'+esc(chipCity(x))+'</i><small class="day-done">'+(all?'✓':count+'/'+x.steps.length)+'</small></button>'}).join("");
+ rail.innerHTML=days.map(function(x,i){var today=i===todayIndex,count=doneCount(x),all=count===x.steps.length;return '<button class="date'+(isMoving(x)?' moving':'')+(today?' today':'')+(i<todayIndex?' past':'')+'" style="--c:'+colorOf(destOf(x))+'" role="tab" aria-selected="'+(i===selected)+'" tabindex="'+(i===selected?0:-1)+'" data-day="'+i+'" aria-label="第'+(i+1)+'天 '+esc(cnDate(x)+" "+x.city)+(today?' 今天':'')+'，已完成'+count+'/'+x.steps.length+'"><b>'+esc(x.d.split("/")[1])+'</b><span>'+(today?'今天':esc(x.w))+'</span><i>'+esc(chipCity(x))+'</i><small class="day-done">'+(all?'✓':count+'/'+x.steps.length)+'</small></button>'}).join("");
  var d=days[selected];
  $("dayKicker").textContent=d.d+" "+d.w+" · 第 "+(selected+1)+" / "+n+" 天 · "+d.city;
  $("dayTitle").textContent=d.title;$("dayNote").textContent=d.note;
