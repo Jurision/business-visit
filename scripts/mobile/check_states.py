@@ -78,7 +78,7 @@ with sync_playwright() as p:
 
     # tap target audit
     small = pg.evaluate("""()=>[...document.querySelectorAll('button,a')].filter(e=>e.offsetParent).map(e=>{const r=e.getBoundingClientRect();return [e.className||e.id||e.tagName,Math.round(r.width),Math.round(r.height)]}).filter(x=>x[1]<40||x[2]<32)""")
-    rec("可见触控目标尺寸（宽≥40/高≥32，照片署名链接除外）", all(x[0] == "photo-credit" for x in small), json.dumps(small, ensure_ascii=False))
+    rec("可见触控目标尺寸（宽≥40/高≥32）", not small, json.dumps(small, ensure_ascii=False))
 
     # 2 adjust each city +1 / -1
     click(pg, "#adjustToggle")
@@ -307,17 +307,6 @@ with sync_playwright() as p:
     click(pg, '#sheetContent [data-goto="9"]')
     rec("预算行点按 → 关闭抽屉并跳到对应日期", pg.locator("#overlay.open").count() == 0 and "第 10" in info(pg)["kicker"], info(pg)["kicker"])
 
-    # 11 photo zoom
-    click(pg, "#dayVisual .photo-btn")
-    pg.wait_for_timeout(1500)
-    rec("照片放大抽屉打开", pg.locator("#zoomBox img").count() == 1)
-    shot(pg, "10-照片抽屉")
-    click(pg, "#zoomBox")
-    rec("点按照片 → 放大可横向拖动", pg.evaluate("document.getElementById('zoomBox').classList.contains('zoomed') && zoomBox.scrollWidth>zoomBox.clientWidth"))
-    shot(pg, "11-照片放大")
-    pg.keyboard.press("Escape"); time.sleep(0.4)
-    print("after esc", pg.evaluate("[overlay.className, document.documentElement.className]"))
-
     # 12 map
     pg.evaluate("scrollTo(0,0)"); time.sleep(0.3)
     click(pg, "#mapBtn")
@@ -328,19 +317,6 @@ with sync_playwright() as p:
 
     rec("全程无横向溢出", overflow(pg) <= 0)
     rec("控制台无错误", not errs, "; ".join(errs))
-    ctx.close()
-
-    # 13 image failure placeholder (block Wikimedia)
-    ctx = b.new_context(viewport={"width": 428, "height": 926}, device_scale_factor=3, is_mobile=True, has_touch=True, user_agent=UA)
-    ctx.route("**/*wikimedia.org/**", lambda r: r.abort())
-    pg = ctx.new_page()
-    pg.goto(URL, wait_until="load"); time.sleep(1)
-    pg.evaluate("localStorage.clear()"); pg.reload(wait_until="load"); time.sleep(1)
-    pg.locator("#dayCard").scroll_into_view_if_needed(); time.sleep(0.3)
-    failed = pg.evaluate("document.getElementById('dayVisual').classList.contains('photo-fail')")
-    rec("图片加载失败显示占位（并隐藏放大按钮）", failed and not pg.locator("#dayVisual .photo-btn").is_visible())
-    pg.evaluate("window.scrollBy(0,-60)"); time.sleep(0.2)
-    shot(pg, "13-图片失败占位")
     ctx.close()
 
     # 14 during-trip "today" (fake clock 2026-10-15)

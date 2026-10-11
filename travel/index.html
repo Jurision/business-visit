@@ -15,8 +15,6 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#f4f0e7">
-<link rel="preconnect" href="https://commons.wikimedia.org">
-<link rel="preconnect" href="https://upload.wikimedia.org">
 <style>
 :root{
   --paper:#f4f0e7;--card:#fffdf8;--ink:#173b43;--muted:#5f6a66;--faint:#8c928d;--line:#e4dccf;--line-strong:#cfc3b1;
@@ -35,9 +33,7 @@ button{color:inherit;touch-action:manipulation}
 .shell{max-width:680px;margin:0 auto;padding:0 16px calc(36px + env(safe-area-inset-bottom))}
 
 /* 顶部 */
-.mast{padding:env(safe-area-inset-top) 4px 16px}
-.hero-art{display:block;margin:0 -20px -4px;height:112px;overflow:hidden;line-height:0}
-.hero-art img{width:100%;height:100%;object-fit:cover;object-position:50% 62%;mix-blend-mode:multiply;-webkit-mask-image:linear-gradient(180deg,#000 72%,transparent);mask-image:linear-gradient(180deg,#000 72%,transparent)}
+.mast{padding:calc(env(safe-area-inset-top) + 22px) 4px 16px}
 .eyebrow{font-size:13px;font-weight:650;color:var(--red);font-variant-numeric:tabular-nums}
 h1{margin:4px 0 10px;font-size:27px;line-height:1.22;font-weight:750;letter-spacing:-.01em}
 h1 span{display:block}
@@ -196,17 +192,7 @@ h1 span{display:block}
 .day{background:var(--card);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:var(--shadow);touch-action:pan-y}
 .day.swap{animation:swap .26s ease-out}
 @keyframes swap{from{opacity:.25;transform:translateX(var(--dx,0))}to{opacity:1;transform:none}}
-.day-visual{position:relative;margin:0;aspect-ratio:16/7;background:linear-gradient(135deg,#e4ece9,#eef2ee);overflow:hidden}
-.photo-btn{display:block;width:100%;height:100%;padding:0;border:0;background:none;cursor:zoom-in}
-.day-photo{display:block;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s}
-.day-photo.ready{opacity:1}
-.day-visual.photo-fail:before{content:"图片暂时无法加载\A" attr(data-alt);white-space:pre-line;position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:0 24px;color:var(--muted);font-size:13px;font-weight:650;line-height:1.7}
-.day-visual.photo-fail .photo-btn{display:none}
-.photo-credit{position:absolute;right:8px;bottom:8px;max-width:75%;color:#fff;background:rgba(17,43,48,.62);border-radius:999px;padding:3px 9px;font-size:10.5px;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.zoom-hint{position:absolute;left:8px;bottom:8px;width:28px;height:28px;border-radius:50%;background:rgba(17,43,48,.55);color:#fff;display:grid;place-items:center;pointer-events:none}
-.zoom-hint svg{width:15px;height:15px}
-.day-visual.photo-fail .zoom-hint{display:none}
-.day-head{padding:14px 18px 0}
+.day-head{padding:18px 18px 0}
 .day-kicker{font-size:12.5px;font-weight:700;color:var(--red);font-variant-numeric:tabular-nums}
 .day-title{font-size:22px;line-height:1.3;margin:3px 0 6px;font-weight:750}
 .day-note{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
@@ -267,13 +253,6 @@ h1 span{display:block}
 .sheet-label{font-size:12.5px;color:var(--red);font-weight:700}
 .sheet h2{font-size:22px;line-height:1.3;font-weight:750;margin:2px 0 8px}
 .sheet-copy{color:var(--muted);margin:0 0 14px;font-size:14.5px;line-height:1.65}
-.zoom{margin:4px -20px 10px;background:#111;line-height:0;overflow:hidden;cursor:zoom-in;position:relative;min-height:120px}
-.zoom.zoomed{overflow:auto;cursor:zoom-out;max-height:72vh}
-.sheet-photo{display:block;width:100%;max-height:68vh;object-fit:contain}
-.zoom.zoomed .sheet-photo{width:220%;max-width:none;max-height:none}
-.zoom.photo-fail:before{content:"图片暂时无法加载";position:absolute;inset:0;display:grid;place-items:center;color:#ddd;font-size:13px;line-height:1.5}
-.zoom.photo-fail img{display:none}
-.zoom-tip{font-size:12px;color:var(--faint);margin:-4px 0 10px}
 .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:4px 0 14px}
 .fact{background:var(--card);padding:11px 13px}
 .fact small,.fact b{display:block}
@@ -346,7 +325,6 @@ html.has-bar .shell{padding-bottom:150px}
   .rail-wrap{margin:0;padding:18px 0 10px;box-shadow:none;border-bottom:1px solid var(--line)}
   .date-rail{padding:2px 2px;scroll-padding-inline:2px}
   .date{flex:1 0 54px}
-  .day-visual{aspect-ratio:21/8}
   .day-head{padding:20px 26px 0}
   .day-title{font-size:26px}
   .day-summary{margin:16px 26px 0}
@@ -356,7 +334,6 @@ html.has-bar .shell{padding-bottom:150px}
   .sheet{left:auto;top:0;height:100%;max-height:none;width:min(520px,100%);border-radius:0;padding:0 30px 40px;transform:translateX(102%)}
   .sheet-grip{display:none}
   .sheet-top{top:0;padding:22px 0 10px}
-  .zoom{margin:4px -30px 10px}
 }
 /* 行程进度：状态按钮与详情按钮分离，避免嵌套按钮和误触。 */
 .trip-progress{padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--paper);margin-bottom:12px}
@@ -402,10 +379,6 @@ html.has-bar .shell{padding-bottom:150px}
 <main class="shell">
   <div class="col-left">
     <header class="mast">
-      <picture class="hero-art">
-        <source srcset="img/personal-trip-watercolor.webp" type="image/webp">
-        <img src="img/personal-trip-watercolor.png" alt="广州、青岛海岸与江西乡野的水彩旅行图" width="2161" height="728" decoding="async">
-      </picture>
       <div class="eyebrow" id="heroDates">10月12日 周一 — 10月23日 周五</div>
       <h1 id="heroTitle"><span>广州—青岛—大连—江西</span><span class="h1-days">12日行程</span></h1>
       <div class="mast-row"><p class="plan-label" id="planStatus">12天 · 候选未订票</p><button class="today-btn" id="todayBtn" hidden></button></div>
@@ -443,7 +416,6 @@ html.has-bar .shell{padding-bottom:150px}
 
     <section class="stage">
       <article class="day" id="dayCard" aria-live="polite">
-        <figure class="day-visual" id="dayVisual"></figure>
         <header class="day-head">
           <div class="day-kicker" id="dayKicker"></div>
           <h2 class="day-title" id="dayTitle"></h2>
@@ -791,7 +763,7 @@ var todayIndex=chinaTodayIndex();
 if(todayIndex>=0&&todayIndex<days.length)selected=todayIndex;
 selected=Math.max(0,Math.min(days.length-1,selected||0));
 function $(id){return document.getElementById(id)}
-var rail=$("dateRail"),phaseRail=$("phaseRail"),steps=$("steps"),card=$("dayCard"),visual=$("dayVisual"),overview=$("overview"),railWrap=$("railWrap");
+var rail=$("dateRail"),phaseRail=$("phaseRail"),steps=$("steps"),card=$("dayCard"),overview=$("overview"),railWrap=$("railWrap");
 var overlay=$("overlay"),sheet=$("sheet"),content=$("sheetContent");
 var reduceMotion=matchMedia("(prefers-reduced-motion: reduce)");
 var icons={
@@ -1015,11 +987,6 @@ function render(opts){
  var d=days[selected];
  $("dayKicker").textContent=d.d+" "+d.w+" · 第 "+(selected+1)+" / "+n+" 天 · "+d.city;
  $("dayTitle").textContent=d.title;$("dayNote").textContent=d.note;
- if(visual.dataset.src!==d.photo.url){
-  visual.dataset.src=d.photo.url;visual.setAttribute("data-alt",d.photo.alt);
-  visual.classList.remove("photo-fail");
-  visual.innerHTML='<button class="photo-btn" aria-label="放大查看：'+esc(d.photo.alt)+'"><img class="day-photo" loading="eager" decoding="async" referrerpolicy="no-referrer" src="'+d.photo.url+'" alt="'+esc(d.photo.alt)+'" onload="this.classList.add(\'ready\')" onerror="var f=this.closest(\'.day-visual\');if(f)f.classList.add(\'photo-fail\')"></button><span class="zoom-hint" aria-hidden="true">'+icons.zoom+'</span><a class="photo-credit" href="'+d.photo.source+'" target="_blank" rel="noopener">'+esc(d.photo.credit)+' ↗</a>';
- }
  $("routeChain").innerHTML=routeHtml(d.route);
  var night=nightOf(d);
  var legsToday=plan.segments.filter(function(x){return x.kind==="transit"&&selected>=x.start&&selected<=x.end});
@@ -1041,7 +1008,6 @@ function render(opts){
  if(opts.refocus){var again=phaseRail.querySelector('[data-adjust="'+opts.refocus[0]+'"][data-delta="'+opts.refocus[1]+'"]');if(again&&!again.disabled)again.focus({preventScroll:true});else{var other=phaseRail.querySelector('[data-adjust="'+opts.refocus[0]+'"]:not([disabled])');if(other)other.focus({preventScroll:true})}}
  try{localStorage.setItem("china-trip-v3-modes",JSON.stringify(tripModes));localStorage.setItem("china-trip-v3-stays",JSON.stringify(stayPrefs));localStorage.setItem("china-trip-v3-day",selected)}catch(e){}
  renderBar(cur);updateJump();
- setTimeout(function(){[selected-1,selected+1].forEach(function(i){var x=days[i];if(!x)return;var im=new Image();im.referrerPolicy="no-referrer";im.src=x.photo.url})},400);
 }
 function updateJump(){
  var pill=$("jumpPill"),r=railWrap.getBoundingClientRect(),inDays=r.top<innerHeight*.5,ovTop=overview.getBoundingClientRect().top;
@@ -1080,14 +1046,8 @@ rail.addEventListener("keydown",function(e){var k={ArrowRight:1,ArrowLeft:-1}[e.
 steps.addEventListener("click",function(e){if(handleProgressClick(e))return;var b=e.target.closest("[data-step]");if(b)openStep(days[selected].steps[+b.dataset.step],b)});
 $("dayLegs").addEventListener("click",handleProgressClick);$("dayHotelStatus").addEventListener("click",handleProgressClick);
 $("bookingSummary").onclick=function(){openSheet("预订进度",bookingDrawer(),this)};
-visual.addEventListener("click",function(e){
- var btn=e.target.closest(".photo-btn");if(!btn)return;var d=days[selected],p=d.photo;
- openSheet("实景照片 · "+d.d+" "+d.w,'<h2 id="sheetTitle">'+esc(d.title)+'</h2><figure class="zoom" id="zoomBox"><img class="sheet-photo" referrerpolicy="no-referrer" src="'+p.url+'" alt="'+esc(p.alt)+'" onerror="this.parentNode.classList.add(\'photo-fail\')"></figure><p class="zoom-tip">点按照片放大，可左右拖动查看细节；也可双指缩放。</p><p class="sheet-copy">'+esc(p.alt)+' · '+esc(p.credit)+'</p><a class="evidence" target="_blank" rel="noopener" href="'+p.source+'">查看照片来源与许可 ↗</a>',btn);
-});
 content.addEventListener("click",function(e){
  if(handleProgressClick(e))return;
- var z=e.target.closest(".zoom");
- if(z){var on=z.classList.toggle("zoomed");if(on){var im=z.querySelector("img");z.scrollLeft=(im.offsetWidth-z.clientWidth)/2}return}
  var g=e.target.closest("[data-goto]");
  if(g){closeSheet(true);setDay(+g.dataset.goto,"force")}
 });

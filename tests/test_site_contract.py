@@ -28,7 +28,6 @@ class SiteContractTests(unittest.TestCase):
 
     def test_local_art_and_favicon_exist(self):
         self.assertIn('href="favicon.svg"', self.html)
-        self.assertIn('src="img/personal-trip-watercolor.png"', self.html)
         self.assertTrue((ROOT / "travel" / "favicon.svg").is_file())
         self.assertTrue((ROOT / "travel" / "img" / "personal-trip-watercolor.png").is_file())
 
@@ -105,7 +104,6 @@ class SiteContractTests(unittest.TestCase):
             "dayBudget",
             "budgetBasis",
             "budgetUnknown",
-            "dayVisual",
         ):
             self.assertIn('id="%s"' % element_id, self.html)
         self.assertIn("routeHtml(d.route)", self.html)
@@ -137,14 +135,10 @@ class SiteContractTests(unittest.TestCase):
         ):
             self.assertIn(token, self.html)
 
-    def test_daily_real_photos_have_sources_alt_and_fallback(self):
-        self.assertIn("Special:FilePath", self.html)
-        self.assertIn("Wikimedia Commons", self.html)
-        self.assertIn("查看照片来源与许可", self.html)
-        self.assertIn("photo-fail", self.html)
-        self.assertIn('referrerpolicy="no-referrer"', self.html)
-        for key in ("badaguan", "yantai", "dalian", "xingan", "nanchang"):
-            self.assertRegex(self.html, rf"{key}:ph\(")
+    def test_page_shows_no_photos(self):
+        body = self.html.split("<body>", 1)[1]
+        for token in ("<img", "<picture", 'id="dayVisual"', "photo-btn", "preconnect"):
+            self.assertNotIn(token, body if token != "preconnect" else self.html)
 
     def test_progressive_controls_and_reduced_motion_remain(self):
         for element_id in ("overlay", "budgetBtn", "mapBtn", "stayControls"):
