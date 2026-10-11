@@ -27,7 +27,7 @@ def info(pg):
       budget:document.getElementById('statBudget').textContent,
       limit:document.getElementById('limitNote').hidden?'(hidden)':document.getElementById('limitNote').textContent,
       kicker:document.getElementById('dayKicker').textContent,
-      segs:[...document.querySelectorAll('#phaseRail .seg.stay')].map(s=>s.querySelector('b').textContent+' '+s.querySelector('.seg-nights').textContent)
+      segs:[...document.querySelectorAll('#phaseRail .seg.stay')].map(s=>s.querySelector('b').textContent+' '+s.querySelector('.seg-nights').firstChild.textContent)
     })""")
 
 
@@ -151,9 +151,11 @@ with sync_playwright() as p:
     rec("展开“新干探亲”显示住家中、逐日 3 天（到达日＋完整日＋离开日）", "住家中" in ptxt and pg.locator("#segPanel7 [data-goto]").count() == 3, ptxt.replace(chr(10), " | ")[:160])
     click(pg, '#phaseRail [data-phase="3"]')
     click(pg, '#segPanel3 [data-goto]')
+    pg.wait_for_function("()=>{const top=dayCard.getBoundingClientRect().top,h=railWrap.getBoundingClientRect().height;return top>=h&&top<=h+30}")
     a = info(pg)
     top = pg.evaluate("document.getElementById('dayCard').getBoundingClientRect().top")
-    rec("展开“大连”后点第一天 → 跳到大连抵达日并滚动到卡片", "旅顺 → 大连" in a["kicker"] and 0 < top < 140, a["kicker"] + " cardTop=%d" % top)
+    rail_height = pg.locator("#railWrap").bounding_box()["height"]
+    rec("展开“大连”后点第一天 → 跳到大连抵达日并滚动到卡片", "旅顺 → 大连" in a["kicker"] and rail_height <= top <= rail_height + 30, a["kicker"] + " cardTop=%d railHeight=%d" % (top, rail_height))
     shot(pg, "06c-展开后跳转大连")
 
     # Jiangxi days
@@ -221,7 +223,7 @@ with sync_playwright() as p:
     rec("在对比卡里点普速卧铺 → 切回 12 天", info(pg)["days"] == 12 and labels()[-1] == "返穗卧铺")
     # nanchang +1 with rail via Beijing
     click(pg, '[data-adjust="nanchang"][data-delta="1"]')
-    fn = pg.evaluate("[...document.querySelectorAll('#dateRail .date')].findIndex(b=>/周. 南昌$/.test(b.getAttribute('aria-label')))")
+    fn = pg.evaluate("[...document.querySelectorAll('#dateRail .date')].findIndex(b=>/周. 南昌(?:，|$)/.test(b.getAttribute('aria-label')))")
     t8 = first_time(fn); title8 = pg.inner_text("#dayTitle")
     rec("普速到南昌再加南昌 1 天 → 第一个南昌日从 07:26 到站开始", title8.startswith("南昌完整游玩日") and t8.startswith("07:26") and info(pg)["days"] == 13, "第 8 天：" + title8 + " " + t8)
     # persistence
@@ -365,3 +367,4 @@ with sync_playwright() as p:
 
 json.dump(log, open(os.path.join(OUT, "check-log.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print("TOTAL", len(log), "FAIL", sum(not x["ok"] for x in log))
+sys.exit(1 if any(not x["ok"] for x in log) else 0)

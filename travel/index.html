@@ -358,6 +358,43 @@ html.has-bar .shell{padding-bottom:150px}
   .sheet-top{top:0;padding:22px 0 10px}
   .zoom{margin:4px -30px 10px}
 }
+/* 行程进度：状态按钮与详情按钮分离，避免嵌套按钮和误触。 */
+.trip-progress{padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--paper);margin-bottom:12px}
+.progress-head{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px}
+.progress-head b{font-size:14px}.sync-state{flex:none;color:var(--faint);font-size:11px}
+.progress-track{height:5px;border-radius:4px;background:var(--line);margin:9px 0;overflow:hidden}
+.progress-track i{display:block;height:100%;background:var(--sea);border-radius:4px;width:var(--w)}
+.book-summary{min-height:44px;width:100%;border:0;background:none;color:var(--sea);text-align:left;padding:0;font-size:13px;font-weight:700;cursor:pointer}
+.progress-help{font-size:11.5px;line-height:1.5;color:var(--muted);margin:0}
+.booking-actions{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 5px 32px}
+.phase-rail>.booking-actions,.phase-rail>.lock-note{display:none}
+.overview.editing .phase-rail>.booking-actions{display:flex}
+.overview.editing .phase-rail>.lock-note{display:block}
+.day .book-toggle{display:none}.day.editing .book-toggle{display:inline-block}
+.book-toggle{border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--paper);color:var(--muted);font-size:12px;min-height:44px;cursor:pointer;max-width:100%;text-align:left;line-height:1.4}
+.book-toggle[aria-pressed="true"]{background:var(--sea-soft);border-color:var(--sea);color:var(--sea)}
+.book-badge{display:block;font-style:normal;font-size:10px;color:var(--faint);margin-top:3px}
+.book-badge{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hotel-badge{font-size:11px;color:var(--faint);margin-left:5px}
+.book-badge.booked,.hotel-badge.booked{color:#357f52}
+.stat .transit-hours{font-size:10px;white-space:nowrap}
+.overview.editing .seg.transit .seg-main{flex-basis:100%}
+.booking-block{border-bottom:1px solid var(--line);padding:10px 0}.booking-block .book-toggle{margin-top:7px}
+.booking-block b,.booking-block small{display:block}.booking-block small{font-size:12px;color:var(--muted);margin-top:4px}
+.lock-note{font-size:11.5px;color:var(--gold);margin:0 0 8px 32px;line-height:1.5}
+.modes button:disabled,.mode-opt:disabled,.reset-btn:disabled{opacity:.55;cursor:not-allowed}
+.date.past:not([aria-selected="true"]){background:var(--paper);color:var(--muted)}
+.date.past:not([aria-selected="true"]) b{opacity:.55}.date .day-done{font-size:10px;line-height:1.4;color:var(--sea);margin-top:3px}
+.date[aria-selected="true"] .day-done{color:#c8e8da}
+.step-row{display:flex;align-items:center;border-bottom:1px solid var(--line)}
+.step-row:last-child{border:0}.step-row .step{flex:1;min-width:0;grid-template-columns:46px 8px minmax(0,1fr) 10px;gap:7px}
+.step-row .step:before{display:none}.step-row .step-dot{width:8px;height:8px;border-width:2px}
+.step-check{flex:none;width:44px;min-height:44px;border:0;background:none;color:var(--muted);cursor:pointer;font-size:19px;padding:0;display:grid;place-items:center}
+.step-check span{display:grid;place-items:center;width:25px;height:25px;border:1.5px solid var(--line-strong);border-radius:50%;font-size:14px}
+.step-check[aria-pressed="true"] span{background:var(--sea);border-color:var(--sea);color:white}
+.step-row.done .step-main b{color:var(--muted)}.step-row.done .step-main em{background:var(--paper);color:var(--muted)}
+.sheet-completion{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--sea)}
+#dayHotelStatus{margin-top:7px}#progressNotice:empty{display:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -376,6 +413,12 @@ html.has-bar .shell{padding-bottom:150px}
 
     <section class="overview" id="overview" aria-labelledby="allocationTitle">
       <div class="ov-head"><h2 id="allocationTitle">行程总览</h2><span class="ov-tools"><button class="pill-btn alt" id="adjustTop" aria-controls="phaseRail">调整</button><button class="pill-btn" id="packBtn">清单</button><button class="pill-btn" id="mapBtn">路线图</button></span></div>
+      <section class="trip-progress" aria-label="行程进度">
+        <div class="progress-head"><b id="tripProgressText"></b><span class="sync-state" id="syncState">仅本机</span></div>
+        <div class="progress-track" id="tripProgressBar" role="progressbar" aria-label="按天推进的行程进度"><i id="tripProgressFill"></i></div>
+        <button class="book-summary" id="bookingSummary" aria-haspopup="dialog"></button>
+        <p class="progress-help" id="progressNotice" role="status" aria-live="polite"></p>
+      </section>
       <div class="allocation-summary" id="allocationSummary">
         <div class="stat" id="statDaysBox"><small>总天数</small><b id="statDays">12天</b><span id="statDaysSub">上限14天</span><em id="dDays"></em></div>
         <button class="stat stat-btn" id="budgetBtn" aria-label="查看逐日预算"><small>预算估算</small><b id="statBudget">—</b><span>交通·住宿·餐饮·门票</span><em id="dBudget"></em></button>
@@ -413,7 +456,7 @@ html.has-bar .shell{padding-bottom:150px}
           </div>
           <div class="sum-legs" id="dayLegs"></div>
           <div class="sum-grid">
-            <div class="sum-cell"><span class="summary-label">今晚</span><b id="dayNight"></b><small id="dayNightSub"></small></div>
+            <div class="sum-cell"><span class="summary-label">今晚</span><b id="dayNight"></b><small id="dayNightSub"></small><div id="dayHotelStatus"></div></div>
             <div class="sum-cell day-budget"><span class="summary-label">当天预算</span><b id="dayBudget"></b><small id="budgetBasis"></small></div>
           </div>
           <small class="unknown" id="budgetUnknown"></small>
@@ -638,8 +681,8 @@ var tickets={
  "xggz:rail":{dep:"16:29",from:"新干站",arr:"07:00",to:"广州白云站",plus:1,dur:"14小时31分",train:"K441 卧铺"},
  "xggz:hsr":{dep:"16:34",from:"新干东站",arr:"20:37",to:"广州东站",plus:0,dur:"4小时03分",train:"G3065 高铁"}
 };
-function ticketsOf(x){var list=tickets[x.leg?x.leg+":"+tripModes[x.leg]:"ferry"];return [].concat(list).map(function(raw){var k=Object.assign({},raw),arr=Math.min(days.length-1,x.start+k.plus);k.depDate=days[x.start].d;k.arrDate=days[arr].d;return k})}
-function ticketHtml(k){return '<span class="tk"><span class="tk-end"><b><em>'+esc(k.depDate)+'</em>'+esc(k.dep)+'</b><span>'+esc(k.from)+'</span></span><span class="tk-mid"><small>'+esc(k.dur)+'</small><i aria-hidden="true"></i><small>'+esc(k.train)+'</small></span><span class="tk-end r"><b><em>'+esc(k.arrDate)+'</em>'+esc(k.arr)+'</b><span>'+esc(k.to)+'</span></span></span>'}
+function ticketsOf(x){var list=tickets[x.leg?x.leg+":"+tripModes[x.leg]:"ferry"];return [].concat(list).map(function(raw,i){var k=Object.assign({},raw),arr=Math.min(days.length-1,x.start+k.plus);k.depDate=days[x.start].d;k.arrDate=days[arr].d;k.bookId=x.leg?"leg:"+x.leg+":"+tripModes[x.leg]:i?"leg:ferry":"leg:c6571";return k})}
+function ticketHtml(k){var booked=!!progressState.booked[k.bookId];return '<span class="tk"><span class="tk-end"><b><em>'+esc(k.depDate)+'</em>'+esc(k.dep)+'</b><span>'+esc(k.from)+'</span></span><span class="tk-mid"><small>'+esc(k.dur)+'</small><i aria-hidden="true"></i><small>'+esc(k.train)+'</small><em class="book-badge'+(booked?' booked':'')+'">'+(booked?"已订":"待订")+'</em></span><span class="tk-end r"><b><em>'+esc(k.arrDate)+'</em>'+esc(k.arr)+'</b><span>'+esc(k.to)+'</span></span></span>'}
 var tripModes={gzqd:"rail",dlnc:"hsr",ncxg:"rail",xggz:"rail"};
 function hm(m){return Math.floor(m/60)+"小时"+(m%60)+"分"}
 function trunkMinutes(){var t=Object.keys(legModes).reduce(function(a,k){return a+legModes[k].opts[tripModes[k]].min},0);return[t+494,t+554]}
@@ -670,20 +713,20 @@ function retimeText(s,info){var cn=info.d.replace("/","月")+"日";return String
 function retimeDay(d,i){var info=dateInfo(i);d.d=info.d;d.w=info.w;["note","unknown","basis"].forEach(function(k){d[k]=retimeText(d[k],info)});d.steps.forEach(function(s){["s","detail","cost"].forEach(function(k){s[k]=retimeText(s[k],info)})});return d}
 function stayValue(k,n){if(k==="xingan")return n+"个完整日＋首尾半日 ≈ "+(n+1)+"天";if(k==="nanchang")return n+"个完整日＋到达半日";return n+"个完整日 · "+(n+1)+"晚"}
 function buildPlan(){
- var built=[],push=function(x){built.push(cloneDay(x))},m=tripModes;
- if(m.gzqd==="hsr")push(legDays.gzqdHsr);else{push(dalianDays[0]);push(dalianDays[1])}
+ var built=[],push=function(x,source){var day=cloneDay(x);day.source=source;day.steps.forEach(function(s,i){s.id="d:"+source+":"+i});built.push(day)},m=tripModes;
+ if(m.gzqd==="hsr")push(legDays.gzqdHsr,"qd-arrive-hsr");else{push(dalianDays[0],"qd-depart-rail");push(dalianDays[1],"qd-arrive")}
  var qdArr=built.length-1;
- [dalianDays[2],dalianDays[3],dalianDays[4]].slice(0,stayPrefs.qingdao).forEach(push);
- var ferryIndex=built.length;push(dalianDays[5]);var dalianArrival=built.length;push(dalianDays[6]);
- [dalianDays[7],dalianDays[8]].slice(0,stayPrefs.dalian).forEach(push);
+ [dalianDays[2],dalianDays[3],dalianDays[4]].slice(0,stayPrefs.qingdao).forEach(function(x,i){push(x,["qd-coast","qd-oldtown","qd-free"][i])});
+ var ferryIndex=built.length;push(dalianDays[5],"ferry-depart");var dalianArrival=built.length;push(dalianDays[6],"dl-arrive");
+ [dalianDays[7],dalianDays[8]].slice(0,stayPrefs.dalian).forEach(function(x,i){push(x,"dl-full-"+(i+1))});
  var longRail=built.length;
- if(m.dlnc==="hsr")push(dalianDays[9]);else{push(legDays.dlncRailA);push(legDays.dlncRailB)}
+ if(m.dlnc==="hsr")push(dalianDays[9],"nc-arrive-hsr");else{push(legDays.dlncRailA,"nc-depart-rail");push(legDays.dlncRailB,"nc-transit-rail")}
  var ncStart=built.length;
- for(var i=0;i<stayPrefs.nanchang;i++){var nc=cloneDay(nanchangFullTemplate);nc.title=stayPrefs.nanchang>1?"南昌完整游玩日 · "+(i+1):nc.title;if(!i&&m.dlnc==="rail"){nc.steps.unshift({t:"07:26参考",n:"T167 抵达南昌站",s:"先去酒店寄存行李，再开始游览",tag:"到站",kind:"火车",cost:"车票已在前一日计入",detail:"夜车到站时间以实际运行为准。"});nc.route[0]="南昌站"}push(nc)}
- var xinganArrival=built.length;built.push(ncxgDay(m.dlnc==="rail"&&!stayPrefs.nanchang));
- for(i=0;i<stayPrefs.xingan;i++){var family=cloneDay(dalianDays[11]);family.title=i?"继续陪家人的完整一天":"陪爷爷奶奶的一整天";family.note="第 "+(i+1)+" 个完整探亲日；不安排观光打卡，家庭具体位置继续隐藏。";family.steps[2].s="完整探亲日结束后继续家中过夜";family.steps[2].tag="第 "+(i+1)+" 个完整日";family.steps[2].detail="增加或减少探亲日只会顺延后续日期，不会偷减其他城市或交通。";push(family)}
+ for(var i=0;i<stayPrefs.nanchang;i++){var nc=cloneDay(nanchangFullTemplate);nc.title=stayPrefs.nanchang>1?"南昌完整游玩日 · "+(i+1):nc.title;if(!i&&m.dlnc==="rail"){nc.steps.unshift({t:"07:26参考",n:"T167 抵达南昌站",s:"先去酒店寄存行李，再开始游览",tag:"到站",kind:"火车",cost:"车票已在前一日计入",detail:"夜车到站时间以实际运行为准。"});nc.route[0]="南昌站"}push(nc,"nc-full-"+(i+1)+(!i&&m.dlnc==="rail"?"-arrive":""))}
+ var xinganArrival=built.length;push(ncxgDay(m.dlnc==="rail"&&!stayPrefs.nanchang),"nc-depart-"+m.ncxg+(m.dlnc==="rail"&&!stayPrefs.nanchang?"-arrive":""));
+ for(i=0;i<stayPrefs.xingan;i++){var family=cloneDay(dalianDays[11]);family.title=i?"继续陪家人的完整一天":"陪爷爷奶奶的一整天";family.note="第 "+(i+1)+" 个完整探亲日；不安排观光打卡，家庭具体位置继续隐藏。";family.steps[2].s="完整探亲日结束后继续家中过夜";family.steps[2].tag="第 "+(i+1)+" 个完整日";family.steps[2].detail="增加或减少探亲日只会顺延后续日期，不会偷减其他城市或交通。";push(family,"family-"+(i+1))}
  var xinganDeparture=built.length;
- if(m.xggz==="rail"){push(dalianDays[12]);push(dalianDays[13])}else push(legDays.xggzHsr);
+ if(m.xggz==="rail"){push(dalianDays[12],"gz-depart-rail");push(dalianDays[13],"gz-arrive-rail")}else push(legDays.xggzHsr,"gz-arrive-hsr");
  var returnIndex=built.length-1;
  built.forEach(retimeDay);
  var qdHotel=built[qdArr].steps.filter(function(x){return x.kind==="住宿"})[0];if(qdHotel)qdHotel.tag="住"+(stayPrefs.qingdao+1)+"晚";
@@ -736,13 +779,15 @@ var evidence={
  ]
 };
 var selected=0,lastFocus=null,editing=false,swipe=null,drag=null,expanded=-1;
+var progressState={done:{},booked:{}},progressStorageOk=true;
+try{var savedProgress=JSON.parse(localStorage.getItem("china-trip-v3-progress")||"null");if(savedProgress){progressState.done=cleanProgressMap(savedProgress.done,200);progressState.booked=cleanProgressMap(savedProgress.booked,40)}}catch(e){}
 var defaultModes=JSON.parse(JSON.stringify(tripModes));
 var defaultStays=JSON.parse(JSON.stringify(stayPrefs));
 try{var savedModes=JSON.parse(localStorage.getItem("china-trip-v3-modes")||"null");if(savedModes)Object.keys(legModes).forEach(function(k){if(legModes[k].opts[savedModes[k]])tripModes[k]=savedModes[k]})}catch(e){}
 try{var saved=JSON.parse(localStorage.getItem("china-trip-v3-stays")||"null");if(saved)Object.keys(stayRules).forEach(function(k){if(Number.isInteger(saved[k]))stayPrefs[k]=Math.max(stayRules[k].min,Math.min(stayRules[k].max,saved[k]))});selected=Number(localStorage.getItem("china-trip-v3-day")||0)}catch(e){}
 var plan=buildPlan(),days=plan.days;
 defSnap=defaultSnap();
-var todayIndex=(function(){var n=new Date();return Math.round((new Date(n.getFullYear(),n.getMonth(),n.getDate())-new Date(2026,9,12))/864e5)})();
+var todayIndex=chinaTodayIndex();
 if(todayIndex>=0&&todayIndex<days.length)selected=todayIndex;
 selected=Math.max(0,Math.min(days.length-1,selected||0));
 function $(id){return document.getElementById(id)}
@@ -814,16 +859,97 @@ function renderBar(cur){
  var f=document.activeElement;
  if(f&&overview.contains(f)){var fr=f.getBoundingClientRect(),top=bar.getBoundingClientRect().top;if(fr.bottom>top-8)window.scrollBy({top:fr.bottom-top+16,behavior:reduceMotion.matches?"auto":"smooth"})}
 }
+/* progress helpers start */
+function cleanProgressMap(raw,max){
+ var out=Object.create(null);if(!raw||typeof raw!=="object"||Array.isArray(raw))return out;
+ Object.keys(raw).filter(function(k){return /^[a-z0-9:_-]{1,48}$/.test(k)&&raw[k]===true}).slice(0,max).forEach(function(k){out[k]=true});return out;
+}
+function saveProgress(){
+ try{localStorage.setItem("china-trip-v3-progress",JSON.stringify(progressState));progressStorageOk=true}catch(e){progressStorageOk=false}
+}
+function bookingItems(p,modes){
+ modes=modes||tripModes;var hotels={qingdao:"qd",dalian:"dl",nanchang:"nc"},items=[];
+ p.segments.forEach(function(x){
+  if(x.kind==="transit"){
+   var raw=[].concat(tickets[x.leg?x.leg+":"+modes[x.leg]:"ferry"]);
+   raw.forEach(function(k,i){var id=x.leg?"leg:"+x.leg+":"+modes[x.leg]:i?"leg:ferry":"leg:c6571",end=p.days[Math.min(p.days.length-1,x.start+k.plus)];
+    items.push({id:id,label:k.train,detail:p.days[x.start].d+" "+k.dep+" "+k.from+" → "+end.d+" "+k.arr+" "+k.to,signature:[p.days[x.start].d,k.dep,k.from,end.d,k.arr,k.to].join("|"),seg:x});
+   });
+  }else{var key=stayKeyOf[x.label];if(hotels[key]&&!/^0晚/.test(x.duration))items.push({id:"hotel:"+hotels[key],label:x.label+"酒店",detail:x.range+" · "+x.duration.split(" · ")[0]+" · 酒店待选定",signature:x.range+"|"+x.duration.split(" · ")[0],seg:x})}
+ });return items;
+}
+function bookButton(id,label){return '<button class="book-toggle" data-book="'+esc(id)+'" aria-pressed="'+!!progressState.booked[id]+'" aria-label="'+esc(label)+'：'+(progressState.booked[id]?'已订，点击取消':'待订，点击标记已订')+'">'+esc(label)+' · '+(progressState.booked[id]?'✓ 已订':'○ 待订')+'</button>'}
+function segmentBooking(x){return bookingItems(plan).filter(function(item){return item.seg===x})}
+function bookingActions(x){var list=segmentBooking(x);return list.length?'<div class="booking-actions">'+list.map(function(item){return bookButton(item.id,item.label)}).join("")+'</div>':""}
+function hotelId(key){return{qingdao:"hotel:qd",dalian:"hotel:dl",nanchang:"hotel:nc"}[key]}
+function hotelBadge(key){var id=hotelId(key);if(!id||!bookingItems(plan).some(function(x){return x.id===id}))return "";var booked=!!progressState.booked[id],label=booked?"酒店已订":"酒店待订";return '<small class="hotel-badge'+(booked?' booked':'')+'" title="'+label+'" aria-label="'+label+'">'+(booked?'✓':'○')+'</small>'}
+function modeLocked(leg){return !!progressState.booked["leg:"+leg+":"+tripModes[leg]]}
+function stayLocked(key){return !!progressState.booked[hotelId(key)]}
+// Compare booked dates as well as local controls: upstream edits must not silently move a booking.
+function changeReason(kind,key,value){
+ var changed=kind==="mode"?tripModes[key]!==value:kind==="stay"?stayPrefs[key]!==value:true;if(!changed)return "";
+ if(kind==="mode"&&modeLocked(key))return "已订票，改方式前先退票并取消已订标记。";
+ if(kind==="stay"&&stayLocked(key))return "已订酒店，改停留前先调整订单并取消已订标记。";
+ var before=bookingItems(plan).filter(function(x){return progressState.booked[x.id]});if(!before.length)return "";
+ var oldModes=tripModes,oldStays=stayPrefs,after;
+ try{tripModes=Object.assign({},tripModes);stayPrefs=Object.assign({},stayPrefs);
+  if(kind==="mode")tripModes[key]=value;else if(kind==="stay")stayPrefs[key]=value;else{tripModes=Object.assign({},defaultModes);stayPrefs=Object.assign({},defaultStays)}
+  after=bookingItems(buildPlan(),tripModes);
+ }finally{tripModes=oldModes;stayPrefs=oldStays}
+ var conflict=before.find(function(x){var item=after.find(function(y){return y.id===x.id});return !item||item.signature!==x.signature});
+ return conflict?"会改变已订的"+conflict.label+"日期或行程，请先调整订单并取消已订标记。":"";
+}
+function doneCount(d){return d.steps.filter(function(s){return progressState.done[s.id]}).length}
+function completionButton(s){var yes=!!progressState.done[s.id];return '<button class="step-check" data-done="'+esc(s.id)+'" aria-pressed="'+yes+'" aria-label="'+esc(s.n)+'：'+(yes?'已完成，点击取消':'未完成，点击标记已完成')+'"><span aria-hidden="true">'+(yes?'✓':'')+'</span></button>'}
+function chinaTodayIndex(){var china=new Date(Date.now()+8*3600000);return Math.floor((Date.UTC(china.getUTCFullYear(),china.getUTCMonth(),china.getUTCDate())-Date.UTC(2026,9,12))/864e5)}
+function renderTripProgress(){
+ todayIndex=chinaTodayIndex();
+ var n=days.length,text,elapsed=Math.max(0,Math.min(n,todayIndex+1));
+ if(todayIndex<0){var first=ticketsOf(plan.segments[0])[0];text="还有 "+(-todayIndex)+" 天出发 · 10/12 "+first.dep+" "+first.train;elapsed=0}
+ else if(todayIndex>=n)text="行程已结束 · 共 "+n+" 天";
+ else text="第 "+(todayIndex+1)+" / "+n+" 天 · "+days[todayIndex].d+" "+days[todayIndex].w+" · "+chipCity(days[todayIndex]);
+ $("tripProgressText").textContent=text;$("tripProgressFill").style.setProperty("--w",elapsed/n*100+"%");
+ var bar=$("tripProgressBar");bar.setAttribute("aria-valuemin","0");bar.setAttribute("aria-valuemax",n);bar.setAttribute("aria-valuenow",elapsed);bar.setAttribute("aria-valuetext",text);
+ var items=bookingItems(plan),count=items.filter(function(x){return progressState.booked[x.id]}).length;
+ $("bookingSummary").textContent="已订 "+count+" / "+items.length+" · 待订 "+(items.length-count)+" ›";
+ $("syncState").textContent=progressStorageOk?"仅本机":"仅本机 · 存储失败";
+ if(progressStorageOk&&count&&!$("progressNotice").textContent)$("progressNotice").textContent="已订项目及日期受保护；调整订单后取消已订，才能修改相关方案。";
+ if(!progressStorageOk)$("progressNotice").textContent="浏览器未允许保存，刷新可能丢失；请允许此站点使用本地存储。";
+}
+function bookingDrawer(){
+ var items=bookingItems(plan),pending=items.filter(function(x){return !progressState.booked[x.id]}),booked=items.filter(function(x){return progressState.booked[x.id]});
+ var group=function(title,list){return '<h3>'+title+' · '+list.length+'</h3>'+(list.length?list.map(function(x){return '<div class="booking-block"><b>'+esc(x.label)+'</b><small>'+esc(x.detail)+'</small>'+bookButton(x.id,x.label)+'</div>'}).join(""):'<p class="sheet-copy">暂无</p>')};
+ return '<h2 id="sheetTitle">预订进度</h2><p class="sheet-copy">仅本机保存。已订是你手动记录，不代表已出票或订房；酒店信息仍待选定。</p>'+group("待订",pending)+group("已订",booked)+'<div class="callout warn"><strong>修改已订行程</strong>请先在购票或订房平台调整、退订，再取消这里的“已订”。取消勾选不会替你退票或退房。</div>';
+}
+function hotelForDay(d){var name=destOf(d),hotel=d.states.some(function(s){return /酒店/.test(s)});if(!hotel)return null;return bookingItems(plan).find(function(x){return x.id.indexOf("hotel:")===0&&name.indexOf(x.seg.label)>=0})}
+function stepBookings(s){
+ if(s.kind==="住宿"){var h=hotelForDay(days[selected]);return h?[h]:[]}
+ if(!/火车|轮渡|到达/.test(s.kind))return [];
+ return bookingItems(plan).filter(function(x){if(x.id.indexOf("leg:")!==0||selected<x.seg.start||selected>x.seg.end)return false;if(x.id==="leg:ferry")return /轮渡|夜船|旅顺/.test(s.n);if(x.id==="leg:c6571")return /C6571|烟台站/.test(s.n);return x.label.split(/[ ·＋→]/).some(function(train){return /[A-Z]\d+/.test(train)&&s.n.indexOf(train)>=0})});
+}
+function handleProgressClick(e){
+ var b=e.target.closest("[data-book],[data-done]");if(!b||b.disabled)return false;e.preventDefault();e.stopPropagation();
+ var isBook=b.hasAttribute("data-book"),id=isBook?b.dataset.book:b.dataset.done,map=isBook?progressState.booked:progressState.done;
+ if(isBook&&!bookingItems(plan).some(function(x){return x.id===id}))return true;
+ if(!isBook&&!days.some(function(d){return d.steps.some(function(s){return s.id===id})}))return true;
+ if(map[id])delete map[id];else{if(Object.keys(map).length>=(isBook?40:200)){ $("progressNotice").textContent="记录已满，请先取消不再需要的标记。";return true}map[id]=true}
+ var inSheet=content.contains(b),host=b.closest("#dayLegs,#dayHotelStatus,#phaseRail,#steps"),drawer=$("sheetLabel").textContent==="预订进度",top=sheet.scrollTop,step=days[selected].steps.find(function(s){return s.id===(isBook?content.dataset.stepId:id)});
+ saveProgress();$("progressNotice").textContent="";render();
+ if(inSheet){if(drawer)content.innerHTML=bookingDrawer();else if(step)openStep(step);sheet.scrollTop=top}
+ var selector=(isBook?'[data-book="':'[data-done="')+id+'"]',scope=inSheet?content:host||document,again=scope.querySelector(selector);if(again)again.focus({preventScroll:true});
+ return true;
+}
+/* progress helpers end */
 function modeChooser(leg){
  var L=legModes[leg],cur=tripModes[leg];
  return '<div class="mode-cmp" role="group" aria-label="'+esc(L.label)+'交通方式">'+L.order.map(function(k){
   var o=L.opts[k],on=k===cur,eff;
   if(on)eff='当前选择 · '+esc(o.effect);
   else{var sim=simulate(leg,k),c=cmp(snap(plan),sim);eff='改选后：坐车船<b class="'+c.timeCls+'">'+esc(c.time)+'</b> · 预算<b class="'+c.moneyCls+'">'+esc(c.money)+'</b> · '+esc(c.days+'（'+sim.end+'结束）· '+o.effect)}
-  return '<button class="mode-opt" data-mode="'+leg+':'+k+'" aria-pressed="'+on+'"><span class="mo-head"><b>'+esc(o.name)+'</b><span>'+esc(o.train)+'</span></span><span class="mo-line">'+esc(o.time)+'</span><span class="mo-line">用时 '+esc(o.dur)+' · '+esc(o.fare)+'</span><span class="mo-eff">'+eff+'</span></button>';
+  var reason=changeReason("mode",leg,k);return '<button class="mode-opt" data-mode="'+leg+':'+k+'" aria-pressed="'+on+'" '+(reason?'disabled title="'+esc(reason)+'"':'')+'><span class="mo-head"><b>'+esc(o.name)+'</b><span>'+esc(o.train)+'</span></span><span class="mo-line">'+esc(o.time)+'</span><span class="mo-line">用时 '+esc(o.dur)+' · '+esc(o.fare)+'</span><span class="mo-eff">'+(reason?esc(reason):eff)+'</span></button>';
  }).join("")+'</div>';
 }
-function modeToggle(leg){var L=legModes[leg];return '<span class="modes" role="group" aria-label="'+esc(L.label)+'交通方式">'+L.order.map(function(k){return '<button data-mode="'+leg+':'+k+'" aria-pressed="'+(tripModes[leg]===k)+'">'+(k==="hsr"?"高铁":"普速")+'</button>'}).join("")+'</span>'}
+function modeToggle(leg){var L=legModes[leg];return '<span class="modes" role="group" aria-label="'+esc(L.label)+'交通方式">'+L.order.map(function(k){var reason=changeReason("mode",leg,k);return '<button data-mode="'+leg+':'+k+'" aria-pressed="'+(tripModes[leg]===k)+'" '+(reason?'disabled title="'+esc(reason)+'"':'')+'>'+(k==="hsr"?"高铁":"普速")+'</button>'}).join("")+'</span>'}
 function panelHtml(x,i){
  var idx=segIdx(x),info="";
  if(x.kind==="transit"){
@@ -834,6 +960,7 @@ function panelHtml(x,i){
   idx.forEach(function(k){days[k].steps.forEach(function(s){if(!hotel&&s.kind==="住宿"&&/150/.test(s.cost))hotel=s})});
   info='<div class="sp-facts"><div class="sp-fact-money"><small>这几天预算合计</small><b>¥'+money(sum[0])+'–'+money(sum[1])+'</b><small>含进出当天的交通</small></div><div><small>住宿</small>'+(home?'<b>住家中</b><small>不计酒店</small>':hotel?'<b>每晚 ≤¥150</b><small>'+esc(hotel.s.split(" · ")[0])+' · 酒店待选定</small>':'<b>—</b>')+'</div></div>';
  }
+ info=bookingActions(x)+info;
  var list='<ol class="sp-days">'+idx.map(function(k){var d=days[k];return '<li><button data-goto="'+k+'"><span class="sp-date">'+esc(d.d+" "+d.w)+'</span><span class="sp-title">'+esc(d.title)+'</span><span class="sp-bud">'+dayBudget(d)+'</span><span class="sp-go" aria-hidden="true">›</span></button></li>'}).join("")+'</ol>';
  var unk=[];idx.forEach(function(k){if(unk.indexOf(days[k].unknown)<0)unk.push(days[k].unknown)});
  return '<div class="seg-panel '+x.kind+'" id="segPanel'+i+'" role="region" aria-label="'+esc(x.label)+'详情">'+info+'<span class="sp-label">'+(x.kind==="stay"?esc(x.duration.split(" · ").slice(1).join(" · "))+' · ':esc(x.duration)+' · 计入路上约'+x.days.toFixed(1)+'天 · ')+'逐日 · 点按查看当天安排</span>'+list+'<p class="sp-unknown">待核：'+esc(unk.join("；"))+'</p></div>';
@@ -843,20 +970,21 @@ function segHtml(x,i,activePhase){
  var btnAttr='data-phase="'+i+'" aria-current="'+(cur?'step':'false')+'" aria-expanded="'+open+'" aria-controls="segPanel'+i+'"',chev='<span class="seg-chev" aria-hidden="true">›</span>',panel=open?panelHtml(x,i):"";
  if(x.kind==="transit"){
   var icon=/船/.test(x.label)?icons.ferry:icons.train;
-  return '<div class="seg transit'+cur+(open?' open':'')+'"><button class="seg-main" '+btnAttr+'><span class="seg-mark" aria-hidden="true">'+icon+'</span><span class="tk-body"><span class="seg-text sr"><b>'+esc(x.label)+'</b></span>'+ticketsOf(x).map(ticketHtml).join("")+'</span><span></span>'+chev+'</button>'+(x.leg?modeToggle(x.leg):'')+'</div>'+panel;
+  return '<div class="seg transit'+cur+(open?' open':'')+'"><button class="seg-main" '+btnAttr+'><span class="seg-mark" aria-hidden="true">'+icon+'</span><span class="tk-body"><span class="seg-text sr"><b>'+esc(x.label)+'</b></span>'+ticketsOf(x).map(ticketHtml).join("")+'</span><span></span>'+chev+'</button>'+(x.leg?modeToggle(x.leg):'')+'</div>'+bookingActions(x)+(x.leg&&modeLocked(x.leg)?'<p class="lock-note">已订票，改方式前先退票并取消已订标记。</p>':'')+panel;
  }
  var key=stayKeyOf[x.label],c=colorOf(x.label),nights=parts.shift(),sub=parts.join(" · ");
  var stepper="";
- if(key){var r=stayRules[key],n=stayPrefs[key];stepper='<span class="stepper"><button data-adjust="'+key+'" data-delta="-1" aria-label="减少'+esc(r.label)+'一天" '+(n<=r.min?'disabled':'')+'>−</button><output aria-live="polite">'+esc(nights)+'</output><button data-adjust="'+key+'" data-delta="1" aria-label="增加'+esc(r.label)+'一天" '+(n>=r.max?'disabled':'')+'>＋</button></span>'}
- return '<div class="seg stay'+(key?' adjustable':'')+cur+(open?' open':'')+'" style="--c:'+c+'"><button class="seg-main" '+btnAttr+'><span class="seg-mark" aria-hidden="true"></span><span class="seg-text"><b>'+esc(x.label)+'</b><span>约'+x.days.toFixed(1)+'天 · '+esc(x.range)+'</span></span><span class="seg-nights">'+esc(nights)+'</span>'+chev+'</button>'+stepper+'</div>'+panel;
+ if(key){var r=stayRules[key],n=stayPrefs[key],minus=changeReason("stay",key,n-1),plus=changeReason("stay",key,n+1);stepper='<span class="stepper"><button data-adjust="'+key+'" data-delta="-1" aria-label="减少'+esc(r.label)+'一天" '+(n<=r.min||minus?'disabled title="'+esc(minus)+'"':'')+'>−</button><output aria-live="polite">'+esc(nights)+'</output><button data-adjust="'+key+'" data-delta="1" aria-label="增加'+esc(r.label)+'一天" '+(n>=r.max||plus?'disabled title="'+esc(plus)+'"':'')+'>＋</button></span>'}
+ return '<div class="seg stay'+(key?' adjustable':'')+cur+(open?' open':'')+'" style="--c:'+c+'"><button class="seg-main" '+btnAttr+'><span class="seg-mark" aria-hidden="true"></span><span class="seg-text"><b>'+esc(x.label)+'</b><span>约'+x.days.toFixed(1)+'天 · '+esc(x.range)+'</span></span><span class="seg-nights">'+esc(nights)+hotelBadge(key)+'</span>'+chev+'</button>'+stepper+'</div>'+bookingActions(x)+(key&&stayLocked(key)?'<p class="lock-note">已订酒店，改停留前先调整订单并取消已订标记。</p>':'')+panel;
 }
 function render(opts){
  opts=opts||{};
  plan=buildPlan();days=plan.days;selected=Math.max(0,Math.min(days.length-1,selected));
+ renderTripProgress();
  var n=days.length,gap=14-n,total=totalBudget(days),onBoard=days.filter(function(d){return d.states.some(function(s){return /火车过夜|轮渡过夜/.test(s)})}).length;
  $("heroDates").textContent=cnDate(days[0])+" — "+cnDate(days[n-1]);
  $("heroTitle").innerHTML='<span>广州—青岛—大连—江西</span><span class="h1-days">'+n+'日行程</span>';
- var status=$("planStatus");status.textContent=plan.status;status.className="plan-label"+(plan.overLimit?" over":"");
+ var status=$("planStatus"),bookings=bookingItems(plan),bookedCount=bookings.filter(function(x){return progressState.booked[x.id]}).length;status.textContent=days.length+"天 · "+(bookedCount===bookings.length?"全部已订":bookedCount?"已订 "+bookedCount+"/"+bookings.length:"候选未订票")+(plan.overLimit?" · 已超14天上限 · 请减少停留":"");status.className="plan-label"+(plan.overLimit?" over":"");
  document.title=plan.title;
  document.querySelector('meta[name="description"]').setAttribute("content",plan.lede);
  $("statDays").textContent=n+"天";
@@ -869,7 +997,7 @@ function render(opts){
  $("dDays").textContent=dd.dn?"比默认"+dd.days:"";
  $("dBudget").textContent=dd.moneyCls?"比默认"+dd.money:"";$("dBudget").className=dd.moneyCls;
  $("dTransit").textContent=dd.dt?"坐车船比默认"+dd.time:"";$("dTransit").className=dd.timeCls;
- $("statTransitSub").innerHTML="坐车船"+esc(transitHours().replace(/^约/,""))+"<br>"+onBoard+"晚在车船上";
+ $("statTransitSub").innerHTML='<span class="transit-hours">坐车船约'+esc(transitHours().replace(/^约/,"").replace(/小时$/, "h"))+'</span>'+onBoard+"晚在车船上";
  var tb=$("todayBtn"),t=days[todayIndex];tb.hidden=!t;if(t)tb.textContent="查看今天 · "+t.d+" "+chipCity(t)+" ↓";
  var activePhase=activePhaseIndex();
  var lg=plan.ledger;
@@ -877,11 +1005,13 @@ function render(opts){
  var pieces=[{c:"o",d:lg.before,t:"出发前"}].concat(plan.segments.map(function(x){return x.kind==="transit"?{c:"t",d:x.days,t:x.label}:{c:"s",d:x.days,t:x.label,col:colorOf(x.label)}}),[{c:"o",d:lg.after,t:"到家后"}]);
  $("timeLedger").innerHTML='<div class="lg-head"><span>时间怎么分</span><span>共 '+days.length+' 天</span></div><div class="lg-bar" role="img" aria-label="'+esc(days.length+"天：停留"+lg.stay+"天，路上"+lg.transit+"天，出发前和到家后"+Math.round((lg.before+lg.after)*10)/10+"天")+'">'+pieces.map(function(x){var w=x.d/days.length*100,px=x.d/days.length*330,short=x.t.replace("探亲","");return '<i class="'+x.c+'" style="flex:'+x.d+' 0 0'+(x.col?';background:'+x.col:'')+'" title="'+esc(x.t+" 约"+x.d.toFixed(1)+"天")+'">'+(px>=52&&x.c==="s"?esc(short)+" "+x.d.toFixed(1):px>=24?x.d.toFixed(1):"")+'</i>'}).join("")+'</div><p class="lg-sum"><b>'+days.length+'天</b> ＝ 停留 <b>'+lg.stay.toFixed(1)+'</b> ＋ 路上 <b class="lg-t">'+lg.transit.toFixed(1)+'</b> ＋ 出发前/到家后 <b>'+(Math.round((lg.before+lg.after)*10)/10).toFixed(1)+'</b> 天</p>';
  overview.classList.toggle("editing",editing);
+ card.classList.toggle("editing",editing);
  var toggle=$("adjustToggle");toggle.setAttribute("aria-expanded",String(editing));toggle.textContent=editing?"完成调整":"调整天数与交通";var tt=$("adjustTop");tt.textContent=editing?"完成":"调整";tt.setAttribute("aria-pressed",String(editing));
  $("resetStays").hidden=!editing||(JSON.stringify(stayPrefs)===JSON.stringify(defaultStays)&&JSON.stringify(tripModes)===JSON.stringify(defaultModes));
+ var resetReason=changeReason("reset");$("resetStays").disabled=!!resetReason;$("resetStays").title=resetReason;
  var limit=$("limitNote");limit.hidden=!editing&&!plan.overLimit;limit.className="limit-note"+(plan.overLimit?" over":"");limit.textContent=plan.overLimit?"当前 "+n+" 天，超过14天上限 "+(-gap)+" 天。请减少任一城市完整日；固定交通不会被压缩。":"当前 "+n+" 天，距14天上限还可增加 "+gap+" 天。改停留天数或交通方式后，后续日期与预算会一起顺延。";
  var railHadFocus=rail.contains(document.activeElement);
- rail.innerHTML=days.map(function(x,i){var today=i===todayIndex;return '<button class="date'+(isMoving(x)?' moving':'')+(today?' today':'')+'" style="--c:'+colorOf(destOf(x))+'" role="tab" aria-selected="'+(i===selected)+'" tabindex="'+(i===selected?0:-1)+'" data-day="'+i+'" aria-label="第'+(i+1)+'天 '+esc(cnDate(x)+" "+x.city)+(today?' 今天':'')+'"><b>'+esc(x.d.split("/")[1])+'</b><span>'+esc(x.w)+'</span><i>'+esc(chipCity(x))+'</i></button>'}).join("");
+ rail.innerHTML=days.map(function(x,i){var today=i===todayIndex,count=doneCount(x),all=count===x.steps.length;return '<button class="date'+(isMoving(x)?' moving':'')+(today?' today':'')+(i<todayIndex?' past':'')+'" style="--c:'+colorOf(destOf(x))+'" role="tab" aria-selected="'+(i===selected)+'" tabindex="'+(i===selected?0:-1)+'" data-day="'+i+'" aria-label="第'+(i+1)+'天 '+esc(cnDate(x)+" "+x.city)+(today?' 今天':'')+'，已完成'+count+'/'+x.steps.length+'"><b>'+esc(x.d.split("/")[1])+'</b><span>'+esc(x.w)+'</span><i>'+esc(chipCity(x))+'</i><small class="day-done">'+(all?'✓':count+'/'+x.steps.length)+'</small></button>'}).join("");
  var d=days[selected];
  $("dayKicker").textContent=d.d+" "+d.w+" · 第 "+(selected+1)+" / "+n+" 天 · "+d.city;
  $("dayTitle").textContent=d.title;$("dayNote").textContent=d.note;
@@ -893,12 +1023,13 @@ function render(opts){
  $("routeChain").innerHTML=routeHtml(d.route);
  var night=nightOf(d);
  var legsToday=plan.segments.filter(function(x){return x.kind==="transit"&&selected>=x.start&&selected<=x.end});
- $("dayLegs").innerHTML=legsToday.length?'<span class="summary-label">今天的车船</span>'+legsToday.map(function(x){return ticketsOf(x).filter(function(k){return selected<=x.start+k.plus}).map(function(k){return '<div class="leg-tk">'+ticketHtml(k)+'</div>'}).join("")}).join(""):"";$("dayLegs").hidden=!legsToday.length;
+ $("dayLegs").innerHTML=legsToday.length?'<span class="summary-label">今天的车船</span>'+legsToday.map(function(x){return ticketsOf(x).filter(function(k){return selected<=x.start+k.plus}).map(function(k){return '<div class="leg-tk">'+ticketHtml(k)+bookButton(k.bookId,k.train)+'</div>'}).join("")}).join(""):"";$("dayLegs").hidden=!legsToday.length;
  $("dayNight").textContent=night.b;$("dayNightSub").textContent=night.sub;
+ var hotelToday=hotelForDay(d);$("dayHotelStatus").innerHTML=hotelToday?bookButton(hotelToday.id,hotelToday.label):"";$("dayHotelStatus").hidden=!editing||!hotelToday;
  $("dayBudget").textContent=dayBudget(d);
  $("budgetBasis").textContent=d.basis;
  $("budgetUnknown").textContent="待核： "+d.unknown;
- steps.innerHTML=d.steps.map(function(s,i){return '<button class="step" data-step="'+i+'" style="--dot:'+kindColor(s.kind)+'"><span class="step-time">'+timeHtml(s.t)+'</span><span class="step-dot" aria-hidden="true"></span><span class="step-main"><b>'+esc(s.n)+'</b><span>'+esc(s.s)+'</span><em>'+esc(s.tag)+'</em></span><span class="step-go" aria-hidden="true">›</span></button>'}).join("");
+ steps.innerHTML=d.steps.map(function(s,i){return '<div class="step-row'+(progressState.done[s.id]?' done':'')+'">'+completionButton(s)+'<button class="step" data-step="'+i+'" style="--dot:'+kindColor(s.kind)+'"><span class="step-time">'+timeHtml(s.t)+'</span><span class="step-dot" aria-hidden="true"></span><span class="step-main"><b>'+esc(s.n)+'</b><span>'+esc(s.s)+'</span><em>'+(progressState.done[s.id]?'已完成 · ':'')+esc(s.tag)+'</em></span><span class="step-go" aria-hidden="true">›</span></button></div>'}).join("");
  var prev=$("prevDay"),next=$("nextDay"),p=days[selected-1],q=days[selected+1];
  prev.disabled=!p;next.disabled=!q;
  prev.innerHTML='<small>← 前一天</small>'+(p?esc(p.d+" "+p.w+" · "+chipCity(p)):"已是第一天");
@@ -926,10 +1057,11 @@ function revealCard(force){
 }
 function setDay(i,reveal){var n=Math.max(0,Math.min(days.length-1,i));if(n===selected&&!reveal)return;var dir=n>selected?1:n<selected?-1:0;selected=n;render({dir:dir});if(reveal)revealCard(reveal==="force")}
 overview.addEventListener("click",function(e){
+ if(handleProgressClick(e))return;
  var mo=e.target.closest("[data-mode]");
- if(mo){var pm=mo.dataset.mode.split(":");if(tripModes[pm[0]]===pm[1])return;var lo=legModes[pm[0]].opts[pm[1]];noteChange(legModes[pm[0]].label+" 改为"+lo.name+"（"+lo.train+"）");tripModes[pm[0]]=pm[1];render();var again=phaseRail.querySelector('[data-mode="'+mo.dataset.mode+'"]');if(again)again.focus({preventScroll:true});return}
+ if(mo){var pm=mo.dataset.mode.split(":"),reason=changeReason("mode",pm[0],pm[1]);if(reason||mo.disabled){$("progressNotice").textContent=reason;return}if(tripModes[pm[0]]===pm[1])return;var lo=legModes[pm[0]].opts[pm[1]];noteChange(legModes[pm[0]].label+" 改为"+lo.name+"（"+lo.train+"）");tripModes[pm[0]]=pm[1];render();var again=phaseRail.querySelector('[data-mode="'+mo.dataset.mode+'"]');if(again)again.focus({preventScroll:true});return}
  var a=e.target.closest("[data-adjust]");
- if(a){var k=a.dataset.adjust,r=stayRules[k],next=stayPrefs[k]+Number(a.dataset.delta);if(next<r.min||next>r.max)return;noteChange(r.label+(Number(a.dataset.delta)>0?" 加1天":" 减1天"));stayPrefs[k]=next;render({refocus:[k,a.dataset.delta]});return}
+ if(a){var k=a.dataset.adjust,r=stayRules[k],next=stayPrefs[k]+Number(a.dataset.delta),reason=changeReason("stay",k,next);if(reason||a.disabled){$("progressNotice").textContent=reason;return}if(next<r.min||next>r.max)return;noteChange(r.label+(Number(a.dataset.delta)>0?" 加1天":" 减1天"));stayPrefs[k]=next;render({refocus:[k,a.dataset.delta]});return}
  var g=e.target.closest("[data-goto]");
  if(g){setDay(+g.dataset.goto,"force");return}
  var b=e.target.closest("[data-phase]");
@@ -942,15 +1074,18 @@ overview.addEventListener("click",function(e){
 $("adjustToggle").onclick=function(){editing=!editing;lastChange=null;barClosed=false;render()};
 $("adjustTop").onclick=function(){$("adjustToggle").click();if(editing)$("timeLedger").scrollIntoView({block:"start",behavior:reduceMotion.matches?"auto":"smooth"})};
 $("changeBar").addEventListener("click",function(e){if(e.target.closest("#closeBar")){barClosed=true;renderBar(snap(plan));updateJump()}});
-$("resetStays").onclick=function(){noteChange("恢复默认方案");stayPrefs=JSON.parse(JSON.stringify(defaultStays));tripModes=JSON.parse(JSON.stringify(defaultModes));render();$("adjustToggle").focus()};
+$("resetStays").onclick=function(){var reason=changeReason("reset");if(reason){$("progressNotice").textContent=reason;return}noteChange("恢复默认方案");stayPrefs=JSON.parse(JSON.stringify(defaultStays));tripModes=JSON.parse(JSON.stringify(defaultModes));render();$("adjustToggle").focus()};
 rail.addEventListener("click",function(e){var b=e.target.closest("[data-day]");if(b)setDay(+b.dataset.day,"soft")});
 rail.addEventListener("keydown",function(e){var k={ArrowRight:1,ArrowLeft:-1}[e.key];if(k){e.preventDefault();setDay(selected+k)}if(e.key==="Home"){e.preventDefault();setDay(0)}if(e.key==="End"){e.preventDefault();setDay(days.length-1)}});
-steps.addEventListener("click",function(e){var b=e.target.closest("[data-step]");if(b)openStep(days[selected].steps[+b.dataset.step],b)});
+steps.addEventListener("click",function(e){if(handleProgressClick(e))return;var b=e.target.closest("[data-step]");if(b)openStep(days[selected].steps[+b.dataset.step],b)});
+$("dayLegs").addEventListener("click",handleProgressClick);$("dayHotelStatus").addEventListener("click",handleProgressClick);
+$("bookingSummary").onclick=function(){openSheet("预订进度",bookingDrawer(),this)};
 visual.addEventListener("click",function(e){
  var btn=e.target.closest(".photo-btn");if(!btn)return;var d=days[selected],p=d.photo;
  openSheet("实景照片 · "+d.d+" "+d.w,'<h2 id="sheetTitle">'+esc(d.title)+'</h2><figure class="zoom" id="zoomBox"><img class="sheet-photo" referrerpolicy="no-referrer" src="'+p.url+'" alt="'+esc(p.alt)+'" onerror="this.parentNode.classList.add(\'photo-fail\')"></figure><p class="zoom-tip">点按照片放大，可左右拖动查看细节；也可双指缩放。</p><p class="sheet-copy">'+esc(p.alt)+' · '+esc(p.credit)+'</p><a class="evidence" target="_blank" rel="noopener" href="'+p.source+'">查看照片来源与许可 ↗</a>',btn);
 });
 content.addEventListener("click",function(e){
+ if(handleProgressClick(e))return;
  var z=e.target.closest(".zoom");
  if(z){var on=z.classList.toggle("zoomed");if(on){var im=z.querySelector("img");z.scrollLeft=(im.offsetWidth-z.clientWidth)/2}return}
  var g=e.target.closest("[data-goto]");
@@ -976,7 +1111,7 @@ function openSheet(label,html,focus){
 }
 function closeSheet(skipFocus){
  overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true");document.documentElement.classList.remove("locked");sheet.style.transform="";
- if(!skipFocus&&lastFocus&&lastFocus.focus)lastFocus.focus({preventScroll:true});
+ if(!skipFocus&&lastFocus&&lastFocus.focus){if(lastFocus.isConnected)lastFocus.focus({preventScroll:true});else{var replacement=lastFocus.dataset.step?steps.querySelector('[data-step="'+lastFocus.dataset.step+'"]'):$("bookingSummary");if(replacement)replacement.focus({preventScroll:true})}}
 }
 $("closeSheet").onclick=function(){closeSheet()};
 overlay.addEventListener("click",function(e){if(e.target===overlay)closeSheet()});
@@ -994,7 +1129,9 @@ function openStep(s,focus){
  var d=days[selected],night=nightOf(d);
  var link=s.link?'<a class="evidence" target="_blank" rel="noopener" href="'+s.link+'">'+esc(s.linkText||"查看来源")+' ↗</a>':"";
  var sources=(s.kind==="火车"||s.kind==="住宿"||s.kind==="轮渡")?'<div class="callout warn"><strong>核验提醒</strong>公开时刻、票价、船班与房价都会变化；本站不连接实时库存。购票或付款前请查看12306、运营方或酒店官方渠道。</div>':"";
- openSheet(d.d+" "+d.w+" · 第 "+(selected+1)+" 天 · "+s.kind,'<h2 id="sheetTitle">'+esc(s.n)+'</h2><p class="sheet-copy">'+esc(s.s)+'</p><div class="facts"><div class="fact"><small>时间</small><b>'+esc(s.t)+'</b></div><div class="fact"><small>这一步费用</small><b>'+esc(s.cost)+'</b></div><div class="fact"><small>当天总预算</small><b>'+dayBudget(d)+'</b></div><div class="fact"><small>今晚</small><b>'+esc(night.b+" · "+night.sub)+'</b></div></div><p class="sheet-copy">'+esc(s.detail)+'</p>'+link+sources,focus);
+ var origin=focus||lastFocus;
+ openSheet(d.d+" "+d.w+" · 第 "+(selected+1)+" 天 · "+s.kind,'<h2 id="sheetTitle">'+esc(s.n)+'</h2><div class="sheet-completion">'+completionButton(s)+(progressState.done[s.id]?'已完成':'标记这一步已完成')+'</div>'+stepBookings(s).map(function(x){return bookButton(x.id,x.label)}).join("")+'<p class="sheet-copy">'+esc(s.s)+'</p><div class="facts"><div class="fact"><small>时间</small><b>'+esc(s.t)+'</b></div><div class="fact"><small>这一步费用</small><b>'+esc(s.cost)+'</b></div><div class="fact"><small>当天总预算</small><b>'+dayBudget(d)+'</b></div><div class="fact"><small>今晚</small><b>'+esc(night.b+" · "+night.sub)+'</b></div></div><p class="sheet-copy">'+esc(s.detail)+'</p>'+link+sources,origin);
+ content.dataset.stepId=s.id;
 }
 function budgetDrawer(){
  var total=totalBudget(days),max=Math.max.apply(null,days.map(function(d){return d.budget[1]}));
@@ -1046,6 +1183,10 @@ $("packBtn").onclick=function(){openSheet("出发前准备",packDrawer(),this)};
 savePack();
 $("mapBtn").onclick=function(){openSheet("完整路线图",mapDrawer(),this)};
 render();updateJump();
+// Refresh the clock after midnight or returning from the background; completion never advances the clock.
+function refreshProgressClock(){var previous=todayIndex;renderTripProgress();if(previous!==todayIndex)render()}
+setInterval(refreshProgressClock,60000);
+document.addEventListener("visibilitychange",function(){if(!document.hidden)refreshProgressClock()});
 })();
 </script>
 </body>
