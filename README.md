@@ -1,74 +1,44 @@
-# Business Visit — Guangzhou Itinerary Site
+# China Journey Planner
 
-A single-file, dependency-free itinerary site built for a business visitor to
-Guangzhou. It turns a WhatsApp conversation with a customer into a living,
-interactive plan: hotel pick, factory visits, a drag-and-drop weekly schedule
-that syncs across devices, a floating minimap with real distances and drive
-times, live weather and a pre-trip checklist.
+A dependency-free personal journey page for a 2026 Guangzhou → Qingdao →
+Yantai night ferry → Dalian → Nanchang → Xingan → Guangzhou trip. Nanchang is a
+one-night stop with a morning in the old town; the trip returns from Xingan on
+the K441 overnight sleeper. Hotels are budgeted at no more than ¥150 per night.
 
-Live at: https://trip.arielzhu.space/nate/
+Live at: https://trip.arielzhu.space/travel/
+
+## Current behavior
+
+- The default itinerary runs for 12 calendar days, from 12 to 23 October 2026.
+- Dalian and the Yantai night ferry are fixed parts of the route.
+- Qingdao, Dalian, Xingan and Nanchang stays can be adjusted directly.
+- Dates, weekdays, accommodation nights and the budget recalculate together.
+- A visible warning appears above the 14-day upper limit; transport time is not
+  silently compressed.
+- Public content omits private family addresses and marks schedules, fares and
+  availability as reference information that must be rechecked.
 
 ## Structure
 
-```
-index.html            landing page
-nate/                 the itinerary site
-  index.html          the whole app (HTML + CSS + JS, no build step)
-  font/               Nunito woff2 subsets
-  img/                hotel photos
-server/
-  trip-plan-sync.py   tiny Python service that persists the plan to plan.json
-```
-
-## Runtime files (not in the repo)
-
-- `nate/plan.json` — written by `trip-plan-sync.py` on every plan change
-  (revision-bumped). The page polls it to keep multiple devices in sync.
-- `nate/weather.json` — refreshed daily by a cron job; the page reads it on
-  the same origin so no external request is made (important inside China).
-  Shape: `{"fetched": iso, "now": {t, rh, code}, "trip": [{d, hi, lo, rain, code}]}`
-
-## How the plan API works
-
-`server/trip-plan-sync.py` serves exactly one tiny JSON document:
-
-- `GET /nate/api/plan` → `{"plan": [[...] × 5 days], "check": {"c1": true, ...}, "rev": N}`
-- `PUT /nate/api/plan` → accepts `plan` and/or `check` (each optional, validated
-  separately); fields merge independently so editing the schedule on one device
-  never clobbers checklist state from another. Bumps `rev` and atomically writes
-  `plan.json`.
-
-Both the schedule and the pre-departure checklist sync across devices this way.
-The page polls every 8s and also pushes each change (debounced) after edits.
-
-Run it on the host (here `python3 /usr/local/bin/trip-plan-sync.py`), bind to
-an interface Caddy can reach, and reverse-proxy `/nate/api/*` to it.
-
-## Caddy example
-
-```
-trip.arielzhu.space {
-    encode zstd gzip
-
-    handle /nate/api/* {
-        uri strip_prefix /nate/api
-        reverse_proxy 172.19.0.1:8791
-    }
-
-    handle {
-        root * /data/trip
-        file_server
-        header {
-            Cache-Control "no-cache"
-            X-Content-Type-Options "nosniff"
-            Referrer-Policy "no-referrer"
-        }
-    }
-}
+```text
+index.html             existing site index; intentionally unchanged
+travel/                current public journey page
+  index.html           page, styles, data and interactions
+  favicon.svg
+  img/
+    personal-trip-watercolor.png
+nate/index.html        legacy client-side redirect to /travel/
+scripts/verify-live.sh compares deployed HTML with travel/index.html
+server/                legacy schedule-sync service retained for history
+tests/                 dependency-free contract and legacy API tests
 ```
 
-## Content
+## Validation
 
-The places, hotels and distances are hardcoded in `nate/index.html` (the `P`,
-`VISITS`, `PROPS`, `DAYS` objects) — tune those for your own trip. Phone and
-booking links are per-visit too.
+```sh
+python3 -m unittest discover -s tests -v
+sh scripts/verify-live.sh
+```
+
+The production Caddy route serves `/travel/` from its own directory, redirects
+the old `/nate/` URL to `/travel/`, and leaves the site root unchanged.
