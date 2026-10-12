@@ -121,7 +121,9 @@ console.log(JSON.stringify({count,errors:errors.slice(0,8)}));''')
                       '清晰3C标识', '随身洗漱用品≤100ml', '夜船晕船药和外套', '11/10',
                       'function weatherRows()', '2026-10-11 08:00', '不是威海或海况预报', 'china-trip-v3-pack'):
             self.assertIn(token, HTML)
-        self.assertNotIn('10/12', HTML)
+        # Oct12 is now a user-provided hotel cancellation deadline, not departure.
+        self.assertIn('10/12 12:00前可免费取消', HTML)
+        self.assertIn('var tripStart=Date.UTC(2026,9,13)', HTML)
         self.assertIn('https://www.weihai.gov.cn/art/2026/4/21/art_58820_6298948.html', HTML)
 
 

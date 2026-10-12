@@ -1,5 +1,6 @@
 import sys, time, json, os
 from playwright.sync_api import sync_playwright
+from ui_tabs import prepare, tab, close_adjust
 
 URL = sys.argv[1]
 OUT = sys.argv[2]
@@ -32,6 +33,8 @@ def info(pg):
 
 
 def click(pg, sel):
+    if not prepare(pg, sel):
+        return
     loc = pg.locator(sel).first
     vp = pg.viewport_size
     box = loc.bounding_box()
@@ -68,6 +71,10 @@ with sync_playwright() as p:
     pg.reload(wait_until="domcontentloaded")
     time.sleep(.5)
     def select_day(i):
+        close_adjust(pg)
+        tab(pg, 'today')
+        if not pg.locator('#dayPicker').evaluate('e=>e.open'):
+            pg.locator('#dayPicker summary').click()
         # Exercise the date strip through its actual touch target.
         loc=pg.locator(f'#dateRail [data-day="{i}"]')
         loc.evaluate("e=>e.scrollIntoView({inline:'center',block:'nearest'})")
@@ -90,13 +97,13 @@ with sync_playwright() as p:
     for idx,label,ticket in [(0,"10-13","AQ1019"),(2,"10-15","C6587"),(3,"10-16","生生2"),(5,"10-18","MU6908")]:
         select_day(idx)
         text=pg.inner_text("#dayCard")
-        rec(label+"卡片日期与交通","10/"+str(13+idx) in pg.inner_text("#dayKicker") and ticket in text and "待核" in text)
+        rec(label+"卡片日期与交通","10/"+str(13+idx) in pg.inner_text("#dayKicker") and ticket in text)
         rec(label+"无横向溢出",overflow(pg)<=0)
         shot(pg,label+"-card")
         shot(pg,label+"-full",True)
     rec("机票实付747与参考费用分开","实付¥747" in pg.inner_text("#budgetBasis") or "实付 ¥747" in pg.inner_text("#budgetBasis"))
     select_day(0)
-    rec("民宿第一晚已订且按实付计价",pg.inner_text("#dayBudget")=="¥785.49–885.49" and "已订" in pg.inner_text("#dayNight") and "海景精致投影一居室" in pg.inner_text("#dayNightSub"))
+    rec("民宿第一晚已订且按实付计价",pg.inner_text("#dayBudget")=="¥785.49–885.49" and "已订" in pg.inner_text("#dayNightSub") and "海景精致投影一居室" in pg.inner_text("#dayNightSub"))
     rec("默认总预算准确到分",pg.inner_text("#statBudget")=="¥3,665.49–5,189.49")
     rec("含分预算完整且当天金额不折行",pg.locator("#dayBudget").evaluate("e=>getComputedStyle(e).whiteSpace==='nowrap'&&e.scrollWidth<=e.clientWidth") and pg.locator("#statBudget").evaluate("e=>e.scrollWidth<=e.clientWidth&&getComputedStyle(e).textOverflow!=='ellipsis'"))
     rec("10/13地铁寄存栈桥与15点后入住",all(s in pg.inner_text("#steps") for s in ["8号线","3号线","寄存行李","栈桥","15:00"]))
@@ -112,7 +119,7 @@ with sync_playwright() as p:
     rec("退房详情指向10/13订单而非第二晚",pg.locator('#sheetContent [data-book="hotel:qd:2026-10-13"]').count()==1 and pg.locator('#sheetContent [data-book="hotel:qd:2026-10-14"]').count()==0)
     pg.keyboard.press("Escape")
     click(pg,"#bookingSummary")
-    rec("抽屉青岛两晚独立状态",pg.locator('#sheetContent [data-book="hotel:qd:2026-10-13"]').get_attribute("aria-pressed")=="true" and pg.locator('#sheetContent [data-book="hotel:qd:2026-10-14"]').get_attribute("aria-pressed")=="false")
+    rec("预订页青岛两晚独立状态",pg.locator('#bookingList [data-book="hotel:qd:2026-10-13"]').get_attribute("aria-pressed")=="true" and pg.locator('#bookingList [data-book="hotel:qd:2026-10-14"]').get_attribute("aria-pressed")=="false")
     shot(pg,"hotel-night-bookings")
     pg.keyboard.press("Escape")
     select_day(9)
@@ -145,6 +152,7 @@ with sync_playwright() as p:
 
     click(pg,"#weihaiToggle")
     rec("不去威海仍11天、青岛3晚",info(pg)["days"]==11 and "威海" not in info(pg)["title"] and info(pg)["segs"][0].startswith("青岛 3晚"))
+    rec("清单提醒随烟台路线更新", "中铁夜船" in pg.text_content("#page-packing .callout.warn"))
     ts=pg.locator('#phaseRail [data-phase="2"] .tk')
     rec("烟台两票显示13:40与22:00",ts.count()==2 and "13:40" in ts.nth(0).inner_text() and "14:54" in ts.nth(0).inner_text() and "22:00" in ts.nth(1).inner_text() and "10/17" in ts.nth(1).inner_text())
     shot(pg,"no-weihai-route",True)
@@ -203,7 +211,7 @@ with sync_playwright() as p:
     shot(pg,"map")
     pg.keyboard.press("Escape")
     click(pg,"#packBtn")
-    rec("原清单保留并补笔记本航空夜船","笔记本电脑和充电器" in pg.inner_text("#sheetContent") and "3C" in pg.inner_text("#sheetContent") and "100ml" in pg.inner_text("#sheetContent"))
+    rec("原清单保留并补笔记本航空夜船","笔记本电脑和充电器" in pg.inner_text("#page-packing") and "3C" in pg.inner_text("#page-packing") and "100ml" in pg.inner_text("#page-packing"))
     rec("天气日期地点随新路线","10/15" in pg.inner_text(".wx") and "威海" in pg.inner_text(".wx") and "10/18" in pg.inner_text(".wx") and "2026-10-11 08:00" in pg.inner_text(".wx-note"))
     pg.locator('[data-pack="0-4"]').check()
     rec("笔记本清单勾选保存",pg.evaluate("JSON.parse(localStorage.getItem('china-trip-v3-pack'))['0-4']===1"))
@@ -221,10 +229,7 @@ with sync_playwright() as p:
     pg.goto(URL,wait_until="domcontentloaded")
     click(pg,"#adjustToggle")
     click(pg,'[data-adjust="nanchang"][data-delta="1"]')
-    pg.locator("footer").evaluate("e=>e.scrollIntoView({block:'end'})")
-    time.sleep(.4)
-    last_line=pg.locator("footer p").last.bounding_box()
-    rec("1440宽屏变化条不盖页脚文字",last_line["y"]+last_line["height"]<=pg.locator("#changeBar").bounding_box()["y"])
+    rec("1440宽屏变化条留在调整抽屉",pg.locator("#changeBar").evaluate("e=>e.closest('#adjustPanel')!==null&&getComputedStyle(e).position==='static'"))
     rec("1440宽屏无溢出",overflow(pg)<=0)
     shot(pg,"desktop-footer-change")
     shot(pg,"desktop-full",True)

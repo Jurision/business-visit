@@ -405,9 +405,65 @@ html.has-bar .shell{padding-bottom:max(150px,var(--bar-clearance,150px))}
 html:not(.keyboard-input) #closeSheet:focus{outline:none;box-shadow:none}
 html.keyboard-input #closeSheet:focus{outline:3px solid rgba(46,127,131,.45);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}}
+/* First redesign stage: task-focused tabs; itinerary model remains unchanged. */
+:root{--paper:#f7f9f9;--card:#fff;--line:#dce5e5;--line-strong:#cad7d7;--muted:#607477;--faint:#607477;--shadow:none}
+body{font-size:16px;line-height:1.5}
+[hidden]{display:none!important}
+.shell{display:block!important;max-width:752px!important;padding:24px 16px calc(100px + env(safe-area-inset-bottom))!important}
+.col-left,.col-right{display:contents!important}.mast{display:none}
+.app-tabs{position:fixed;inset:auto 0 0;z-index:35;display:flex;background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);height:calc(56px + env(safe-area-inset-bottom))}
+.app-tabs button{flex:1;border:0;background:none;font-size:12px;min-height:56px;color:var(--muted);cursor:pointer;display:grid;place-content:center;gap:2px}
+.app-tabs svg{width:22px;height:22px;margin:auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.app-tabs [aria-selected=true]{color:var(--ink);font-weight:750;background:var(--sea-soft)}
+.tab-panel{min-width:0}.tab-panel:focus{outline:none}.page-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 22px}
+.page-head h1{font-size:26px;margin:0}.page-head button,.plain-btn{border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px 14px;min-height:44px;font-size:14px;cursor:pointer}
+.today-line{font-size:14px;color:var(--muted);margin:0 0 16px;line-height:1.6}
+.today-line #dayKicker{font-size:14px;color:inherit;letter-spacing:0;margin:0}
+.departure-note{padding:20px 0;border-bottom:1px solid var(--line);margin-bottom:20px}.departure-note b{display:block;font-size:24px}.departure-note p{margin:8px 0 0;font-size:14px;color:var(--muted)}
+.next-step{background:#fff;border:1px solid var(--line);box-shadow:none;border-radius:16px;margin:0 0 24px;padding:20px}
+.next-head h2,.next-title{font-size:20px}.next-head{margin-bottom:18px}.next-time{font-size:30px}.next-place,.next-countdown{font-size:16px}.next-when,.next-overdue{font-size:14px}.next-actions button{min-height:44px;font-size:16px}.next-all{display:none}
+.day{background:none;border:0;border-radius:0;box-shadow:none;padding:0}.day-head,.sum-route,#budgetBasis,#budgetUnknown{display:none}
+.day-summary{border:0;border-radius:0;background:none;padding:0}.sum-legs{padding:0 0 24px;border:0}.sum-legs>.summary-label{font-size:20px;color:var(--ink);margin-bottom:14px;display:block}
+.leg-tk{background:none;padding:16px 0;border:0;border-bottom:1px solid var(--line);border-radius:0}.day .book-toggle{display:none!important}
+.sum-grid{display:block;border:0;background:none}.sum-cell{border:0;padding:0 0 24px}.sum-cell>.summary-label{font-size:20px;color:var(--ink);margin-bottom:12px;display:block}
+#dayNight{font-size:18px;line-height:1.5;display:block;margin:0 0 6px}#dayNightSub{font-size:14px;line-height:1.65;color:var(--muted);display:block}
+.night-order{font-size:14px;line-height:1.65;color:var(--muted);margin:8px 0}.copy-address{border:0;padding:0;min-height:44px;text-align:left;display:block;background:none;font-size:14px;color:var(--sea);text-decoration:underline;text-underline-offset:3px;cursor:pointer;overflow-wrap:anywhere}
+.day-budget{padding:0;margin:0 0 24px;display:flex;align-items:center;gap:5px;border:0;background:none;cursor:pointer}.day-budget>.summary-label{font-size:14px;font-weight:400;margin:0;display:inline;color:var(--muted)}
+#dayBudget,#dayBudget.precise{font-size:14px;color:var(--muted);display:inline;line-height:1.5;white-space:nowrap}
+.steps-label{margin:0 0 12px;padding:0}.steps-label span{font-size:20px;color:var(--ink)}.step-row{grid-template-columns:44px 65px minmax(0,1fr);gap:8px;padding:10px 0}.step-check{grid-column:1;grid-row:1}.step-time{grid-column:2;grid-row:1;font-size:14px;padding:12px 0}.step{grid-column:3;grid-row:1;padding:10px 0}
+.step-row:before{left:21px;top:32px;bottom:-32px}.step-main b{font-size:16px;line-height:1.5}.step-main span{font-size:14px;line-height:1.5}.step-main em{display:none}.step-time small{font-size:12px}.nav-row{margin-top:22px}.nav-row button,.nav-row small{font-size:14px}
+.tk{grid-template-columns:minmax(0,1fr) minmax(0,.85fr) minmax(0,1fr);gap:10px}.tk-end b{font-size:20px;white-space:normal}.tk-end b em{font-size:12px;display:block;margin:0 0 4px;vertical-align:baseline}.tk-end span{font-size:14px;line-height:1.5}.tk-mid small{font-size:14px;line-height:1.5;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}.tk-mid .book-badge{font-size:12px;white-space:normal}.tk-ref{font-size:12px!important;color:var(--muted)!important;font-weight:400}
+.tk{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 24px}.tk-end{grid-column:1;grid-row:1}.tk-end.r{grid-column:2}.tk-mid{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:start;text-align:left}.tk-mid i{display:none}.tk-mid small:first-child{grid-column:2;grid-row:1;text-align:right}.tk-mid small:nth-of-type(2){grid-column:1;grid-row:1}.tk-mid .book-badge{grid-column:1/-1;grid-row:2;text-align:left}.tk-end.r:before{content:"→";position:absolute;left:calc(50% - 8px);top:28px;color:var(--red);font-size:16px}.tk{position:relative}
+.rail-wrap{position:static!important;margin:16px 0;background:none;box-shadow:none}.date-rail{padding:8px 0}.date b{font-size:20px}.date span,.date i,.date small{font-size:12px}.date{min-height:70px}.day-picker{margin:0 0 20px;border-bottom:1px solid var(--line)}.day-picker summary{padding:12px 0;font-size:14px;cursor:pointer}
+.day-picker summary{min-height:44px}
+.date .day-done,.next-time small{font-size:12px}.adjust-panel .progress-help{font-size:14px}
+.overview{padding:0;border:0;background:none;box-shadow:none;border-radius:0}.overview>.trip-progress,.overview>.allocation-summary,.overview>.ov-actions,.overview>.route-expand{display:none!important}
+.ov-head{margin-bottom:16px}.ov-head h2{font-size:26px}.ov-tools #packBtn{display:none}.ov-tools button{font-size:14px;min-height:44px;border-radius:10px}
+.route-summary{font-size:14px;color:var(--muted);margin:0 0 12px;line-height:1.7}.ledger{margin:0 0 24px}.lg-head,.lg-sum{display:none}.lg-bar{height:8px;opacity:.5}.lg-bar i{font-size:12px;color:transparent}
+.route-item{padding:18px 0;border-bottom:1px solid var(--line)}.route-item button{border:0;background:none;padding:0;text-align:left;width:100%;cursor:pointer;min-height:44px}.route-city{display:flex;justify-content:space-between;gap:16px}.route-city b{font-size:18px}.route-city span,.route-range{font-size:14px;color:var(--muted)}.route-range{margin:6px 0 0}.route-item .hotel-badge{font-size:12px}.route-item .tk+.tk{margin-top:20px}
+.route-budget{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:22px 0;font-size:14px;color:var(--muted)}.route-budget #budgetBtn{display:inline;border:0;background:none;padding:0;min-height:44px;color:var(--ink)}.route-budget #budgetBtn>*:not(#statBudget){display:none}.route-budget #statBudget{font-size:16px;white-space:normal;overflow:visible}
+.booking-title{margin:0 0 6px;font-size:26px}.booking-count{font-size:16px;color:var(--muted);margin:0 0 12px}.booking-track{height:4px;background:var(--line);margin-bottom:26px}.booking-track i{display:block;height:100%;background:var(--sea);width:var(--w)}
+.booking-row{border-bottom:1px solid var(--line);padding:18px 0}.booking-row h3{font-size:16px;margin:0 0 6px}.booking-row p{font-size:14px;color:var(--muted);margin:6px 0;line-height:1.65;overflow-wrap:anywhere}.booking-row .book-toggle{display:inline-flex;min-height:44px;font-size:14px;border-radius:10px;white-space:normal;text-align:left;margin:8px 0 0}
+.book-toggle[aria-pressed=true]{color:#388857;border-color:#83ad92;background:#edf5ef}.night-order .booked{color:#388857;font-weight:650}#localNotice{font-size:14px}
+.booking-price{font-size:14px}.booking-city{font-size:20px;margin:26px 0 0}.flight-task{font-size:14px;line-height:1.65;margin:26px 0;background:var(--gold-soft);color:var(--ink);border:0;padding:16px;border-radius:12px}
+.foot{font-size:14px;padding:24px 0 0;margin-top:20px;border-top:1px solid var(--line)}.foot p{font-size:14px;line-height:1.65}
+.adjust-overlay{position:fixed;inset:0;z-index:50;background:rgba(23,59,67,.35);display:flex;align-items:flex-end;justify-content:center}.adjust-panel{width:100%;max-width:720px;max-height:90dvh;overflow:auto;background:var(--card);padding:20px 20px calc(28px + env(safe-area-inset-bottom));border-radius:20px 20px 0 0;overscroll-behavior:contain}
+.adjust-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.adjust-head h2{margin:0;font-size:22px}.adjust-head button{min-width:44px;min-height:44px;border:0;background:var(--sea-soft);border-radius:10px;font-size:20px;cursor:pointer}
+.adjust-head{position:sticky;top:-20px;z-index:3;background:var(--card);margin:-20px -20px 18px;padding:20px;border-bottom:1px solid var(--line)}
+.adjust-panel .route-tools{display:flex;gap:8px;flex-wrap:wrap}.adjust-panel .phase-rail{margin-top:20px}.adjust-panel .seg-main{min-height:60px}.adjust-panel .seg-text span,.adjust-panel .seg-end span span{font-size:14px}.adjust-panel .seg-text b{font-size:16px}.adjust-panel .stepper button{width:44px;height:44px;font-size:18px}.adjust-panel .stepper output,.adjust-panel .modes button{font-size:14px}.adjust-panel .modes button{min-height:44px}.adjust-panel .lock-note,.adjust-panel .limit-note,.adjust-panel .sp-label,.adjust-panel small,.adjust-panel .sp-unknown,.adjust-panel .mo-line,.adjust-panel .mo-eff{font-size:14px}.adjust-panel .sp-days button{grid-template-columns:75px minmax(0,1fr) auto 14px}.adjust-panel .sp-bud{font-size:12px}.adjust-panel .book-toggle{font-size:14px;min-height:44px;white-space:normal}
+.change-bar{position:static!important;width:100%!important;max-width:none!important;margin-top:20px;box-shadow:none;border-radius:12px;transform:none!important}.cb-cell small,.cb-cell span,.cb-foot{font-size:12px}.cb-cell b{font-size:16px}.cb-title{font-size:14px}
+#jumpPill{display:none!important}.sheet{font-size:16px}.sheet small,.sheet-copy,.sheet-label,.sheet .callout,.sheet .list,.sheet .evidence,.sheet .fact small,.sheet .booking-block small{font-size:14px}.sheet .close{min-width:44px;min-height:44px}.sheet .book-toggle{font-size:14px;white-space:normal;min-height:44px}
+.packing-page h2{font-size:26px;margin:0 0 20px}.packing-page h3{font-size:20px}.pack-tip,.pack-progress,.pack-list small,.wx-note,.wx-row,.packing-page .callout,.packing-page .evidence{font-size:14px}.pack-list label{font-size:16px}.pack-reset{font-size:14px;min-height:44px}.wx-row{grid-template-columns:50px 70px minmax(0,1fr)}
+@media(min-width:1000px){.app-tabs{position:sticky;inset:0 auto auto;max-width:720px;margin:20px auto 0;height:56px;border:1px solid var(--line);border-radius:12px;overflow:hidden;padding:0}.app-tabs button{font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px}.app-tabs svg{margin:0}.shell{padding-top:32px!important;padding-bottom:56px!important}.adjust-overlay{align-items:center}.adjust-panel{border-radius:20px;max-height:85dvh}.next-step{padding:24px}.day-budget{max-width:none}.sheet{max-width:720px}.overview.editing .seg.transit .modes{margin-left:32px}}
 </style>
 </head>
 <body>
+<nav class="app-tabs" id="appTabs" aria-label="主要页面" role="tablist">
+  <button id="tab-today" data-tab="today" role="tab" aria-controls="page-today" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg>今天</button>
+  <button id="tab-route" data-tab="route" role="tab" aria-controls="page-route" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"/></svg>行程</button>
+  <button id="tab-booking" data-tab="booking" role="tab" aria-controls="page-booking" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16m-12 5 3 3 5-5"/></svg>预订</button>
+  <button id="tab-packing" data-tab="packing" role="tab" aria-controls="page-packing" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9zM9 11h6M9 16h6"/></svg>清单</button>
+</nav>
 <main class="shell">
   <div class="col-left">
     <header class="mast">
@@ -727,7 +783,7 @@ var confirmedFlights={
 var confirmedHotels={"hotel:qd:2026-10-13":{
  date:"10/13",out:"10/14",paid:133.49,name:"青岛一然海景民宿（青岛火车站栈桥店）",
  address:"市南区北京路38号鲁邦新天地1单元0704",room:"海景精致投影一居室 · 大床、有窗",
- detail:"10/13 15:00后入住—10/14 12:00前离店，1晚；飞猪在线实付¥133.49，订单已确认（由你提供）。寄存行李、钥匙领取方式、Wi-Fi和书桌、取消政策待与房东或订单确认。10/14这一晚尚未订，可能续订同一家。"
+ detail:"10/13 15:00后入住—10/14 12:00前离店，1晚；飞猪在线实付¥133.49，订单已确认（由你提供）。取消政策：10/12 12:00前可免费取消（你提供的订单信息，以飞猪订单为准）。寄存行李、钥匙领取方式、Wi-Fi和书桌待与房东确认。10/14这一晚尚未订，可能续订同一家。"
 }};
 var flightHotelDetail="酒店尚未预订；每晚含税预算≤¥200。1人、大床或单人房，书桌、稳定Wi-Fi、有窗与禁烟优先；寄存、实际房价与取消政策均待核。";
 var flightDays={
@@ -1038,9 +1094,7 @@ function nextStepTicket(index,s){
 var routeExpanded=false;
 try{routeExpanded=localStorage.getItem("china-trip-v3-route-open")==="true"}catch(e){}
 function renderRouteVisibility(){
- var during=todayIndex>=0&&todayIndex<days.length,open=!during||routeExpanded||editing;
- $("stayControls").hidden=!open;$("overviewActions").hidden=!open;
- var b=$("routeExpand");b.hidden=!during||editing;b.textContent=open?"收起全部路线":"展开全部路线";b.setAttribute("aria-expanded",String(open));
+ $("stayControls").hidden=!editing;$("overviewActions").hidden=!editing;$("routeExpand").hidden=true;
 }
 function renderNextStep(){
  var next=nextPending(days,progressState.done,todayIndex),during=todayIndex>=0&&todayIndex<days.length;
@@ -1111,7 +1165,7 @@ function panelHtml(x,i){
  var idx=segIdx(x),info="";
  if(x.kind==="transit"){
   var legs=[];idx.forEach(function(k){days[k].steps.forEach(function(s){if(/火车|飞机|轮渡|到达/.test(s.kind))legs.push(s)})});
-  info=(x.leg?modeChooser(x.leg):'')+'<div class="sp-legs">'+legs.map(function(s){return '<div class="sp-leg"><span class="sp-t">'+timeHtml(s.t)+'</span><span><b>'+esc(s.n)+'</b><small>'+esc(s.s)+'</small><em>'+esc(s.cost)+'</em></span></div>'}).join("")+'</div>';
+  info=(x.leg&&editing?modeChooser(x.leg):'')+'<div class="sp-legs">'+legs.map(function(s){return '<div class="sp-leg"><span class="sp-t">'+timeHtml(s.t)+'</span><span><b>'+esc(s.n)+'</b><small>'+esc(s.s)+'</small><em>'+esc(s.cost)+'</em></span></div>'}).join("")+'</div>';
  }else{
   var sum=totalBudget(idx.map(function(k){return days[k]})),hotel=null,home=x.label.indexOf("新干")>=0;
   idx.forEach(function(k){days[k].steps.forEach(function(s){if(!hotel&&s.kind==="住宿"&&/200/.test(s.cost))hotel=s})});
@@ -1200,9 +1254,10 @@ function render(opts){
  if(opts.refocus){var again=phaseRail.querySelector('[data-adjust="'+opts.refocus[0]+'"][data-delta="'+opts.refocus[1]+'"]');if(again&&!again.disabled)again.focus({preventScroll:true});else{var other=phaseRail.querySelector('[data-adjust="'+opts.refocus[0]+'"]:not([disabled])');if(other)other.focus({preventScroll:true})}}
  try{localStorage.setItem("china-trip-v4-modes",JSON.stringify(tripModes));localStorage.setItem("china-trip-v4-stays",JSON.stringify(stayPrefs));localStorage.setItem("china-trip-v4-day",selected);localStorage.setItem("china-trip-v4-route",JSON.stringify(routePrefs));localStorage.setItem("china-trip-v4-compare",String(comparisonMode));saveProgress()}catch(e){progressStorageOk=false}
  if(!progressStorageOk)renderTripProgress();
- renderBar(cur);updateJump();
+ renderBar(cur);updateJump();renderPresentation();
 }
 function updateJump(){
+ $("jumpPill").hidden=true;return;
  var pill=$("jumpPill"),r=railWrap.getBoundingClientRect(),inDays=r.top<innerHeight*.5,ovTop=overview.getBoundingClientRect().top;
  if(matchMedia("(min-width:1000px)").matches||(ovTop>40&&!inDays)){pill.hidden=true;return}
  var bar=$("changeBar");pill.style.bottom=bar.hidden?"":(innerHeight-bar.getBoundingClientRect().top+8)+"px";
@@ -1215,7 +1270,7 @@ function revealCard(force){
  var offset=railWrap.getBoundingClientRect().height+10,top=card.getBoundingClientRect().top;
  if(top<offset||(force&&top>innerHeight*.45))window.scrollTo({top:window.scrollY+top-offset,behavior:reduceMotion.matches?"auto":"smooth"});
 }
-function setDay(i,reveal){var n=Math.max(0,Math.min(days.length-1,i));if(n===selected&&!reveal)return;var dir=n>selected?1:n<selected?-1:0;selected=n;render({dir:dir});if(reveal)revealCard(reveal==="force")}
+function setDay(i,reveal){var n=Math.max(0,Math.min(days.length-1,i));if(n===selected&&!reveal)return;var dir=n>selected?1:n<selected?-1:0;selected=n;if(reveal){if(editing)closeAdjust();setTab("today",false)}render({dir:dir});if(reveal)revealCard(reveal==="force")}
 overview.addEventListener("click",function(e){
  if(handleProgressClick(e))return;
  var mo=e.target.closest("[data-mode]");
@@ -1233,12 +1288,12 @@ overview.addEventListener("click",function(e){
 });
 $("weihaiToggle").onclick=function(){var reason=changeReason("weihai",null,!routePrefs.weihai);if(reason){$("progressNotice").textContent=reason;return}noteChange(routePrefs.weihai?"不去威海，改经烟台夜船":"去威海，改乘生生2");routePrefs.weihai=!routePrefs.weihai;expanded=-1;render()};
 $("compareToggle").onclick=function(){if(comparisonMode){var reason=changeReason("reset");if(reason){$("progressNotice").textContent=reason;return}noteChange("结束比较，恢复已订路线");tripModes=copy(defaultModes);stayPrefs=copy(defaultStays);routePrefs.weihai=true;comparisonMode=false}else{comparisonMode=true}render()};
-$("adjustToggle").onclick=function(){editing=!editing;lastChange=null;barClosed=false;render()};
+$("adjustToggle").onclick=function(){if(editing)closeAdjust();else openAdjust()};
 $("routeExpand").onclick=function(){routeExpanded=!routeExpanded;try{localStorage.setItem("china-trip-v3-route-open",String(routeExpanded))}catch(e){}renderRouteVisibility();updateJump()};
 $("nextComplete").onclick=function(e){var id=this.dataset.done;if(id&&!progressState.done[id])handleProgressClick(e)};
 $("nextAll").onclick=function(){setDay(todayIndex,"force")};
 $("nextOverdue").onclick=function(){openSheet("补勾已过时步骤",overdueDrawer(),this)};
-$("adjustTop").onclick=function(){$("adjustToggle").click();if(editing)$("timeLedger").scrollIntoView({block:"start",behavior:reduceMotion.matches?"auto":"smooth"})};
+$("adjustTop").onclick=function(){openAdjust()};
 $("changeBar").addEventListener("click",function(e){if(e.target.closest("#closeBar")){barClosed=true;renderBar(snap(plan));updateJump()}});
 $("resetStays").onclick=function(){var reason=changeReason("reset");if(reason){$("progressNotice").textContent=reason;return}noteChange("恢复默认方案");stayPrefs=JSON.parse(JSON.stringify(defaultStays));tripModes=JSON.parse(JSON.stringify(defaultModes));routePrefs.weihai=true;comparisonMode=false;render();$("adjustToggle").focus()};
 rail.addEventListener("click",function(e){var b=e.target.closest("[data-day]");if(b)setDay(+b.dataset.day,"soft")});
@@ -1354,12 +1409,94 @@ function packDrawer(){
 function savePack(){try{localStorage.setItem("china-trip-v3-pack",JSON.stringify(packed))}catch(e){}var c=packCount(),el=$("packCount");if(el){el.textContent="已准备 "+c[0]+" / "+c[1];el.nextElementSibling.style.setProperty("--w",(c[0]/c[1]*100).toFixed(0)+"%")}$("packBtn").textContent=c[0]?"清单 "+c[0]+"/"+c[1]:"清单"}
 content.addEventListener("change",function(e){var b=e.target.closest("[data-pack]");if(!b)return;if(b.checked)packed[b.dataset.pack]=1;else delete packed[b.dataset.pack];savePack()});
 content.addEventListener("click",function(e){if(!e.target.closest("#packReset"))return;packed={};content.querySelectorAll("[data-pack]").forEach(function(x){x.checked=false});savePack()});
-$("packBtn").onclick=function(){openSheet("出发前准备",packDrawer(),this)};
+$("packBtn").onclick=function(){setTab("packing")};
 savePack();
 $("mapBtn").onclick=function(){openSheet("完整路线图",mapDrawer(),this)};
-render();updateJump();
+/* Presentation layer only. Model, ledger, prices, IDs and booking locks above are reused. */
+var currentTab="today",adjustOrigin=null,tabScroll={};
+try{var rememberedTab=localStorage.getItem("china-trip-v4-tab");if(["today","route","booking","packing"].indexOf(rememberedTab)>=0)currentTab=rememberedTab;else if(todayIndex>=days.length)currentTab="route"}catch(e){}
+function panelNode(id){var el=document.createElement("section");el.id="page-"+id;el.className="tab-panel";el.setAttribute("role","tabpanel");el.setAttribute("aria-labelledby","tab-"+id);el.tabIndex=0;document.querySelector(".shell").appendChild(el);return el}
+function mountTabs(){
+ var today=panelNode("today"),route=panelNode("route"),booking=panelNode("booking"),pack=panelNode("packing");
+ var notice=document.createElement("p");notice.id="localNotice";notice.setAttribute("role","status");notice.className="limit-note";notice.hidden=true;document.querySelector(".shell").insertBefore(notice,today);
+ today.innerHTML='<div class="page-head"><h1>今天</h1><button id="backToday" hidden>回到今天</button></div><div class="today-line" id="todayLine"></div><div id="departureNote" class="departure-note" hidden></div>';
+ $("todayLine").appendChild($("dayKicker"));today.appendChild($("nextStep"));
+ var picker=document.createElement("details");picker.className="day-picker";picker.id="dayPicker";picker.innerHTML='<summary>选择日期</summary>';picker.appendChild(railWrap);today.appendChild(picker);today.appendChild(card);
+ var legSection=document.createElement("details");legSection.id="todayTickets";legSection.className="day-picker";legSection.innerHTML='<summary>今天的车票</summary>';legSection.appendChild($("dayLegs"));card.insertBefore(legSection,card.querySelector(".day-summary"));
+ card.querySelector(".steps-label span").textContent="今天要做的事";
+ var budget=card.querySelector(".day-budget");budget.classList.add("daily-budget-link");budget.setAttribute("role","button");budget.tabIndex=0;budget.setAttribute("aria-label","查看今天的费用明细");budget.querySelector(".summary-label").textContent="今天预计花费";card.insertBefore(budget,card.querySelector(".nav-row"));
+ route.appendChild(overview);$("allocationTitle").textContent="行程";
+ $("adjustTop").textContent="调整方案";
+ var summary=document.createElement("p");summary.id="routeSummary";summary.className="route-summary";overview.insertBefore(summary,$("timeLedger"));
+ var routeList=document.createElement("div");routeList.id="routeList";overview.insertBefore(routeList,$("routeExpand"));
+ var total=document.createElement("div");total.className="route-budget";total.innerHTML='<span>全程预计花费</span>';total.appendChild($("budgetBtn"));overview.appendChild(total);
+ booking.innerHTML='<h1 class="booking-title">预订</h1><p class="booking-count" id="bookingCount"></p><div class="booking-track" role="progressbar" aria-label="预订进度" id="bookingTrack"><i></i></div><div id="bookingList"></div>';
+ booking.appendChild(document.querySelector(".flight-task"));booking.appendChild(document.querySelector(".foot"));
+ var adjust=document.createElement("div");adjust.id="adjustOverlay";adjust.className="adjust-overlay";adjust.hidden=true;adjust.innerHTML='<section class="adjust-panel" id="adjustPanel" role="dialog" aria-modal="true" aria-labelledby="adjustHeading"><div class="adjust-head"><h2 id="adjustHeading">调整方案</h2><button id="closeAdjust" aria-label="关闭调整方案">×</button></div></section>';overview.appendChild(adjust);
+ var body=$("adjustPanel");[document.querySelector(".route-tools"),$("compareNote"),$("stayControls"),$("overviewActions"),$("limitNote"),$("progressNotice"),$("changeBar")].forEach(function(el){body.appendChild(el)});
+ $("overviewActions").appendChild($("resetStays"));$("adjustToggle").hidden=true;
+ $("backToday").onclick=function(){setDay(Math.max(0,Math.min(days.length-1,chinaTodayIndex())),true);window.scrollTo(0,0)};
+ $("closeAdjust").onclick=function(){closeAdjust()};adjust.addEventListener("click",function(e){if(e.target===adjust)closeAdjust()});
+ $("appTabs").addEventListener("click",function(e){var b=e.target.closest("[data-tab]");if(b)setTab(b.dataset.tab)});
+ $("appTabs").addEventListener("keydown",function(e){var keys=["today","route","booking","packing"],i=keys.indexOf(currentTab),n=e.key==="ArrowRight"?(i+1)%4:e.key==="ArrowLeft"?(i+3)%4:e.key==="Home"?0:e.key==="End"?3:-1;if(n>=0){e.preventDefault();setTab(keys[n]);$("tab-"+keys[n]).focus()}});
+ $("bookingList").addEventListener("click",handleProgressClick);
+ budget.onclick=function(){openSheet("今天的费用",'<h2 id="sheetTitle">'+esc(days[selected].d)+' 今天预计花费</h2><div class="budget-total">'+dayBudget(days[selected])+'</div><p class="sheet-copy">'+esc(days[selected].basis)+'</p><p class="sheet-copy">待确认：'+esc(days[selected].unknown)+'</p>',budget)};
+ budget.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();budget.click()}};
+ $("routeList").addEventListener("click",function(e){var b=e.target.closest("[data-route-detail]");if(b){var i=+b.dataset.routeDetail;openSheet("行程详情",'<h2 id="sheetTitle">'+esc(plan.segments[i].label)+'</h2>'+panelHtml(plan.segments[i],i),b)}});
+ pack.addEventListener("change",function(e){var b=e.target.closest("[data-pack]");if(b){if(b.checked)packed[b.dataset.pack]=1;else delete packed[b.dataset.pack];savePack()}});
+ pack.addEventListener("click",function(e){if(e.target.closest("#packReset")){packed={};pack.querySelectorAll("[data-pack]").forEach(function(x){x.checked=false});savePack()}});
+ document.addEventListener("keydown",function(e){if(!editing||overlay.classList.contains("open"))return;if(e.key==="Escape"){e.preventDefault();closeAdjust()}if(e.key==="Tab"){var f=Array.from(body.querySelectorAll('button:not([disabled]),a[href]')).filter(function(x){return x.offsetParent!==null});if(!f.length)return;var first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
+}
+function setTab(name,scroll){
+ if(["today","route","booking","packing"].indexOf(name)<0)return;
+ tabScroll[currentTab]=window.scrollY;if(editing&&name!=="route")closeAdjust();currentTab=name;
+ ["today","route","booking","packing"].forEach(function(key){$("page-"+key).hidden=key!==name;$("tab-"+key).setAttribute("aria-selected",String(key===name));$("tab-"+key).tabIndex=key===name?0:-1});
+ try{localStorage.setItem("china-trip-v4-tab",name)}catch(e){}
+ if(scroll!==false)window.scrollTo({top:tabScroll[name]||0,behavior:"instant"});
+}
+function openAdjust(){setTab("route");adjustOrigin=document.activeElement;editing=true;lastChange=null;barClosed=false;$("adjustOverlay").hidden=false;document.documentElement.classList.add("locked");render();$("closeAdjust").focus({preventScroll:true})}
+function closeAdjust(){editing=false;$("adjustOverlay").hidden=true;document.documentElement.classList.remove("locked");render();if(adjustOrigin&&adjustOrigin.isConnected)adjustOrigin.focus({preventScroll:true})}
+function bookingPrice(item){
+ var h=confirmedHotels[item.id];if(h)return "实付 ¥"+money(h.paid)+" · 飞猪在线付";
+ if(item.id.indexOf("hotel:")===0)return "每晚预算 ¥120–200 · 房价待确认";
+ var k=ticketsOf(item.seg).find(function(k){return k.bookId===item.id});if(k&&k.paid)return "实付 ¥"+money(k.paid);
+ if(item.seg.leg)return legModes[item.seg.leg].opts[tripModes[item.seg.leg]].fare;
+ var code=k&&k.train.match(/[A-Z]\d+/),costStep=days[item.seg.start].steps.find(function(s){return code?s.n.indexOf(code[0])>=0:item.id==="leg:shengsheng"?s.n.indexOf("生生2")>=0:s.kind==="轮渡"});return costStep?costStep.cost:"票价待确认";
+}
+function bookingPoint(item){if(item.id==="leg:gzqd:air")return "九元：出发前确认行李额与值机截止时间";if(item.id==="leg:dlnc:air")return "约11:30前到周水子机场，确认行李额";if(item.id==="leg:shengsheng")return "待确认：是否载客、舱位与大连实际靠岸码头";var h=confirmedHotels[item.id];return h?"15:00后入住 · 次日12:00前退房；10/12 12:00前免费取消。寄存与钥匙待房东确认":item.id.indexOf("hotel:")===0?"待选定；确认寄存、书桌、Wi-Fi、入住与取消政策":"班次、站点和票价以运营方为准"}
+function renderBookings(){
+ var items=bookingItems(plan),count=items.filter(bookingFlag).length;
+ $("bookingCount").textContent="已订 "+count+" / "+items.length;var track=$("bookingTrack");track.querySelector("i").style.setProperty("--w",count/items.length*100+"%");track.setAttribute("aria-valuemin","0");track.setAttribute("aria-valuemax",items.length);track.setAttribute("aria-valuenow",count);
+ var lastHotel="";$("bookingList").innerHTML=items.map(function(item){var hotel=item.id.indexOf("hotel:")===0,heading=hotel&&lastHotel!==item.seg.label?'<h2 class="booking-city">'+esc(item.seg.label+' · '+item.seg.duration.split(' · ')[0])+'</h2>':'';lastHotel=hotel?item.seg.label:"";var status=bookingFlag(item),toggle=bookButton(item.id,item.label).replace(/>[^<]*<\/button>$/,">"+(status?"✓ 已订 · 点击取消":"○ 待订 · 点击标记")+"</button>");return heading+'<article class="booking-row"><h3>'+esc(confirmedHotels[item.id]?confirmedHotels[item.id].name:item.label)+'</h3><p>'+esc(hotel?confirmedHotels[item.id]?item.date+'—'+confirmedHotels[item.id].out+' · '+confirmedHotels[item.id].room:item.detail:item.detail)+'</p><div class="booking-price">'+esc(bookingPrice(item))+'</div><p>'+esc(bookingPoint(item))+'</p>'+toggle+'</article>'}).join("");
+}
+function renderPresentation(){
+ if(!$("page-today"))return;
+ var d=days[selected],during=todayIndex>=0&&todayIndex<days.length,before=todayIndex<0;
+ $("backToday").hidden=selected===(during?todayIndex:before?0:days.length-1);
+ if(before&&selected===0)$("dayKicker").textContent=(-todayIndex===1?"明天出发":"还有 "+(-todayIndex)+" 天出发")+" · "+d.d+" "+d.w+" · "+d.city;
+ $("nextStep").hidden=!during||selected!==todayIndex;
+ var dep=$("departureNote");dep.hidden=!before||selected!==0;dep.innerHTML='<b>'+esc(days[0].steps[0].t)+' · '+esc(days[0].steps[0].n)+'</b><p>'+esc(days[0].steps[0].s)+'</p>';
+ var legs=$("todayTickets");legs.hidden=$("dayLegs").hidden;var ticketCount=$("dayLegs").querySelectorAll(".tk").length;legs.querySelector("summary").textContent="今天的车票 · "+ticketCount+" 张";var duplicate= !$("nextStep").hidden&&!$("nextTicket").hidden,autoKey=selected+"|"+duplicate;if(legs.dataset.autoKey!==autoKey){legs.open=!duplicate;legs.dataset.autoKey=autoKey}$("dayLegs").querySelectorAll(".summary-label").forEach(function(x){x.hidden=true});
+ var item=hotelForDay(d),h=d.hotelOrderId&&confirmedHotels[d.hotelOrderId],night=nightOf(d);
+ var nightly=card.querySelector(".sum-cell:not(.day-budget)");nightly.querySelector(".summary-label").textContent="今晚住哪";
+ $("dayNight").textContent=h?h.name:item?item.seg.label+"酒店 · 待选定 · "+(bookingFlag(item)?"已订":"待订"):night.b;
+ if(!h&&!item){var aboard=d.states.some(function(s){return /火车过夜|轮渡过夜/.test(s)}),vehicle=plan.segments.find(function(x){return x.kind==="transit"&&selected>=x.start&&selected<=x.end});if(aboard&&vehicle)$("dayNight").textContent="在 "+ticketsOf(vehicle).slice(-1)[0].train.replace(/ · .*/,"")+(/轮渡过夜/.test(d.states.join(" "))?"夜船上":" 上过夜");else if(/家中/.test(night.b))$("dayNight").textContent="在家"}
+ if(h){$("dayNightSub").innerHTML='<button class="copy-address" data-copy-address>'+esc(h.address)+'</button><div class="night-order">'+esc(h.room)+'</div><div class="night-order">'+esc(h.date)+' 15:00后入住 → '+esc(h.out)+' 12:00前退房<br><span class="'+(bookingFlag(item)?'booked':'')+'">'+(bookingFlag(item)?'已订':'待订')+'</span> · 飞猪实付 ¥'+money(h.paid)+'<br>10/12 12:00前可免费取消<br>先寄存行李、怎么拿钥匙：待房东确认</div>';var cp=$("dayNightSub").querySelector("[data-copy-address]");cp.onclick=async function(){try{await navigator.clipboard.writeText(h.address);this.textContent="已复制地址"}catch(e){openSheet("酒店地址",'<h2 id="sheetTitle">复制地址</h2><p class="sheet-copy" style="user-select:all">'+esc(h.address)+'</p>',this)}}}
+ else $("dayNightSub").textContent=item?item.detail+" · "+bookingPrice(item):night.sub;
+ $("dayPicker").querySelector("summary").textContent="查看其他日期 · "+d.d;
+ var lg=plan.ledger;$("routeSummary").textContent=days.length+" 天 · "+days[0].d+"—"+days[days.length-1].d+" · 停留 "+lg.stay.toFixed(1)+" 天 · 路上 "+lg.transit.toFixed(1)+" 天";
+ $("routeList").innerHTML=plan.segments.map(function(x,i){var body=x.kind==="transit"?ticketsOf(x).map(ticketHtml).join(""):'<div class="route-city"><b>'+esc(x.label)+'</b><span>'+esc(x.duration.split(" · ")[0])+" · "+esc(segmentBooking(x).length?segmentBooking(x).every(bookingFlag)?"已订":segmentBooking(x).some(bookingFlag)?"部分已订":"待订":"住家中")+'</span></div><p class="route-range">'+esc(x.range)+'</p>';return '<div class="route-item"><button data-route-detail="'+i+'" aria-label="查看'+esc(x.label)+'详情">'+body+'</button></div>'}).join("");
+ $("adjustTop").textContent="调整方案";$("adjustTop").setAttribute("aria-expanded",String(editing));
+ $("adjustToggle").hidden=true;$("changeBar").hidden=$("changeBar").hidden||!editing;
+ renderBookings();var pack=$("page-packing"),packRoute=JSON.stringify([routePrefs.weihai,days.map(function(x){return x.d})]);if(pack.dataset.route!==packRoute){pack.innerHTML=packDrawer().replace('id="sheetTitle"','id="packingHeading"');pack.dataset.route=packRoute}
+ // Refresh route-dependent weather and advice without replacing focused checkboxes.
+ pack.querySelector(".wx").innerHTML=weatherRows();pack.querySelectorAll("[data-pack]").forEach(function(x){x.checked=!!packed[x.dataset.pack]});
+ $("localNotice").hidden=progressStorageOk;$("localNotice").textContent=progressStorageOk?"":"浏览器未允许本地保存，刷新可能丢失记录。请允许此站点使用本地存储。";
+ setTab(currentTab,false);
+}
+mountTabs();render();updateJump();
 // Refresh the clock after midnight or returning from the background; completion never advances the clock.
-function refreshProgressClock(){var previous=todayIndex;renderTripProgress();if(previous!==todayIndex)render();else renderNextStep()}
+function refreshProgressClock(){var previous=todayIndex;renderTripProgress();if(previous!==todayIndex){if(selected===previous)selected=Math.max(0,Math.min(days.length-1,todayIndex));render()}else renderNextStep();renderPresentation()}
 setInterval(refreshProgressClock,60000);
 document.addEventListener("visibilitychange",function(){if(!document.hidden)refreshProgressClock()});
 })();
